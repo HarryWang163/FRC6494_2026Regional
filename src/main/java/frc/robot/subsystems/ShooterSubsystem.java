@@ -114,7 +114,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         // 使用PID控制器来计算背板的运动速度
         double pidOutput = backboardPID.calculate(getBackboardPosition());
-        pidOutput = Math.max(-Constants.Shooter.backboardSpeedMax, Math.min(Constants.Shooter.backboardSpeedMax, pidOutput)); // 限制输出范围在-1到1之间
+        pidOutput = Math.max(-Constants.Shooter.backboardSpeedMax, Math.min(Constants.Shooter.backboardSpeedMax, pidOutput)); // 限制输出范围
         shooterNetworkTable.getEntry("backboardPIDOutput").setDouble(pidOutput);
         // // 设置背板电机的速度，根据PID输出进行调整
         setBackboardSpeedByRPS(pidOutput);

@@ -146,8 +146,8 @@ public class DriveControls {
 
                 Rotation2d BumpcurrentAngle = drivetrain.getState().Pose.getRotation();
                 double BumpcurrentRad = BumpcurrentAngle.getRadians();
-                double targetA = Math.toRadians(135.0);
-                double targetB = Math.toRadians(-135.0);
+                double targetA = Math.toRadians(45);
+                double targetB = Math.toRadians(-45);
                 // 计算误差
                 double errorA = targetA - BumpcurrentRad;
                 double errorB = targetB - BumpcurrentRad;
