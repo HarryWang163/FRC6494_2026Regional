@@ -4,12 +4,14 @@ import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.RobotStatus;
 import frc.robot.controls.DriveControls;
 import frc.robot.controls.ShooterControls;
@@ -21,7 +23,8 @@ import frc.robot.tuning.ConfigTalonFXMotorTuner;
 import frc.robot.tuning.ConfigTalonFXSMotorTuner;
 import frc.robot.tuning.DriveGainsTuner;
 import frc.robot.utils.LedBindings;
-
+import frc.robot.controls.ClimberControls;
+import frc.robot.subsystems.ClimberSubsystem;
 public class RobotContainer {
 
   /* ====================== */
@@ -37,6 +40,7 @@ public class RobotContainer {
 
   // Phoenix TunerX 生成的底盘
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+  public final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
 
   // LED 子系统
@@ -56,6 +60,8 @@ public class RobotContainer {
   private ConfigTalonFXSMotorTuner configBackboardTuner = new ConfigTalonFXSMotorTuner(shooterSubsystem.backboardMotor, "backboard", Constants.Shooter.backboardSlot0Configs);
 
   private final SendableChooser<Command> autoChooser;
+  
+  private final Trigger enableTrigger = new Trigger(DriverStation::isEnabled);
 
   
   public RobotContainer() {
@@ -64,6 +70,7 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", autoChooser);
     configueSwerve();
     configueShooter();
+    configueClimber();
     bingdingLED();
   }
 
@@ -144,6 +151,13 @@ public class RobotContainer {
     configConveyorTuner.periodic(null);
     configBackboardTuner.periodic();
     shooterSubsystem.setRightFollowLeft();
+  }
+
+  private void configueClimber() {
+    
+    enableTrigger.onTrue(climberControls.enableInitCommand());
+
+    climberSubsystem.setDefaultCommand(climberControls.defaultClimberCommand());
   }
 
 }

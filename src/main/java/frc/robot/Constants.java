@@ -109,5 +109,28 @@ public final class Constants {
     public static final double positionToleranceRotations = 0.00;
     //rotater容差
     }   
-    
+    public static class Climber {
+
+    public static final int motorID = 49;
+
+    public static final boolean inverted = false;
+
+    public static final double climbUpTicks = 83; // TODO: 实测后调整
+    public static final double climbDownTicks = 0; // TODO: 实测后调整
+    public static final double holdToleranceRot = 0.5; 
+
+    public static final Slot0Configs slot0Configs = new Slot0Configs();
+
+    static {
+        // TODO: PID/F 值你们实测后填
+        slot0Configs.kP = 0.2;
+        slot0Configs.kI = 0.0;
+        slot0Configs.kD = 0.0;
+
+        // TODO: 如果要前馈（速度闭环一般建议有 kV）
+        slot0Configs.kS = 0.0;
+        slot0Configs.kV = 0.1;
+        slot0Configs.kA = 0.0;
+    }
+}
 }
