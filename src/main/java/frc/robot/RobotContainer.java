@@ -53,7 +53,7 @@ public class RobotContainer {
 
   private final DriveControls driveControls = new DriveControls(drivetrain, controller,robotStatusManager );
   private final ShooterControls shooterControls = new ShooterControls(shooterSubsystem, controller,robotStatusManager);
-
+  private final ClimberControls climberControls = new ClimberControls(climberSubsystem, controller);
   private final DriveGainsTuner driveGainsTuner = new DriveGainsTuner(drivetrain);
   private ConfigTalonFXMotorTuner configFlywheelTuner = new ConfigTalonFXMotorTuner(shooterSubsystem.flywheelMotorLeft, "flywheel", Constants.Shooter.flyWheelSlot0Configs);
   private ConfigTalonFXMotorTuner configConveyorTuner = new ConfigTalonFXMotorTuner(shooterSubsystem.conveyorMotor, "conveyor", Constants.Shooter.conveyorSlot0Configs);

@@ -116,6 +116,9 @@ public class ShooterSubsystem extends SubsystemBase {
         double pidOutput = backboardPID.calculate(getBackboardPosition());
         pidOutput = Math.max(-Constants.Shooter.backboardSpeedMax, Math.min(Constants.Shooter.backboardSpeedMax, pidOutput)); // 限制输出范围
         shooterNetworkTable.getEntry("backboardPIDOutput").setDouble(pidOutput);
+        if (Math.abs(pidOutput) < 0.8) {
+        pidOutput = 0.0;
+        }//防止抖动
         // // 设置背板电机的速度，根据PID输出进行调整
         setBackboardSpeedByRPS(pidOutput);
     }
