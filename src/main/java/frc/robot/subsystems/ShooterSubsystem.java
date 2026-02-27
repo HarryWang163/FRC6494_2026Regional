@@ -140,6 +140,12 @@ public class ShooterSubsystem extends SubsystemBase {
     public boolean isBackboardAtTarget() {
         return backboardPID.atGoal();  // 判断背板是否到达目标角度
     }
+    public void conveyorWaitForAcceleration(){
+        conveyorMotor.set(0);
+    }
+    public void conveyorRun(){
+        setConveyorSpeedByRPS(Constants.Shooter.conveyorSpeed);
+    }
 
     @Override
     public void periodic() {

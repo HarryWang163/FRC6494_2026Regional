@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.RobotStatusManager;
+import frc.robot.Constants.Intaker;
+import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
 public class ShooterControls {
@@ -16,6 +18,9 @@ public class ShooterControls {
     private double flywheelSpeedOffset = 0.0;
     private double backboardPositionOffset = 0.0;
     private NetworkTable shooterControlTable;
+    private double conveyorSpeed = 0.0;
+    double flywheelSpeed = 0;
+    double backboardPosition = 0;
     private final RobotStatusManager robotStatusManager;
     public ShooterControls(ShooterSubsystem shooterSubsystem, CommandXboxController controller,RobotStatusManager rsm) {
         this.shooterSubsystem = shooterSubsystem;
@@ -23,7 +28,7 @@ public class ShooterControls {
         this.robotStatusManager = rsm;
         shooterControlTable = NetworkTableInstance.getDefault().getTable("ShooterControl");
     }
-
+    
     public Command defaultShooterCommand() {
         return Commands.run(() -> {
             switch (robotStatusManager.getStatus()) {
@@ -31,10 +36,36 @@ public class ShooterControls {
                     shooterSubsystem.stopMotors();
                     break;
                 case AllTelop:
+                case PassingBall:
+                    flywheelSpeed = 0;//todo:实测传球的时候的速度
+                    flywheelSpeed += flywheelSpeedOffset;
+                    backboardPosition = 0;//todo:实测传球的时候的背板位置
+                    backboardPosition += backboardPositionOffset;
+                    conveyorSpeed = Constants.Shooter.conveyorSpeed;
+                    if (controller.getRightTriggerAxis() < 0.1) {
+                        flywheelSpeed = 0;
+                        conveyorSpeed = 0;
+                    }
+                    if(shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble()<flywheelSpeed*0.7){
+                        conveyorSpeed = 0;
+                    }
+                    // flywheelSpeed = calculateFlywheelSpeedOnlywithOffset(60);
+                    // double flywheelSpeed = calculateFlywheelSpeed(0);
+                    // double BackboardPosition = calculateBackboardPosition(0);
+                    shooterControlTable.getEntry("flywheelTargetSpeed").setDouble(flywheelSpeed);
+                    shooterControlTable.getEntry("conveyerTargetSpeed").setDouble(conveyorSpeed);
+                    shooterControlTable.getEntry("backboardTargetPosition").setDouble(backboardPosition);
+                    shooterSubsystem.setFlywheelSpeedByRPS(flywheelSpeed);
+                    shooterSubsystem.setConveyorSpeedByRPS(conveyorSpeed);
+                    shooterSubsystem.setBackboardPosition(backboardPosition);  
+                    if(shooterSubsystem.isBackboardAtTarget()){
+                        shooterSubsystem.backboardMotor.set(0);
+                    }else{
+                        shooterSubsystem.outputBackboard();
+                    }  
+                    break;
                 case AutoAimming:
-                    double flywheelSpeed = 0;
-                    double backboardPosition = 0;
-                    double conveyorSpeed = 0;
+                
                     var x = shooterSubsystem.getDistance();
                     x = Math.max(1.2, Math.min(4.5, x));
                     flywheelSpeed = 0.6956596811733782*x*x*x*x*x*x*x-14.164408860183267*x*x*x*x*x*x+119.7115375240918*x*x*x*x*x-543.0984876677477*x*x*x*x+1425.1928543240738*x*x*x-2156.199296490315*x*x+1736.568139600292*x-516.097598057351;
@@ -44,6 +75,9 @@ public class ShooterControls {
                     conveyorSpeed = Constants.Shooter.conveyorSpeed;
                     if (controller.getRightTriggerAxis() < 0.1) {
                         flywheelSpeed = 0;
+                        conveyorSpeed = 0;
+                    }
+                    if(shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble()<flywheelSpeed*0.7){
                         conveyorSpeed = 0;
                     }
                     // flywheelSpeed = calculateFlywheelSpeedOnlywithOffset(60);

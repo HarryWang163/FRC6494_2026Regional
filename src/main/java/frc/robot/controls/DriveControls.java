@@ -122,6 +122,11 @@ public class DriveControls {
                 vy = 0;
                 vomega = 0;
                 break;
+            case PassingBall:
+                vomega = calculateRotationSpeedFromRotationAngle(calculateDistanceAndRotationToPassBall()[1]);
+                autoControlNetworkTable.getEntry("autoRotationRate").setDouble(vomega);
+                break;
+
             case AutoAimming:
                 vomega = calculateRotationSpeedFromRotationAngle(distanceAndRotation[1]);
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(vomega);
@@ -268,6 +273,36 @@ public class DriveControls {
         // 计算目标角度（相对于场地坐标系）
         double deltaX = targetX - currentPose.getX();
         double deltaY = targetY - currentPose.getY();
+        double targetAngle = Math.toDegrees(Math.atan2(deltaY, deltaX)); // 转换为度
+
+        // 当前机器人角度
+        double currentAngle = currentPose.getRotation().getDegrees();
+        double angleDifference = targetAngle - currentAngle;
+        // Normalize angle difference to the range [-180, 180]
+        if (angleDifference > 180) {
+            angleDifference -= 360;
+        } else if (angleDifference < -180) {
+            angleDifference += 360;
+        }
+
+        // 计算距离
+        double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                // 计算距离和旋转角度
+        double[] distanceAndRotation = new double[]{distance, angleDifference};
+
+        // 返回距离和角度差
+        return distanceAndRotation;
+    }
+    public double[] calculateDistanceAndRotationToPassBall() {
+        Pose2d currentPose = drivetrain.getState().Pose; // 获取机器人当前的位置和角度
+        double targetX = Constants.Field.PassingBallPosX;  // 目标 X 坐标
+        double targetY1 = Constants.Field.PassingBallPosY1;  // 目标 Y 坐标
+        double targetY2 = Constants.Field.PassingBallPosY2;  // 目标 Y 坐标
+       
+
+        // 计算目标角度（相对于场地坐标系）
+        double deltaX = targetX - currentPose.getX();
+        double deltaY = calculateDifferenceToTwoTarget(currentPose.getY(), targetY1, targetY2);
         double targetAngle = Math.toDegrees(Math.atan2(deltaY, deltaX)); // 转换为度
 
         // 当前机器人角度

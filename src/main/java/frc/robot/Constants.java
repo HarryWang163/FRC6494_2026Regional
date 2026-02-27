@@ -8,6 +8,7 @@ public final class Constants {
     public enum RobotStatus{
         Stopped,
         AllTelop,
+        PassingBall,
         AutoAimming,
         Climbing,
         CrossingBump,
@@ -86,7 +87,9 @@ public final class Constants {
     public class Field {
         public static final double RedHubPositionX = 11.914;
         public static final double RedHubPositionY = 4.034;
-        
+        public static final double PassingBallPosX = 0;
+        public static final double PassingBallPosY1 = 0;
+        public static final double PassingBallPosY2 = 0;
     }
 
     public class Intaker {

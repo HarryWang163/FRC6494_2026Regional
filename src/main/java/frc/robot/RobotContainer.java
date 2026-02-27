@@ -126,7 +126,6 @@ public class RobotContainer {
 
   private void configueShooter(){
     shooterSubsystem.setDefaultCommand(shooterControls.defaultShooterCommand());
-
     controller.povLeft().onTrue(Commands.runOnce(() -> shooterControls.adjustFlywheelSpeedOffset(-1)));
     controller.povRight().onTrue(Commands.runOnce(() -> shooterControls.adjustFlywheelSpeedOffset(1)));
     controller.povUp().onTrue(Commands.runOnce(() -> shooterControls.adjustBackboardRateOffset(100)));
