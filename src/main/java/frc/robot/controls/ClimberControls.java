@@ -24,9 +24,9 @@ public class ClimberControls {
         return Commands.run(()->{
             //climber.climbUp();
                 // 优先级：如果同时按，优先上升（你也可以反过来）
-                if (controller.x().getAsBoolean()) {
+                if (controller.y().getAsBoolean()) {
                     climber.climbUp();
-                } else if (controller.y().getAsBoolean()) {
+                } else if (controller.x().getAsBoolean()) {
                     climber.climbDown();
                 } else {
                     // 松开：记录当前位置 + 锁死

@@ -115,7 +115,7 @@ public final class Constants {
 
     public static final boolean inverted = false;
 
-    public static final double climbUpTicks = 83; // TODO: 实测后调整
+    public static final double climbUpTicks = 94; // TODO: 实测后调整
     public static final double climbDownTicks = 0; // TODO: 实测后调整
     public static final double holdToleranceRot = 0.5; 
 
