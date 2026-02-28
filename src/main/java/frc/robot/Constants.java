@@ -88,9 +88,10 @@ public final class Constants {
         public static final double RedHubPositionX = 11.914;
         public static final double RedHubPositionY = 4.034;
         public static final double PassingBallPosX = 0;
-        public static final double PassingBallPosY1 = 0;
-        public static final double PassingBallPosY2 = 0;
+        public static final double PassingBallPosY1 = 2.51;
+        public static final double PassingBallPosY2 = 5.556;
     }
+    
 
     public class Intaker {
 
