@@ -24,15 +24,19 @@ public class ClimberControls {
         return Commands.run(()->{
             //climber.climbUp();
                 // 优先级：如果同时按，优先上升（你也可以反过来）
-                if (controller.y().getAsBoolean()) {
+                if(controller.y().getAsBoolean()&&controller.x().getAsBoolean()){
+                    climber.zeroEncoder();
+                }
+                else if (controller.y().getAsBoolean()) {
                     climber.climbUp();
                 } else if (controller.x().getAsBoolean()) {
-                    climber.climbDown();
+                    climber.climbDownNonStop();
                 } else {
                     // 松开：记录当前位置 + 锁死
                     climber.captureHoldPosition();
                     climber.holdPosition();
                 }
+                
 
                 // 调试用
                 table.getEntry("xHeld_up").setBoolean(controller.x().getAsBoolean());

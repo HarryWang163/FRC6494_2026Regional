@@ -122,6 +122,7 @@ public final class Constants {
     public static final double climbUpTicks = 94; // TODO: 实测后调整
     public static final double climbDownTicks = 0; // TODO: 实测后调整
     public static final double holdToleranceRot = 0.5; 
+    public static final double deltaDownTicks = 1;
 
     public static final Slot0Configs slot0Configs = new Slot0Configs();
 

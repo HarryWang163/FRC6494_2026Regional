@@ -25,6 +25,7 @@ public class ClimberSubsystem extends SubsystemBase {
     private final VelocityVoltage velocityRequest = new VelocityVoltage(0).withSlot(0);
 
     private double holdPositionTicks = 0.0;
+    private double deltaPositionTicks = 0.0;
 
     private final NetworkTable climberTable;
     
@@ -71,6 +72,12 @@ public class ClimberSubsystem extends SubsystemBase {
     public void climbDown() {
         targetPositionTicks = Constants.Climber.climbDownTicks;  
         climberMotor.setControl(positionHoldRequest.withPosition(targetPositionTicks));
+        
+    }
+    public void climbDownNonStop(){
+
+        deltaPositionTicks = Constants.Climber.deltaDownTicks;  
+        climberMotor.setControl(positionHoldRequest.withPosition(targetPositionTicks-deltaPositionTicks));
     }
 
     public void captureHoldPosition() {
