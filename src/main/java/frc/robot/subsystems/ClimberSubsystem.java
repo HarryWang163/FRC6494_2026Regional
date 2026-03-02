@@ -73,8 +73,7 @@ public class ClimberSubsystem extends SubsystemBase {
         
     }
     public void climbDownNonStop(){
-        deltaPositionTicks = Constants.Climber.deltaDownTicks;  
-        climberMotor.setControl(positionHoldRequest.withPosition(targetPositionTicks-deltaPositionTicks));
+        climberMotor.setControl(velocityRequest.withVelocity(Constants.Climber.climbDownVelocity));
     }
 
     public void captureHoldPosition() {
