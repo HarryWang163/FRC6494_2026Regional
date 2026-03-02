@@ -126,7 +126,6 @@ public class DriveControls {
                 vomega = calculateRotationSpeedFromRotationAngle(calculateDistanceAndRotationToPassBall()[1]);
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(vomega);
                 break;
-
             case AutoAimming:
                 vomega = calculateRotationSpeedFromRotationAngle(distanceAndRotation[1]);
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(vomega);
@@ -161,15 +160,8 @@ public class DriveControls {
                 errorB = Math.atan2(Math.sin(errorB), Math.cos(errorB));
                 // 选误差绝对值更小的那个
                 double chosenError = (Math.abs(errorA) <= Math.abs(errorB)) ? errorA : errorB;
-
-                if (Math.abs(chosenError) < Math.toRadians(2.0)) {
-                    vomega = 0.0;
-                } else {
-                    vomega = chosenError * Constants.AutoPositioning.TurningkP;
-                }
-                // 限制最大角速度
-                vomega = Math.max(-maxAngularRate, Math.min(maxAngularRate, vomega));
-
+                vomega = calculatevomegaFromRotationAngle(chosenError);
+                autoControlNetworkTable.getEntry("BumpAutoRotationRate").setDouble(vomega);
                 //vomega = calculateRotationSpeedForBump();
                 break;
             case CrossingTrench:
@@ -188,14 +180,8 @@ public class DriveControls {
                 double currentRad = currentAngle.getRadians();
                 double targetRad = Math.toRadians(Constants.AutoPositioning.TrenchtargetAngle);
                 double TrenchAngleerror = targetRad - currentRad;
-                if (Math.abs(TrenchAngleerror) < Math.toRadians(1.0)) {
-                    vomega = 0.0;
-                } else {
-                    vomega = TrenchAngleerror * Constants.AutoPositioning.TurningkP;
-                }
-                // 限幅（防止转太快）
-                vomega = Math.max(-maxAngularRate, Math.min(maxAngularRate, vomega));
-
+                vomega = calculatevomegaFromRotationAngle(TrenchAngleerror);
+                autoControlNetworkTable.getEntry("TrenchAutoRotationRate").setDouble(vomega);
                 //vomega = calculateRotationSpeedForTrench();
                 break;
         }        
@@ -238,33 +224,6 @@ public class DriveControls {
           double x2 = target2 - current;
           return Math.abs(x1) < Math.abs(x2) ? x1 : x2;
     }
-    public double calculateRotationSpeedForTrench(){
-        Pose2d currentPose = drivetrain.getState().Pose; // 获取机器人当前的位置和角度
-        double currentAngle = currentPose.getRotation().getDegrees();
-        double targetAngle = Constants.AutoPositioning.autoRotationForTrenchTargetDegrees; // 转换为度
-        double angleDifference = targetAngle - currentAngle;
-        // Normalize angle difference to the range [-180, 180]
-        if (angleDifference > 180) {
-            angleDifference -= 360;
-        } else if (angleDifference < -180) {
-            angleDifference += 360;
-        }
-        return calculateRotationSpeedFromRotationAngle(angleDifference);
-    }
-    public double calculateRotationSpeedForBump(){
-        Pose2d currentPose = drivetrain.getState().Pose; // 获取机器人当前的位置和角度
-        double currentAngle = currentPose.getRotation().getDegrees();
-        double targetAngle = Constants.AutoPositioning.autoRotationForBumpTargetDegrees; // 转换为度
-        double angleDifference = targetAngle - currentAngle;
-        // Normalize angle difference to the range [-180, 180]
-        if (angleDifference > 180) {
-            angleDifference -= 360;
-        } else if (angleDifference < -180) {
-            angleDifference += 360;
-        }
-        return calculateRotationSpeedFromRotationAngle(angleDifference);
-    }
-    // Calculate distance and rotation (angle difference)
     public double[] calculateDistanceAndRotationToHub() {
         Pose2d currentPose = drivetrain.getState().Pose; // 获取机器人当前的位置和角度
         double targetX = Constants.Field.RedHubPositionX;  // 目标 X 坐标
@@ -299,7 +258,6 @@ public class DriveControls {
         double targetY1 = Constants.Field.PassingBallPosY1;  // 目标 Y 坐标
         double targetY2 = Constants.Field.PassingBallPosY2;  // 目标 Y 坐标
        
-
         // 计算目标角度（相对于场地坐标系）
         double deltaX = targetX - currentPose.getX();
         double deltaY = calculateDifferenceToTwoTarget(currentPose.getY(), targetY1, targetY2);
@@ -324,7 +282,6 @@ public class DriveControls {
         return distanceAndRotation;
     }
 
-    // Calculate rotation speed from rotation angle difference
     public double calculateRotationSpeedFromRotationAngle(double angleDifference) {
         double calDifference = angleDifference;
 
@@ -341,8 +298,18 @@ public class DriveControls {
             return 0;
         }
     }
-
-
+    
+    private double calculatevomegaFromRotationAngle(double error) {
+        double vomega;
+        if (Math.abs(error) < Math.toRadians(Constants.AutoPositioning.autoPositioningAngleError)) {
+                vomega = 0.0;
+            } else {
+                vomega = error * Constants.AutoPositioning.TurningkP;
+            }
+            // 限制最大角速度
+            vomega = Math.max(-maxAngularRate, Math.min(maxAngularRate, vomega));
+        return vomega;
+    }
 
         /**
      * 只限制“加速”（幅值变大），不限制“减速”（幅值变小）

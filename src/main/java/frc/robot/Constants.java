@@ -52,6 +52,7 @@ public final class Constants {
         public static final double teleopOffsetkP = 15;
 
         public static final double autoPositioningkP = 1.0;
+        public static final double autoPositioningAngleError = 1.0; // 角度误差容忍度，单位为度
 
         public static final double[] bumpY = {2.51,5.556};
         public static final double[] trenchY = {0.639,7.43};
@@ -112,6 +113,8 @@ public final class Constants {
     // 单位RPS
     public static final double positionToleranceRotations = 0.00;
     //rotater容差
+    public static final double IntakeGetterK = 1.0; // intake getter速度与触发器输入的比例
+    public static final double Getterminspeed = 20; // intake getter的基础速度（即触发器输入为0时的速度，正值表示默认向内转）
     }   
     public static class Climber {
 

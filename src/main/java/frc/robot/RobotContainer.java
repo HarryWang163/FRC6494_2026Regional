@@ -14,9 +14,11 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.RobotStatus;
 import frc.robot.controls.DriveControls;
+import frc.robot.controls.IntakerControls;
 import frc.robot.controls.ShooterControls;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.tuning.ConfigTalonFXMotorTuner;
@@ -32,7 +34,8 @@ public class RobotContainer {
   /* ====================== */
 
   // 只使用一个 Xbox 手柄（端口 0）
-  private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController controllerlower = new CommandXboxController(0);
+  private final CommandXboxController controllerupper = new CommandXboxController(1);
 
   /* ====================== */
   /*         子系统           */
@@ -42,6 +45,7 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   public final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+  public final IntakerSubsystem IntakerSubsystem = new IntakerSubsystem();
 
   // LED 子系统
   private final LEDSubsystem leds = new LEDSubsystem(0, 72 ,0); // 总长度=72+72         
@@ -51,9 +55,10 @@ public class RobotContainer {
   /*     控制封装/日志        */
   /* ====================== */
 
-  private final DriveControls driveControls = new DriveControls(drivetrain, controller,robotStatusManager );
-  private final ShooterControls shooterControls = new ShooterControls(shooterSubsystem, controller,robotStatusManager);
-  private final ClimberControls climberControls = new ClimberControls(climberSubsystem, controller);
+  private final DriveControls driveControls = new DriveControls(drivetrain, controllerlower, robotStatusManager );
+  private final ShooterControls shooterControls = new ShooterControls(shooterSubsystem, controllerupper,robotStatusManager);
+  private final ClimberControls climberControls = new ClimberControls(climberSubsystem, controllerupper);
+  private final IntakerControls intakerControls = new IntakerControls(IntakerSubsystem, controllerupper);
   private final DriveGainsTuner driveGainsTuner = new DriveGainsTuner(drivetrain);
   private ConfigTalonFXMotorTuner configFlywheelTuner = new ConfigTalonFXMotorTuner(shooterSubsystem.flywheelMotorLeft, "flywheel", Constants.Shooter.flyWheelSlot0Configs);
   private ConfigTalonFXMotorTuner configConveyorTuner = new ConfigTalonFXMotorTuner(shooterSubsystem.conveyorMotor, "conveyor", Constants.Shooter.conveyorSlot0Configs);
@@ -106,30 +111,32 @@ public class RobotContainer {
     //     .onFalse(Commands.runOnce(() -> driveControls.setBoostEnabled(false)));
 
     // Back：重置场地坐标系角度
-    controller.back().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+    controllerlower.back().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
     
     // Start：强行使用metaTag2全场定位
-    controller.start().whileTrue(drivetrain.run(drivetrain::forceUsingLimelightMT2));
+    controllerlower.start().whileTrue(drivetrain.run(drivetrain::forceUsingLimelightMT2));
 
     //LM 按下时使用机器人坐标系
-    controller.leftStick().onTrue(robotStatusManager.setStatusCommand(RobotStatus.AutoAimming));
-    controller.leftStick().onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
+    //controllerlower.leftStick().onTrue(robotStatusManager.setStatusCommand(RobotStatus.AutoAimming));
+    //controllerlower.leftStick().onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
 
-    controller.rightStick().and(controller.leftBumper())
-    .onTrue(robotStatusManager.setStatusCommand(RobotStatus.CrossingBump))
+    controllerlower.leftTrigger()
+    .onTrue(robotStatusManager.setStatusCommand(RobotStatus.CrossingTrench))
     .onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
     
-    controller.rightStick().and(controller.rightBumper())
-    .onTrue(robotStatusManager.setStatusCommand(RobotStatus.CrossingTrench))
+    controllerlower.rightTrigger()
+    .onTrue(robotStatusManager.setStatusCommand(RobotStatus.CrossingBump))
     .onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
   }
 
   private void configueShooter(){
     shooterSubsystem.setDefaultCommand(shooterControls.defaultShooterCommand());
-    controller.povLeft().onTrue(Commands.runOnce(() -> shooterControls.adjustFlywheelSpeedOffset(-1)));
-    controller.povRight().onTrue(Commands.runOnce(() -> shooterControls.adjustFlywheelSpeedOffset(1)));
-    controller.povUp().onTrue(Commands.runOnce(() -> shooterControls.adjustBackboardRateOffset(100)));
-    controller.povDown().onTrue(Commands.runOnce(() -> shooterControls.adjustBackboardRateOffset(-100)));
+    controllerupper.povLeft().onTrue(Commands.runOnce(() -> shooterControls.adjustFlywheelSpeedOffset(-1)));
+    controllerupper.povRight().onTrue(Commands.runOnce(() -> shooterControls.adjustFlywheelSpeedOffset(1)));
+    controllerupper.povUp().onTrue(Commands.runOnce(() -> shooterControls.adjustBackboardRateOffset(100)));
+    controllerupper.povDown().onTrue(Commands.runOnce(() -> shooterControls.adjustBackboardRateOffset(-100)));
+    controllerupper.back().onTrue(Commands.runOnce(() -> shooterControls.resetOffsets()));
+    controllerupper.start().onTrue(Commands.runOnce(() -> shooterControls.resetBackboardCommand()));
   }
   /* ====================== */
   /*        LED 绑定          */

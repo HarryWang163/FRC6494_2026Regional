@@ -64,4 +64,7 @@ public class IntakerSubsystem extends SubsystemBase{
             intakegetter.setControl(velocityRequest.withVelocity(0));
         }
     }
+    public void setIntakerGetterSpeed(double speed) {
+        intakegetter.setControl(velocityRequest.withVelocity(speed));
+    }
 }

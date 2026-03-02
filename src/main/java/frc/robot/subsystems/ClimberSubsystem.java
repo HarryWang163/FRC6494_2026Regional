@@ -46,12 +46,10 @@ public class ClimberSubsystem extends SubsystemBase {
         holdPositionTicks = getPositionTicks();
     }
     public void initialize() {
-        
         climberMotor.set(-0.07);
-
     }
+    
     public void zeroEncoder(){
-
         climberMotor.setPosition(0);
         stopMotor();
     }
@@ -75,7 +73,6 @@ public class ClimberSubsystem extends SubsystemBase {
         
     }
     public void climbDownNonStop(){
-
         deltaPositionTicks = Constants.Climber.deltaDownTicks;  
         climberMotor.setControl(positionHoldRequest.withPosition(targetPositionTicks-deltaPositionTicks));
     }

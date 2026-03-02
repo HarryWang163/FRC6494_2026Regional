@@ -110,8 +110,6 @@ public class ShooterControls {
                     break;
                     
             }
-                
-
         }, shooterSubsystem);
     }
 
@@ -145,78 +143,15 @@ public class ShooterControls {
                 shooterSubsystem.backboardPID.reset(0);}, shooterSubsystem);
     }
 
-    //打表参数
-    // private static final double[][] FLYWHEEL_TABLE = {
-    // {1.5, 0.42},
-    // {2.0, 0.46},
-    // {2.5, 0.51},
-    // {3.0, 0.57},
-    // {3.5, 0.64},
-    // {4.0, 0.72}
-    // };
-
-    // //线性插值函数
-    // private static double lerp(double x0, double y0, double x1, double y1, double x)  {
-    // if (Math.abs(x1 - x0) < 1e-9) {
-    //     return y0;
-    // }
-    // double t = (x - x0) / (x1 - x0);
-    // return y0 + t * (y1 - y0);
-    // }
-    // private double calculateFlywheelSpeedOnlywithOffset(double defaultSpeed) {
-    //     return defaultSpeed + flywheelSpeedOffset;
-    // }
-    // private double calculateBackboardPositionOnlywithOffset(double defaultPosition) {
-    //     return defaultPosition + backboardPositionOffset;
-    // }
-
-
-    // private double calculateFlywheelSpeed(double distance) {
-    //     // 小于最小距离：用第一个点
-    //     if (distance <= FLYWHEEL_TABLE[0][0]) {
-    //     return FLYWHEEL_TABLE[0][1] + flywheelSpeedOffset;
-    //     }
-    //     // 大于最大距离：用最后一个点
-    //     int last = FLYWHEEL_TABLE.length - 1;
-    //     if (distance >= FLYWHEEL_TABLE[last][0]) {
-    //     return FLYWHEEL_TABLE[last][1] + flywheelSpeedOffset;
-    //     }
-    //     // 查找区间并插值
-    //     for (int i = 0; i < FLYWHEEL_TABLE.length - 1; i++) {
-    //         double d0 = FLYWHEEL_TABLE[i][0];
-    //         double s0 = FLYWHEEL_TABLE[i][1];
-    //         double d1 = FLYWHEEL_TABLE[i + 1][0];
-    //         double s1 = FLYWHEEL_TABLE[i + 1][1];
-    //         if (distance >= d0 && distance <= d1) {
-    //             return lerp(d0, s0, d1, s1, distance) + flywheelSpeedOffset;
-    //         }
-    //     }
-    //     return 0;
-    // }
-    
-    // private double calculateBackboardPosition(double distance) {
-    //     double BackboardPosition;
-    //     // 距离阈值（单位自己按distance进行修改）
-    //     final double DISTANCE_NEAR = 2.0;   // 近距离阈值
-    //     final double DISTANCE_MID  = 4.0;   // 中距离阈值
-    //     if (distance < DISTANCE_NEAR) {
-    //     BackboardPosition = Constants.ShooterCalculation.positionNear;
-    //     } 
-    //     else if (distance < DISTANCE_MID) {
-    //     BackboardPosition = Constants.ShooterCalculation.positionMid;
-    //     } 
-    //     else {
-    //     BackboardPosition = Constants.ShooterCalculation.postionFar;
-    //     }
-    //     BackboardPosition += backboardPositionOffset;
-    //     return BackboardPosition;
-    // }
-
     public void adjustFlywheelSpeedOffset(double offset) {
         flywheelSpeedOffset += offset;
     }
 
     public void adjustBackboardRateOffset(double offset) {
         backboardPositionOffset += offset;
+    }
+    public void resetOffsets(){
+        flywheelSpeedOffset = 0.0;
+        backboardPositionOffset = 0.0;
     }
 }

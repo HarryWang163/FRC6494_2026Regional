@@ -146,6 +146,9 @@ public class ShooterSubsystem extends SubsystemBase {
     public void conveyorRun(){
         setConveyorSpeedByRPS(Constants.Shooter.conveyorSpeed);
     }
+    public void resetbackboardencoder(){
+        backboardEncoder.reset();
+    }
 
     @Override
     public void periodic() {
