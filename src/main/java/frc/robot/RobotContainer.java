@@ -33,7 +33,7 @@ public class RobotContainer {
   /*         手柄            */
   /* ====================== */
 
-  // 只使用一个 Xbox 手柄（端口 0）
+  // 使用2个 Xbox 手柄（端口 0,1）
   private final CommandXboxController controllerlower = new CommandXboxController(0);
   private final CommandXboxController controllerupper = new CommandXboxController(1);
 
@@ -100,15 +100,15 @@ public class RobotContainer {
     RobotModeTriggers.disabled().whileTrue(driveControls.idleCommand());
 
     
-    // //左保险：按住刹车
-    // controller.leftBumper()
-    //   .onTrue(Commands.runOnce(driveControls::emergencyStop))
-    //   .whileTrue(driveControls.brakeWhileHeld());
+    //左保险：按住刹车
+    controllerlower.leftBumper()
+      .onTrue(Commands.runOnce(driveControls::emergencyStop))
+      .whileTrue(driveControls.brakeWhileHeld());
     
-    // // 右保险：按住加速（Boost）
-    // controller.rightBumper()
-    //     .onTrue(Commands.runOnce(() -> driveControls.setBoostEnabled(true)))
-    //     .onFalse(Commands.runOnce(() -> driveControls.setBoostEnabled(false)));
+    // 右保险：按住加速（Boost）
+    controllerlower.rightBumper()
+        .onTrue(Commands.runOnce(() -> driveControls.setBoostEnabled(true)))
+        .onFalse(Commands.runOnce(() -> driveControls.setBoostEnabled(false)));
 
     // Back：重置场地坐标系角度
     controllerlower.back().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
@@ -116,9 +116,9 @@ public class RobotContainer {
     // Start：强行使用metaTag2全场定位
     controllerlower.start().whileTrue(drivetrain.run(drivetrain::forceUsingLimelightMT2));
 
-    //LM 按下时使用机器人坐标系
-    //controllerlower.leftStick().onTrue(robotStatusManager.setStatusCommand(RobotStatus.AutoAimming));
-    //controllerlower.leftStick().onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
+    //LM 按下时autoaimming
+    controllerlower.leftStick().onTrue(robotStatusManager.setStatusCommand(RobotStatus.AutoAimming));
+    controllerlower.leftStick().onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
 
     controllerlower.leftTrigger()
     .onTrue(robotStatusManager.setStatusCommand(RobotStatus.CrossingTrench))
