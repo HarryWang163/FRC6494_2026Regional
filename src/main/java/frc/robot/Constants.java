@@ -88,9 +88,12 @@ public final class Constants {
     public class Field {
         public static final double RedHubPositionX = 11.914;
         public static final double RedHubPositionY = 4.034;
-        public static final double PassingBallPosX = 0;
+        public static final double BlueHubPositionX = 0;
+        public static final double BlueHubPositionY = 0;
         public static final double PassingBallPosY1 = 2.51;
         public static final double PassingBallPosY2 = 5.556;
+        public static final double RedPassingBallPosX = 0;
+        public static final double BluePassingBallPosX = 0;
     }
     
 
@@ -111,12 +114,12 @@ public final class Constants {
         .withKV(0.00).withKA(0.00).withKS(0.00);
     //如果 rotater 受重力影响明显，可能需要用 withKG/withGravityType/withGravityArmPositionOffset（看机构形式）(这句fromAI)
 
-    public static final double IntakeGetterSpeedforAuto = 0.0;
+    public static final double IntakeGetterSpeedforAuto = 0.4;
     // 单位RPS
     public static final double positionToleranceRotations = 0.00;
     //rotater容差
     public static final double IntakeGetterK = 0.3; // intake getter速度与触发器输入的比例
-    public static final double Getterminspeed = 0.2; // intake getter的基础速度（即触发器输入为0时的速度，正值表示默认向内转）
+    public static final double Getterminspeed = 0.3; // intake getter的基础速度（即触发器输入为0时的速度，正值表示默认向内转）
     }   
     public static class Climber {
 

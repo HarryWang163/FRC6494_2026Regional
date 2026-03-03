@@ -83,26 +83,9 @@ public class IntakerSubsystem extends SubsystemBase{
         stopIntakerotater();
     }
     public void IntakerDownNonStop(){
-        double currentPosition = getIntakerotaterPosition();
-        if (currentPosition > Constants.Intaker.intakeRotaterDownLimit) {
-        
-        intakerotater.set(-0.05);}
-        // double currentPosition = getIntakerotaterPosition();
-        // if (currentPosition > Constants.Intaker.intakeRotaterDownLimit) {
-        //     intakerotater.setControl(velocityRequest.withVelocity(Constants.Intaker.intakeRotaterVelocity));
-        // } else {
-        //     stopIntakerotater();
-        // }
-    }
+        intakerotater.set(-0.05);
+        }
     public void IntakerUpNonStop(){
-        double currentPosition = getIntakerotaterPosition();
-        if (currentPosition < Constants.Intaker.intakeRotaterUpLimit) {
-        intakerotater.set(0.1);}
-        
-        // if (currentPosition < Constants.Intaker.intakeRotaterUpLimit) {
-        //     intakerotater.setControl(velocityRequest.withVelocity(-Constants.Intaker.intakeRotaterVelocity));
-        // } else {
-        //     stopIntakerotater();
-        // }
+        intakerotater.set(0.2);
     }
 }

@@ -76,9 +76,9 @@ public class IntakerControls {
         IntakerSubsystem.setIntakerGetterSpeed(getterspeed);
         
         if(controller.getLeftY() < -0.5){
-                    IntakerSubsystem.IntakerDownNonStop();
-            } else if(controller.getLeftY() > 0.5){
                     IntakerSubsystem.IntakerUpNonStop();
+            } else if(controller.getLeftY() > 0.5){
+                    IntakerSubsystem.IntakerDownNonStop();
             } else {
                     IntakerSubsystem.stopIntakerotater();
             }

@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance; 
 
 public class DriveControls {
+
     public boolean isRedAlliance;
 
     private final CommandSwerveDrivetrain drivetrain;
@@ -234,8 +235,8 @@ public class DriveControls {
     }
     public double[] calculateDistanceAndRotationToHub() {
         Pose2d currentPose = drivetrain.getState().Pose; // 获取机器人当前的位置和角度
-        double targetX = Constants.Field.RedHubPositionX;  // 目标 X 坐标
-        double targetY = Constants.Field.RedHubPositionY;  // 目标 Y 坐标
+        double targetX = isRedAlliance ? Constants.Field.RedHubPositionX : Constants.Field.BlueHubPositionX;
+        double targetY = isRedAlliance ? Constants.Field.RedHubPositionY : Constants.Field.BlueHubPositionY;
 
         // 计算目标角度（相对于场地坐标系）
         double deltaX = targetX - currentPose.getX();
@@ -262,7 +263,7 @@ public class DriveControls {
     }
     public double[] calculateDistanceAndRotationToPassBall() {
         Pose2d currentPose = drivetrain.getState().Pose; // 获取机器人当前的位置和角度
-        double targetX = Constants.Field.PassingBallPosX;  // 目标 X 坐标
+        double targetX = isRedAlliance ? Constants.Field.RedPassingBallPosX : Constants.Field.BluePassingBallPosX;  // 目标 X 坐标
         double targetY1 = Constants.Field.PassingBallPosY1;  // 目标 Y 坐标
         double targetY2 = Constants.Field.PassingBallPosY2;  // 目标 Y 坐标
        
