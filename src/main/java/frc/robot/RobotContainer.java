@@ -77,6 +77,7 @@ public class RobotContainer {
     configueShooter();
     configueClimber();
     bingdingLED();
+    configueIntaker();
   }
 
   /* ====================== */

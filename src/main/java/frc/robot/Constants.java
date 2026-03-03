@@ -99,6 +99,7 @@ public final class Constants {
     public static final double intakeRotaterUpLimit = 0.0;  // rotator上限角度
     public static final double intakeRotaterDownLimit = 0.0;  // rotator下限角度
     public static final double intakeRotaterVelocity = 10; // rotater的速度（如果你用速度控制的话）
+    public static final double IntakeRotaterGravityFF = 0.0; // 重力前馈增益（需要实测调整）
 
     public static final Slot0Configs intakeGetterSlot0Configs = new Slot0Configs()
         .withKP(0.00).withKI(0.00).withKD(0.00)

@@ -13,7 +13,7 @@ public class IntakerControls {
     private final IntakerSubsystem IntakerSubsystem;
     private final CommandXboxController controller;
 
-    private static final double ROTATER_STEP_PER_CYCLE = 0.00;
+    //private static final double ROTATER_STEP_PER_CYCLE = 0.00;
 
     public IntakerControls(IntakerSubsystem Intaker, CommandXboxController controller) {
         this.IntakerSubsystem = Intaker;

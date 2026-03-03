@@ -4,6 +4,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -18,12 +19,23 @@ public class IntakerSubsystem extends SubsystemBase{
  
     private double intakeRotaterTargetPosition = 0.0;
 
+    public double getGravityFFVolts(){
+        double intakerotaterPosition = getIntakerotaterPosition();
+        double gravityFFVolts = Constants.Intaker.IntakeRotaterGravityFF * intakerotaterPosition;
+        return gravityFFVolts;
+    }
+
+    public void setIntakerRotaterVelocityRps(double IntakeRotaterTargetVelocity) {
+        double gravityFeedforward = getGravityFFVolts();
+        intakerotater.setControl(velocityRequest.withVelocity(IntakeRotaterTargetVelocity).withFeedForward(gravityFeedforward));// 重力前馈);
+    } 
+
     public IntakerSubsystem() {
         //初始化rotater&getter
         intakegetter = new TalonFX(47);
         intakerotater = new TalonFX(48);
         intakegetter.getConfigurator().apply(Constants.Intaker.intakeGetterSlot0Configs);
-        intakerotater.getConfigurator().apply(Constants.Intaker.intakeRotaterSlot0Configs);        
+        intakerotater.getConfigurator().apply(Constants.Intaker.intakeRotaterSlot0Configs);      
     }
 
     public void setIntakerRotaterPosition(double targetPosition) {
@@ -35,7 +47,6 @@ public class IntakerSubsystem extends SubsystemBase{
         }
 
         intakeRotaterTargetPosition = targetPosition;
-
         intakerotater.setControl(positionRequest.withPosition(targetPosition)); // 设置rotater位置（TalonFX 内部闭环 PID）
     }
 
