@@ -10,13 +10,13 @@ import frc.robot.Constants;
 
 
 public class IntakerControls {
-    private final IntakerSubsystem intakerSubsystem;
+    private final IntakerSubsystem IntakerSubsystem;
     private final CommandXboxController controller;
 
-    private static final double ROTATER_STEP_PER_CYCLE = 0.00; // 需要你按实际速度调：越大越快（fromAI）
+    private static final double ROTATER_STEP_PER_CYCLE = 0.00;
 
-    public IntakerControls(IntakerSubsystem intakerSubsystem, CommandXboxController controller) {
-        this.intakerSubsystem = intakerSubsystem;
+    public IntakerControls(IntakerSubsystem Intaker, CommandXboxController controller) {
+        this.IntakerSubsystem = Intaker;
         this.controller = controller;
     }
 
@@ -73,8 +73,18 @@ public class IntakerControls {
         if (controller.getLeftTriggerAxis() < 0.1) {
             getterspeed = 0;
             }
-        intakerSubsystem.setIntakerGetterSpeed(getterspeed);
-        
-        }, intakerSubsystem);
+        IntakerSubsystem.setIntakerGetterSpeed(getterspeed);
+
+        if(controller.getLeftY() < -0.5){
+                    IntakerSubsystem.IntakerDownNonStop();
+            } else if(controller.getLeftY() > 0.5){
+                    IntakerSubsystem.IntakerUpNonStop();
+            } else {
+                    IntakerSubsystem.stopIntakerotater();
+            }
+        }, IntakerSubsystem);
+    }
+    public Command resetIntakerRotaterEncoderCommand(IntakerSubsystem intakerSubsystem) {
+        return Commands.runOnce(intakerSubsystem::zeroEncoder, intakerSubsystem);
     }
 }

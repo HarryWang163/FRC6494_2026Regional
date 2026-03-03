@@ -40,7 +40,6 @@ public class ShooterControls {
                     var xP = shooterSubsystem.getDistance();
                     //xP = Math.max(1.2, Math.min(4.5, xP));
                     flywheelSpeed = 0.6956596811733782*xP*xP*xP*xP*xP*xP*xP-14.164408860183267*xP*xP*xP*xP*xP*xP+119.7115375240918*xP*xP*xP*xP*xP-543.0984876677477*xP*xP*xP*xP+1425.1928543240738*xP*xP*xP-2156.199296490315*xP*xP+1736.568139600292*xP-516.097598057351;
-                    
                     flywheelSpeed += flywheelSpeedOffset;
                     backboardPosition = xP*xP;//todo:实测传球的时候的背板位置 打表
                     backboardPosition += backboardPositionOffset;

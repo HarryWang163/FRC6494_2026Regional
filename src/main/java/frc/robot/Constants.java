@@ -98,6 +98,7 @@ public final class Constants {
 
     public static final double intakeRotaterUpLimit = 0.0;  // rotator上限角度
     public static final double intakeRotaterDownLimit = 0.0;  // rotator下限角度
+    public static final double intakeRotaterVelocity = 10; // rotater的速度（如果你用速度控制的话）
 
     public static final Slot0Configs intakeGetterSlot0Configs = new Slot0Configs()
         .withKP(0.00).withKI(0.00).withKD(0.00)
@@ -122,9 +123,9 @@ public final class Constants {
 
     public static final boolean inverted = false;
 
-    public static final double climbUpTicks = 94; // TODO: 实测后调整
-    public static final double climbDownTicks = 0; // TODO: 实测后调整
-    public static final double climbDownVelocity = -200;
+    public static double climbUpTicks = 94; // TODO: 实测后调整
+    public static double climbDownTicks = 0; // TODO: 实测后调整
+    public static final double climbVelocity = -200;
     public static final double holdToleranceRot = 0.5; 
     public static final double deltaDownTicks = 1;
 

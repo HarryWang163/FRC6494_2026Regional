@@ -160,10 +160,14 @@ public class RobotContainer {
   }
 
   private void configueClimber() {
-    
     enableTrigger.onTrue(climberControls.enableInitCommand());
-
     climberSubsystem.setDefaultCommand(climberControls.defaultClimberCommand());
+    controllerupper.b().onTrue(climberControls.resetClimberEncoderCommand(climberSubsystem));
+  }
+
+  private void configueIntaker() {
+    IntakerSubsystem.setDefaultCommand(intakerControls.defaultIntakerCommand());
+    controllerupper.a().onTrue(intakerControls.resetIntakerRotaterEncoderCommand(IntakerSubsystem));
   }
 
 }

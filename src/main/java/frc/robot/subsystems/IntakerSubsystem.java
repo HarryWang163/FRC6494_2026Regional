@@ -50,21 +50,41 @@ public class IntakerSubsystem extends SubsystemBase{
         return error <= Constants.Intaker.positionToleranceRotations;
     }
 
-     public void stopintakerotater() {
-        intakerotater.setControl(velocityRequest.withVelocity(0));
+     public void stopIntakerotater() {
+        intakerotater.set(0);
         // 如果你希望停止后保持当前位置，建议改用中性模式/或维持 positionRequest（这句fromAI）
     }
 
     //intakegetter的on/off
-    public void setIntakeGetterOn(boolean on) {
-        if (on) {
-            intakegetter.setControl(velocityRequest.withVelocity(Constants.Intaker.IntakeGetterSpeed));
-        }
-        else {
-            intakegetter.setControl(velocityRequest.withVelocity(0));
-        }
-    }
+    // public void setIntakeGetterOn(boolean on) {
+    //     if (on) {
+    //         intakegetter.setControl(velocityRequest.withVelocity(Constants.Intaker.IntakeGetterSpeed));
+    //     }
+    //     else {
+    //         intakegetter.setControl(velocityRequest.withVelocity(0));
+    //     }
+    // }
     public void setIntakerGetterSpeed(double speed) {
         intakegetter.setControl(velocityRequest.withVelocity(speed));
+    }
+    public void zeroEncoder(){
+        intakerotater.setPosition(0);
+        stopIntakerotater();
+    }
+    public void IntakerDownNonStop(){
+        double currentPosition = getIntakerotaterPosition();
+        if (currentPosition < Constants.Intaker.intakeRotaterDownLimit) {
+            intakerotater.setControl(velocityRequest.withVelocity(Constants.Intaker.intakeRotaterVelocity));
+        } else {
+            stopIntakerotater();
+        }
+    }
+    public void IntakerUpNonStop(){
+        double currentPosition = getIntakerotaterPosition();
+        if (currentPosition > Constants.Intaker.intakeRotaterUpLimit) {
+            intakerotater.setControl(velocityRequest.withVelocity(-Constants.Intaker.intakeRotaterVelocity));
+        } else {
+            stopIntakerotater();
+        }
     }
 }

@@ -23,11 +23,11 @@ public class ClimberControls {
     public Command defaultClimberCommand() {
         return Commands.run(()->{
             //climber.climbUp();
-                // 优先级：如果同时按，优先上升（你也可以反过来）
-                if(controller.y().getAsBoolean()&&controller.x().getAsBoolean()){
+                if(controller.getRightY() < -0.5){
                     climber.climbDownNonStop();
-                }
-                else if (controller.y().getAsBoolean()) {
+                } else if(controller.getRightY() > 0.5){
+                    climber.climbUpNonStop();
+                } else if (controller.y().getAsBoolean()) {
                     climber.climbUp();
                 } else if (controller.x().getAsBoolean()) {
                     climber.climbDown();
@@ -49,5 +49,8 @@ public class ClimberControls {
         return Commands.run(climber::initialize, climber)
                 .withTimeout(0.5)
                 .andThen(Commands.runOnce(climber::zeroEncoder, climber));
+    }
+    public Command resetClimberEncoderCommand(ClimberSubsystem climber) {
+        return Commands.runOnce(climber::zeroEncoder, climber);
     }
 }

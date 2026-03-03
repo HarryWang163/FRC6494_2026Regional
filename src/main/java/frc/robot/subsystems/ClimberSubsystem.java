@@ -70,10 +70,14 @@ public class ClimberSubsystem extends SubsystemBase {
     public void climbDown() {
         targetPositionTicks = Constants.Climber.climbDownTicks;  
         climberMotor.setControl(positionHoldRequest.withPosition(targetPositionTicks));
-        
     }
+
     public void climbDownNonStop(){
-        climberMotor.setControl(velocityRequest.withVelocity(Constants.Climber.climbDownVelocity));
+        climberMotor.setControl(velocityRequest.withVelocity(Constants.Climber.climbVelocity));
+    }
+    
+    public void climbUpNonStop(){
+        climberMotor.setControl(velocityRequest.withVelocity(-Constants.Climber.climbVelocity));
     }
 
     public void captureHoldPosition() {
