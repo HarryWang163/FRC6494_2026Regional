@@ -11,6 +11,8 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.RobotStatusManager;
@@ -19,7 +21,13 @@ import frc.robot.Constants.RobotStatus;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
+import java.util.Optional;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance; 
+
 public class DriveControls {
+    public boolean isRedAlliance;
+
     private final CommandSwerveDrivetrain drivetrain;
     private final CommandXboxController driver;
 
@@ -362,5 +370,26 @@ public class DriveControls {
     public double getMaxAngularRate() {
         return maxAngularRate;
     }
+    public void setTeamColors() {
+        Optional<Alliance> ally = DriverStation.getAlliance(); // 获取队伍颜色
+        if (ally.isPresent()) {
+            // 根据队伍颜色设置布尔值
+            if (ally.get() == Alliance.Red) {
+                isRedAlliance = true; // 红队
+            } else if (ally.get() == Alliance.Blue) {
+                isRedAlliance = false; // 蓝队
+            }
+        } else {
+            isRedAlliance = true;
+        }
+        if (isRedAlliance) {
+            System.out.println("Robot is on the Red Alliance.");
+        } else {
+            System.out.println("Robot is on the Blue Alliance.");
+        }
+    }
+    public Command getAllianceColorCommand() {
+        return Commands.runOnce(this::setTeamColors);
+}
 
 }
