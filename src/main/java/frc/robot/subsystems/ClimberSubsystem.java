@@ -25,7 +25,6 @@ public class ClimberSubsystem extends SubsystemBase {
     private final VelocityVoltage velocityRequest = new VelocityVoltage(0).withSlot(0);
 
     private double holdPositionTicks = 0.0;
-    private double deltaPositionTicks = 0.0;
 
     private final NetworkTable climberTable;
     

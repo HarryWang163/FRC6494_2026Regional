@@ -73,7 +73,7 @@ public class RobotContainer {
     SignalLogger.enableAutoLogging(false);
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    configueSwerve();
+    //configueSwerve();
     configueShooter();
     configueClimber();
     bingdingLED();

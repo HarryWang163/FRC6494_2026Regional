@@ -97,8 +97,8 @@ public final class Constants {
     public class Intaker {
 
     public static final double intakeRotaterUpLimit = 0.0;  // rotator上限角度
-    public static final double intakeRotaterDownLimit = 0.0;  // rotator下限角度
-    public static final double intakeRotaterVelocity = 10; // rotater的速度（如果你用速度控制的话）
+    public static final double intakeRotaterDownLimit = -7.6;  // rotator下限角度
+    public static final double intakeRotaterVelocity = 5; // rotater的速度（如果你用速度控制的话）
     public static final double IntakeRotaterGravityFF = 0.0; // 重力前馈增益（需要实测调整）
 
     public static final Slot0Configs intakeGetterSlot0Configs = new Slot0Configs()
@@ -115,8 +115,8 @@ public final class Constants {
     // 单位RPS
     public static final double positionToleranceRotations = 0.00;
     //rotater容差
-    public static final double IntakeGetterK = 1.0; // intake getter速度与触发器输入的比例
-    public static final double Getterminspeed = 20; // intake getter的基础速度（即触发器输入为0时的速度，正值表示默认向内转）
+    public static final double IntakeGetterK = 0.3; // intake getter速度与触发器输入的比例
+    public static final double Getterminspeed = 0.2; // intake getter的基础速度（即触发器输入为0时的速度，正值表示默认向内转）
     }   
     public static class Climber {
 

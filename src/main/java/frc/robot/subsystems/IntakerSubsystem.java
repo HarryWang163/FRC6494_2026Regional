@@ -76,7 +76,7 @@ public class IntakerSubsystem extends SubsystemBase{
     //     }
     // }
     public void setIntakerGetterSpeed(double speed) {
-        intakegetter.setControl(velocityRequest.withVelocity(speed));
+        intakegetter.set(speed);
     }
     public void zeroEncoder(){
         intakerotater.setPosition(0);
@@ -84,18 +84,25 @@ public class IntakerSubsystem extends SubsystemBase{
     }
     public void IntakerDownNonStop(){
         double currentPosition = getIntakerotaterPosition();
-        if (currentPosition < Constants.Intaker.intakeRotaterDownLimit) {
-            intakerotater.setControl(velocityRequest.withVelocity(Constants.Intaker.intakeRotaterVelocity));
-        } else {
-            stopIntakerotater();
-        }
+        if (currentPosition > Constants.Intaker.intakeRotaterDownLimit) {
+        
+        intakerotater.set(-0.05);}
+        // double currentPosition = getIntakerotaterPosition();
+        // if (currentPosition > Constants.Intaker.intakeRotaterDownLimit) {
+        //     intakerotater.setControl(velocityRequest.withVelocity(Constants.Intaker.intakeRotaterVelocity));
+        // } else {
+        //     stopIntakerotater();
+        // }
     }
     public void IntakerUpNonStop(){
         double currentPosition = getIntakerotaterPosition();
-        if (currentPosition > Constants.Intaker.intakeRotaterUpLimit) {
-            intakerotater.setControl(velocityRequest.withVelocity(-Constants.Intaker.intakeRotaterVelocity));
-        } else {
-            stopIntakerotater();
-        }
+        if (currentPosition < Constants.Intaker.intakeRotaterUpLimit) {
+        intakerotater.set(0.1);}
+        
+        // if (currentPosition < Constants.Intaker.intakeRotaterUpLimit) {
+        //     intakerotater.setControl(velocityRequest.withVelocity(-Constants.Intaker.intakeRotaterVelocity));
+        // } else {
+        //     stopIntakerotater();
+        // }
     }
 }
