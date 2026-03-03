@@ -85,6 +85,7 @@ public class RobotContainer {
   /* ====================== */
 
   private void configueSwerve() {
+    enableTrigger.onTrue(driveControls.getAllianceColorCommand());
     Pose2d startingPose = Constants.StartingPoints.Red.Point2;
     drivetrain.resetPose(startingPose);
 

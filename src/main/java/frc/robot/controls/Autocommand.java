@@ -48,14 +48,14 @@ import frc.robot.Constants.RobotStatus;
             return new InstantCommand(() -> {
                 intaker.IntakerDownNonStop();  // 吸球机构下降
             }, intaker).withTimeout(0.5).andThen(new InstantCommand(() -> {
-                intaker.stopIntakerotater();;  // 吸球机构保持当前位置
+                intaker.stopIntakerotater();;  // 停止旋转
             }, intaker));
         }
         public static Command intaker_up(IntakerSubsystem intaker) {
             return new InstantCommand(() -> {
                 intaker.IntakerUpNonStop();  // 吸球机构上升
             }, intaker).withTimeout(0.5).andThen(new InstantCommand(() -> {
-                intaker.stopIntakerotater();;  // 吸球机构保持当前位置
+                intaker.stopIntakerotater();;  // 停止旋转
             }, intaker));
         }
         
