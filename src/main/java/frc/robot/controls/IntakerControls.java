@@ -74,7 +74,7 @@ public class IntakerControls {
             getterspeed = 0;
             }
         IntakerSubsystem.setIntakerGetterSpeed(getterspeed);
-
+        
         if(controller.getLeftY() < -0.5){
                     IntakerSubsystem.IntakerDownNonStop();
             } else if(controller.getLeftY() > 0.5){

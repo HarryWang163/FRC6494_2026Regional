@@ -17,6 +17,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.RobotStatus;
 
     public class Autocommand extends SequentialCommandGroup{
+        
         public static Command climb_up(ClimberSubsystem climber) {
             return new RunCommand(() -> {
                 climber.climbUp();  // 控制爬升器上升
@@ -33,6 +34,31 @@ import frc.robot.Constants.RobotStatus;
                 climber.holdPosition();  // 停止并锁定当前爬升器位置
             }, climber));
         }
+        public static Command start_intake(IntakerSubsystem intaker) {
+            return new InstantCommand(() -> {
+                intaker.setIntakerGetterSpeed(Constants.Intaker.IntakeGetterSpeedforAuto);  // 启动吸球
+            }, intaker);
+        }
+        public static Command stop_intake(IntakerSubsystem intaker) {
+            return new InstantCommand(() -> {
+                intaker.setIntakerGetterSpeed(0);  // 停止吸球
+            }, intaker);
+        }
+        public static Command intaker_down(IntakerSubsystem intaker) {
+            return new InstantCommand(() -> {
+                intaker.IntakerDownNonStop();  // 吸球机构下降
+            }, intaker).withTimeout(0.5).andThen(new InstantCommand(() -> {
+                intaker.stopIntakerotater();;  // 吸球机构保持当前位置
+            }, intaker));
+        }
+        public static Command intaker_up(IntakerSubsystem intaker) {
+            return new InstantCommand(() -> {
+                intaker.IntakerUpNonStop();  // 吸球机构上升
+            }, intaker).withTimeout(0.5).andThen(new InstantCommand(() -> {
+                intaker.stopIntakerotater();;  // 吸球机构保持当前位置
+            }, intaker));
+        }
+        
     }
 
 

@@ -111,7 +111,7 @@ public final class Constants {
         .withKV(0.00).withKA(0.00).withKS(0.00);
     //如果 rotater 受重力影响明显，可能需要用 withKG/withGravityType/withGravityArmPositionOffset（看机构形式）(这句fromAI)
 
-    public static final double IntakeGetterSpeed = 0.0;
+    public static final double IntakeGetterSpeedforAuto = 0.0;
     // 单位RPS
     public static final double positionToleranceRotations = 0.00;
     //rotater容差

@@ -67,7 +67,6 @@ public class ShooterControls {
                     }  
                     break;
                 case AutoAimming:
-                
                     var x = shooterSubsystem.getDistance();
                     x = Math.max(1.2, Math.min(4.5, x));
                     flywheelSpeed = 0.6956596811733782*x*x*x*x*x*x*x-14.164408860183267*x*x*x*x*x*x+119.7115375240918*x*x*x*x*x-543.0984876677477*x*x*x*x+1425.1928543240738*x*x*x-2156.199296490315*x*x+1736.568139600292*x-516.097598057351;
