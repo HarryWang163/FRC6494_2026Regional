@@ -15,6 +15,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -129,6 +130,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             new SwerveRequest.ApplyRobotSpeeds().withSpeeds(scaled)
         );
     }
+
+    
 
 
 
@@ -275,6 +278,73 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
 
         return true;
+    }
+
+    public String driveToAprilTag(){
+        //Rotation2d targetHeading = getPose().getRotation();
+        if(!LimelightSupplier.isTargetVisible() ){
+            return "No Target";
+        }
+        boolean ifRightTag = false;
+        int trueId = LimelightSupplier.getAprilTagID();
+        for(int id : new int[]{16,32}){
+            if(id == trueId){
+                ifRightTag = true;
+                break;
+            }
+        }
+        if(!ifRightTag){
+            return "No Target";
+        }
+        double tx = LimelightSupplier.getTX() ;
+        double targetTz = -LimelightSupplier.getTargetTZ();
+        double ry = LimelightSupplier.getTargetRotationY();
+
+        double multiply = Constants.Limelight.AutoClimbAlignSpeed;
+        if(Math.abs(tx)<Constants.Limelight.AutoClimbAlignTolerance){
+            tx = 0;
+        }
+        else{
+            tx *= multiply ;
+        }
+        
+        if(Math.abs(targetTz)<Constants.Limelight.AutoClimbAlignTolerance){
+            targetTz = 0;
+        }
+        else{
+            targetTz*= multiply ;
+            targetTz*= 5;
+        }
+
+        if(Math.abs(ry)<Constants.Limelight.AutoClimbAlignTolerance){
+            ry = 0;
+        }
+        else{
+            ry/=10;
+            ry = Math.min(ry, Constants.Limelight.AutoClimbmaxAngularVelocity);
+            ry = Math.max(ry, -Constants.Limelight.AutoClimbmaxAngularVelocity);
+        }
+        
+        
+        positioningNetworkTable.getEntry("interestPointsClimb tx").setDouble(tx);
+        positioningNetworkTable.getEntry("interestPointsClimb targetTz").setDouble(targetTz);
+        positioningNetworkTable.getEntry("interestPointsClimb ry").setDouble(ry);
+        
+
+        ChassisSpeeds scaled = new ChassisSpeeds(
+            tx,                 // X 不变
+            targetTz,                 // Y 不变
+            ry
+        );
+        driveRobotRelative(scaled);
+        // drive(
+        //     new Translation2d(tx, targetTz),
+        //     ry,
+        //     false,
+        //     false
+        // );
+
+        return "Driving to AprilTag";
     }
     @Override
     public void periodic() {
