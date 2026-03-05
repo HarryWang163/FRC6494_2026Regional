@@ -78,6 +78,9 @@ public final class Constants {
         public static final String LIMELIGHT_NAME_Shooter = "limelight-shooter";
         public static final String LIMELIGHT_NAME_Intaker = "limelight-intaker";
         public static final Boolean UsingMetaTag2 = true;
+        public static final int Pipeline = 1;
+        public static final double TXDeadHand = 0.5;
+        public static final double TZDeadHand = 0.5;
     }
 
     public class Field {

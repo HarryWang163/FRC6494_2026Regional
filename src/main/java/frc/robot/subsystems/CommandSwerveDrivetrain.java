@@ -15,6 +15,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -127,12 +128,82 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         setControl(
             new SwerveRequest.ApplyRobotSpeeds().withSpeeds(scaled)
-        );
+        ); 
     }
 
+    // public String driveToAprilTagOfClimber(double speed) {
+    //     // 记录当前方向，作为目标方向，避免在驱动过程中偏航
+    //     Rotation2d TargetHeading=getPose().getRotation();
+    //     // 设置 Limelight pipeline（25赛季只有一条，直接设置）
+    //     LimelightHelpers.setPipelineIndex(Constants.Limelight.LIMELIGHT_NAME_Intaker,Constants.Limelight.Pipeline);
 
+    //     // 如果 Limelight 没有检测到目标，直接返回
+    //     if (!LimelightSupplier.isTargetVisible()) {
+    //     return "No Target";
+    //     }
+    //     // 获取检测到的 AprilTag ID
+    //     int trueId = LimelightSupplier.getAprilTagID();
 
-        
+    //     // 只有特定的 Tag ID 被认为是目标
+    //     int[] validTagIDs = {16,32};
+    //     boolean isValidTag = false;
+    //     for (int id : validTagIDs) {
+    //         if (id == trueId) {
+    //             isValidTag = true;
+    //             break;
+    //         }
+    //     }
+    //     if (!isValidTag) {
+    //         return "No Target";
+    //     }
+
+    //     // 获取 Limelight 的偏移数据
+    //     double tx = LimelightSupplier.getTX();                // 水平偏移角度
+    //     double targetTz = -LimelightSupplier.getTargetTZ();   // 目标与底盘前方的距离，取负方便坐标系
+    //     double ry = LimelightSupplier.getTargetRotationY();  // 目标旋转角
+
+    //     // 根据速度参数计算实际驱动速度
+    //     double multiply = Constants.Swerve.maxSpeed * speed;
+
+    //     // 水平偏移死区处理
+    //     if (Math.abs(tx) < Constants.Limelight.TXDeadHand) {
+    //         tx = 0;
+    //     } else {
+    //         tx *= multiply;
+    //     }
+
+    //     // 前进距离死区处理
+    //     if (Math.abs(targetTz) < Constants.Limelight.TZDeadHand) {
+    //         targetTz = 0;
+    //     } else {
+    //         targetTz *= multiply;
+    //         targetTz *= 5; // 放大系数，增加前进响应
+    //     }
+
+    //     // 旋转角度死区处理
+    //     if (Math.abs(ry) < Constants.Swerve.reefCorrection.roatationYDeadHand) {
+    //         ry = 0;
+    //     } else {
+    //         ry /= 10; // 缩小旋转响应
+    //         ry = Math.min(ry, Constants.Swerve.maxAngularVelocity);
+    //         ry = Math.max(ry, -Constants.Swerve.maxAngularVelocity);
+    //     }
+
+    //     // 输出到 SmartDashboard 方便调试
+    //     SmartDashboard.putNumber("driveTx_r", tx);
+    //     SmartDashboard.putNumber("driveTz_r", targetTz);
+    //     SmartDashboard.putNumber("driveRy_r", ry);
+
+    //     // 调用底盘驱动方法
+    //     drive(
+    //         new Translation2d(tx, targetTz), // x = 水平, y = 前进
+    //         ry,                              // 旋转速度
+    //         false,                           // 是否相对场地驱动
+    //         false                            // 是否速度保持为绝对速度
+    //     );
+    //         return "Driving to AprilTag";
+    // }
+
     private static final double kMaxVisionJumpMeters = 1.0;
     private static final double kMaxOmegaDegPerSec = 360.0;
 
