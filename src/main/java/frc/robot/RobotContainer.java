@@ -123,10 +123,15 @@ public class RobotContainer {
     // controllerlower.leftStick().onTrue(robotStatusManager.setStatusCommand(RobotStatus.AutoAimming));
     // controllerlower.leftStick().onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
 
-    //双操均可触发autoaimming
-    Trigger autoAim = controllerupper.rightBumper().or(controllerlower.leftStick());
+    //双操均可触发autoaimming模式，松开时alltelop
+    Trigger autoAim = controllerupper.rightBumper().or(controllerlower.rightStick());
     autoAim.onTrue(robotStatusManager.setStatusCommand(RobotStatus.AutoAimming));
     autoAim.onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
+
+    //双操均可触发passingball模式，松开时alltelop
+    Trigger autoAim2 = controllerupper.leftBumper().or(controllerlower.leftStick());
+    autoAim2.onTrue(robotStatusManager.setStatusCommand(RobotStatus.PassingBall));
+    autoAim2.onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
 
     controllerlower.leftTrigger()
     .onTrue(robotStatusManager.setStatusCommand(RobotStatus.CrossingTrench))

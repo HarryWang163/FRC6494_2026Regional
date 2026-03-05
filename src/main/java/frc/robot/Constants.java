@@ -88,12 +88,12 @@ public final class Constants {
     public class Field {
         public static final double RedHubPositionX = 11.914;
         public static final double RedHubPositionY = 4.034;
-        public static final double BlueHubPositionX = 0;
-        public static final double BlueHubPositionY = 0;
-        public static final double PassingBallPosY1 = 2.51;
-        public static final double PassingBallPosY2 = 5.556;
-        public static final double RedPassingBallPosX = 0;
-        public static final double BluePassingBallPosX = 0;
+        public static final double BlueHubPositionX = 4.625;
+        public static final double BlueHubPositionY = 4.034;
+        public static final double PassingBallPosY1 = 1.405;
+        public static final double PassingBallPosY2 = 6.664;
+        public static final double RedPassingBallPosX = 13.355;
+        public static final double BluePassingBallPosX = 3.184;
     }
     
 
