@@ -76,9 +76,9 @@ public class ShooterControls {
                         flywheelSpeed = 0;
                         conveyorSpeed = 0;
                     }
-                    if(shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble()<flywheelSpeed*0.9){
-                        conveyorSpeed = 0;
-                    }
+                    // if(shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble()<flywheelSpeed*0.7){
+                    //     conveyorSpeed = 0;
+                    // }
                     shooterControlTable.getEntry("flywheelTargetSpeed").setDouble(flywheelSpeed);
                     shooterControlTable.getEntry("conveyerTargetSpeed").setDouble(conveyorSpeed);
                     shooterControlTable.getEntry("backboardTargetPosition").setDouble(backboardPosition);

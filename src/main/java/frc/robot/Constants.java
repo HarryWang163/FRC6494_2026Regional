@@ -78,18 +78,9 @@ public final class Constants {
         public static final String LIMELIGHT_NAME_Shooter = "limelight-shooter";
         public static final String LIMELIGHT_NAME_Intaker = "limelight-intaker";
         public static final Boolean UsingMetaTag2 = true;
-<<<<<<< HEAD
-        public static final int Pipeline = 1;
-        public static final double TXDeadHand = 0.5;
-        public static final double TZDeadHand = 0.5;
-        public static final double AutoClimbAlignSpeed = 0.1;
-        public static final double AutoClimbAlignTolerance = 0.1;
-        public static final double AutoClimbmaxAngularVelocity = 0.1;
-=======
         public static final double AutoClimbAlignSpeed = 0.5;//等查资料
         public static final double AutoClimbAlignTolerance = 0.1;//？
         public static final double AutoClimbmaxAngularVelocity  = 0.5;//等查资料
->>>>>>> a8acbce9dc302adc52e28e6f8c205677f50ea20e
     }
 
     public class Field {

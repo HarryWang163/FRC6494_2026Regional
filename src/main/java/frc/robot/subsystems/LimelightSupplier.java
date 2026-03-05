@@ -84,20 +84,7 @@ public class LimelightSupplier extends SubsystemBase {
         SmartDashboard.putString("LimelightPipeType", LimelightHelpers.getCurrentPipelineType(Constants.Limelight.LIMELIGHT_NAME_Intaker));
         if (isTargetVisible()){
             SmartDashboard.putString("LimelightTargetVisible", "YES");
-<<<<<<< HEAD
-            // SmartDashboard.putNumber("LimelightTX", getTX());
-            // SmartDashboard.putNumber("LimelightTY", getTY());
             SmartDashboard.putNumber("LimelightTA", getTA());
-            // double[] targetPose = getTargetPose();
-            // String s = "";
-            // for(double x : targetPose){
-            //     s += Double.toString(x);
-            //     s += " ";
-            // }
-            // SmartDashboard.putString("LimeLightTP", s);
-=======
-            SmartDashboard.putNumber("LimelightTA", getTA());
->>>>>>> a8acbce9dc302adc52e28e6f8c205677f50ea20e
             SmartDashboard.putNumber("TargetRY", getTargetRotationY());
             SmartDashboard.putNumber("TargetTX", getTX());
             SmartDashboard.putNumber("TargetTZ", getTargetTZ());
