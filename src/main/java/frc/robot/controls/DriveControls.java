@@ -145,6 +145,7 @@ public class DriveControls {
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(Double.NaN);
                 break;
             case Climbing:
+                drivetrain.driveToAprilTag();
                 break;
             case CrossingBump:
                 double differenceBump = calculateDifferenceToTwoTarget(drivetrain.getState().Pose.getY(), Constants.AutoPositioning.bumpY[0], Constants.AutoPositioning.bumpY[1]);

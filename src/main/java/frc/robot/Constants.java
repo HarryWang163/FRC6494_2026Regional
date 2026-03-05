@@ -81,6 +81,9 @@ public final class Constants {
         public static final int Pipeline = 1;
         public static final double TXDeadHand = 0.5;
         public static final double TZDeadHand = 0.5;
+        public static final double AutoClimbAlignSpeed = 0.1;
+        public static final double AutoClimbAlignTolerance = 0.1;
+        public static final double AutoClimbmaxAngularVelocity = 0.1;
     }
 
     public class Field {

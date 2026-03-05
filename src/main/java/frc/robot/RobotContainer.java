@@ -140,6 +140,10 @@ public class RobotContainer {
     controllerlower.rightTrigger()
     .onTrue(robotStatusManager.setStatusCommand(RobotStatus.CrossingBump))
     .onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
+
+    controllerlower.a()
+    .onTrue(robotStatusManager.setStatusCommand(RobotStatus.Climbing))
+    .onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
   }
 
   private void configueShooter(){
