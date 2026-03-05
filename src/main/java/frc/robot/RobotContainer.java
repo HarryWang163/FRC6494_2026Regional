@@ -144,6 +144,11 @@ public class RobotContainer {
     controllerlower.a()
     .onTrue(robotStatusManager.setStatusCommand(RobotStatus.Climbing))
     .onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> a8acbce9dc302adc52e28e6f8c205677f50ea20e
   }
 
   private void configueShooter(){

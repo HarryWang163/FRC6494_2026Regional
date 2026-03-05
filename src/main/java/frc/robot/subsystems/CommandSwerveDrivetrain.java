@@ -131,6 +131,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         ); 
     }
 
+<<<<<<< HEAD
+=======
+    
+
+
+
+        
+>>>>>>> a8acbce9dc302adc52e28e6f8c205677f50ea20e
     private static final double kMaxVisionJumpMeters = 1.0;
     private static final double kMaxOmegaDegPerSec = 360.0;
 
@@ -274,6 +282,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         return true;
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a8acbce9dc302adc52e28e6f8c205677f50ea20e
     public String driveToAprilTag(){
         //Rotation2d targetHeading = getPose().getRotation();
         if(!LimelightSupplier.isTargetVisible() ){
@@ -284,12 +296,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         for(int id : new int[]{16,32}){
             if(id == trueId){
                 ifRightTag = true;
+<<<<<<< HEAD
                 System.out.println("Target get.");
+=======
+>>>>>>> a8acbce9dc302adc52e28e6f8c205677f50ea20e
                 break;
             }
         }
         if(!ifRightTag){
+<<<<<<< HEAD
             System.out.println("No Target.");
+=======
+>>>>>>> a8acbce9dc302adc52e28e6f8c205677f50ea20e
             return "No Target";
         }
         double tx = LimelightSupplier.getTX() ;
