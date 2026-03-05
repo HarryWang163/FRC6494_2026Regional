@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -31,7 +32,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private NetworkTable shooterNetworkTable;
 
-    private final VelocityDutyCycle velocityRequest = new VelocityDutyCycle(0);
+    private final VelocityVoltage velocityRequest = new VelocityVoltage(0);
 
 
     // 初始化各个部件

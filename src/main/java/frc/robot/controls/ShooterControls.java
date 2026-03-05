@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.RobotStatusManager;
 import frc.robot.Constants.Intaker;
+import frc.robot.Constants.RobotStatus;
 import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
@@ -78,12 +79,9 @@ public class ShooterControls {
                         flywheelSpeed = 0;
                         conveyorSpeed = 0;
                     }
-                    if(shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble()<flywheelSpeed*0.7){
+                    if(shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble()<flywheelSpeed*0.95){
                         conveyorSpeed = 0;
                     }
-                    // flywheelSpeed = calculateFlywheelSpeedOnlywithOffset(60);
-                    // double flywheelSpeed = calculateFlywheelSpeed(0);
-                    // double BackboardPosition = calculateBackboardPosition(0);
                     shooterControlTable.getEntry("flywheelTargetSpeed").setDouble(flywheelSpeed);
                     shooterControlTable.getEntry("conveyerTargetSpeed").setDouble(conveyorSpeed);
                     shooterControlTable.getEntry("backboardTargetPosition").setDouble(backboardPosition);

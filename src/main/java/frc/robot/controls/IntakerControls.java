@@ -6,16 +6,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.IntakerSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.Constants;
 
 
 public class IntakerControls {
     private final IntakerSubsystem IntakerSubsystem;
     private final CommandXboxController controller;
+    private final ShooterSubsystem ShooterSubsystem;
 
     //private static final double ROTATER_STEP_PER_CYCLE = 0.00;
 
-    public IntakerControls(IntakerSubsystem Intaker, CommandXboxController controller) {
+    public IntakerControls(IntakerSubsystem Intaker, ShooterSubsystem Shooter, CommandXboxController controller) {
+        this.ShooterSubsystem = Shooter;
         this.IntakerSubsystem = Intaker;
         this.controller = controller;
     }
@@ -70,10 +73,13 @@ public class IntakerControls {
     public Command defaultIntakerCommand() {
         return Commands.run(() -> {
         double getterspeed = controller.getLeftTriggerAxis() * Constants.Intaker.IntakeGetterK + Constants.Intaker.Getterminspeed;
+        double conveyoyspeedforintake = 10;
         if (controller.getLeftTriggerAxis() < 0.1) {
             getterspeed = 0;
+            conveyoyspeedforintake = 0;
             }
         IntakerSubsystem.setIntakerGetterSpeed(getterspeed);
+        ShooterSubsystem.setConveyorSpeedByRPS(conveyoyspeedforintake);
         
         if(controller.getLeftY() < -0.5){
                     IntakerSubsystem.IntakerUpNonStop();

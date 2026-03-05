@@ -15,14 +15,14 @@ public final class Constants {
         CrossingTrench
     }
     public class Shooter {
-        public static final double conveyorSpeed = 20;
+        public static final double conveyorSpeed = 25;
         public static final Slot0Configs flyWheelSlot0Configs = new Slot0Configs()
             .withKP(0.0).withKI(0).withKD(0)
-            .withKV(0.0088).withKA(0.0).withKS(0.0);
+            .withKV(0.099).withKA(0.0).withKS(0.0);
 
         public static final Slot0Configs conveyorSlot0Configs = new Slot0Configs()
             .withKP(0.0).withKI(0).withKD(0)
-            .withKV(0.02).withKA(0.15).withKS(0);
+            .withKV(0.16).withKA(0.15).withKS(0);
 
         public static final Slot0Configs backboardSlot0Configs = new Slot0Configs()
             .withKP(0.01).withKI(0).withKD(0)
