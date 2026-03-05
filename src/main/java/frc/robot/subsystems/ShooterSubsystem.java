@@ -95,6 +95,9 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setConveyorSpeedByRPS(double speed) {
         conveyorMotor.setControl(velocityRequest.withVelocity(speed));  // 设置传动电机速度
     }
+    public void setConveyorSpeedOpen(double speed){
+        conveyorMotor.set(speed);
+    }
 
     //调试用
     public void setBackboardSpeedByRPS(double speed){
@@ -167,6 +170,7 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterNetworkTable.getEntry("backboardTargetRate").setDouble(backboardPID.getSetpoint().position);
         shooterNetworkTable.getEntry("isBackboardAtTarget").setBoolean(isBackboardAtTarget());
         shooterNetworkTable.getEntry("distanceGetted").setDouble(getDistanceToHub());
+        shooterNetworkTable.getEntry("distancetopassball").setDouble(getDistanceToPassball());
     }
 
     public double getDistanceToHub(){

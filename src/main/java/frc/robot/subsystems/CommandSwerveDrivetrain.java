@@ -284,10 +284,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         for(int id : new int[]{16,32}){
             if(id == trueId){
                 ifRightTag = true;
+                System.out.println("Target get.");
                 break;
             }
         }
         if(!ifRightTag){
+            System.out.println("No Target.");
             return "No Target";
         }
         double tx = LimelightSupplier.getTX() ;

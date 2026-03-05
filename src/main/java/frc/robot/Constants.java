@@ -15,7 +15,7 @@ public final class Constants {
         CrossingTrench
     }
     public class Shooter {
-        public static final double conveyorSpeed = 25;
+        public static final double conveyorSpeed = 50;
         public static final Slot0Configs flyWheelSlot0Configs = new Slot0Configs()
             .withKP(0.0).withKI(0).withKD(0)
             .withKV(0.099).withKA(0.0).withKS(0.0);
