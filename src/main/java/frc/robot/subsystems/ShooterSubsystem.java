@@ -98,6 +98,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
     //调试用
     public void setBackboardSpeedByRPS(double speed){
+         if (speed > 0 && speed < 10) {
+        speed = 10;
+        } else if (speed < 0 && speed > -10) {
+        speed = -10;
+        }
         backboardMotor.setControl(velocityRequest.withVelocity(speed));
     }
 

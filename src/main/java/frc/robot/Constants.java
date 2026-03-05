@@ -26,15 +26,15 @@ public final class Constants {
 
         public static final Slot0Configs backboardSlot0Configs = new Slot0Configs()
             .withKP(0.01).withKI(0).withKD(0)
-            .withKV(0.008).withKA(0.0).withKS(0.010);
+            .withKV(0.03).withKA(0.0).withKS(0.010);
 
         public class backboardPositionPID {
-            public static final double kP = 0.1;
+            public static final double kP = 0.3;
             public static final double kI = 0.0;
             public static final double kD = 0.0;
             
         }
-        public static final double backboardSpeedMax = 30; //也就是output
+        public static final double backboardSpeedMax = 60; //也就是output
         // 背板的上下限位角度
         public static final double backboardUpLimit = 3000.0;  // 背板上限角度（根据实际需求设置）
         public static final double backboardDownLimit = 0.0;  // 背板下限角度（根据实际需求设置）
