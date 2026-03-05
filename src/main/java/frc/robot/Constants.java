@@ -39,11 +39,6 @@ public final class Constants {
         public static final double backboardUpLimit = 3000.0;  // 背板上限角度（根据实际需求设置）
         public static final double backboardDownLimit = 0.0;  // 背板下限角度（根据实际需求设置）
     }
-    public class ShooterCalculation{
-        public static final double positionNear = 0;  // 近距离背板角度
-        public static final double positionMid  = 1600;  // 中距离背板角度
-        public static final double postionFar  = 3200;  // 远距离背板角度
-    }
     public class AutoPositioning {
         public static final double autoRotationkP = 0.1;
         public static final double autoRotationForBumpTargetDegrees = 45;

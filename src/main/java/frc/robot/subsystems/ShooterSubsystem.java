@@ -161,11 +161,14 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterNetworkTable.getEntry("backboardCurrentRate").setDouble(getBackboardPosition());
         shooterNetworkTable.getEntry("backboardTargetRate").setDouble(backboardPID.getSetpoint().position);
         shooterNetworkTable.getEntry("isBackboardAtTarget").setBoolean(isBackboardAtTarget());
-        shooterNetworkTable.getEntry("distanceGetted").setDouble(getDistance());
+        shooterNetworkTable.getEntry("distanceGetted").setDouble(getDistanceToHub());
     }
 
-    public double getDistance(){
+    public double getDistanceToHub(){
         //获得车子距离Hub的距离
         return NetworkTableInstance.getDefault().getTable("AutoControl").getEntry("distanceToHub").getDouble(0.0);
+    }
+    public double getDistanceToPassball(){
+        return NetworkTableInstance.getDefault().getTable("AutoControl").getEntry("distanceToPassball").getDouble(0.0);
     }
 }

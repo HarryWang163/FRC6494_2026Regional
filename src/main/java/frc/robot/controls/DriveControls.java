@@ -124,7 +124,9 @@ public class DriveControls {
         // 将距离值写入 NetworkTable
         autoControlNetworkTable.getEntry("distanceToHub").setDouble(distanceAndRotation[0]);
         autoControlNetworkTable.getEntry("angleDifferenceToHub").setDouble(distanceAndRotation[1]);
-
+        autoControlNetworkTable.getEntry("distanceToPassball").setDouble(calculateDistanceAndRotationToPassBall()[0]);
+        autoControlNetworkTable.getEntry("angleDifferenceToPassball").setDouble(calculateDistanceAndRotationToPassBall()[1]);
+        
         switch (robotStatusManager.getStatus()) {
             case Stopped:
                 vx = 0;
