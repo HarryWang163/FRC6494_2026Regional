@@ -274,6 +274,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         return true;
     }
+    public void setLimelightIntakerPipeline(int pipeline){
+        LimelightSupplier.setPipeline(pipeline);
+    }
+
     public String driveToAprilTag(){
         //Rotation2d targetHeading = getPose().getRotation();
         if(!LimelightSupplier.isTargetVisible() ){
@@ -322,11 +326,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         
         
-        positioningNetworkTable.getEntry("interestPointsClimb tx").setDouble(tx);
-        positioningNetworkTable.getEntry("interestPointsClimb targetTz").setDouble(targetTz);
-        positioningNetworkTable.getEntry("interestPointsClimb ry").setDouble(ry);
-        
-
         ChassisSpeeds scaled = new ChassisSpeeds(
             tx,                 // X 不变
             targetTz,                 // Y 不变

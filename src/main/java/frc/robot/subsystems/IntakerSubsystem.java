@@ -86,6 +86,6 @@ public class IntakerSubsystem extends SubsystemBase{
         intakerotater.set(-0.05);
         }
     public void IntakerUpNonStop(){
-        intakerotater.set(0.2);
+        intakerotater.set(0.1);
     }
 }

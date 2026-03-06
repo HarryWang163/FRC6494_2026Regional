@@ -75,6 +75,7 @@ public class IntakerControls {
         double getterspeed = 0;
         double conveyoyspeedforintake = 15;
         double statorCurrent = ShooterSubsystem.getConveyorStatorCurrent();
+        
         if (controller.getLeftTriggerAxis() > 0.1) {
             getterspeed = controller.getLeftTriggerAxis() * Constants.Intaker.IntakeGetterK + Constants.Intaker.Getterminspeed;
             ShooterSubsystem.setConveyorSpeedByRPS(conveyoyspeedforintake);
