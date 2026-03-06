@@ -158,6 +158,10 @@ public class ShooterSubsystem extends SubsystemBase {
     public void resetbackboardencoder(){
         backboardEncoder.reset();
     }
+    public double getConveyorStatorCurrent(){
+        double statorCurrent = conveyorMotor.getStatorCurrent().getValueAsDouble();
+        return statorCurrent;
+    }
 
     @Override
     public void periodic() {
@@ -171,6 +175,7 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterNetworkTable.getEntry("isBackboardAtTarget").setBoolean(isBackboardAtTarget());
         shooterNetworkTable.getEntry("distanceGetted").setDouble(getDistanceToHub());
         shooterNetworkTable.getEntry("distancetopassball").setDouble(getDistanceToPassball());
+        shooterNetworkTable.getEntry("statorCurrent").setDouble(getConveyorStatorCurrent());
     }
 
     public double getDistanceToHub(){
