@@ -72,14 +72,13 @@ public class IntakerControls {
     
     public Command defaultIntakerCommand() {
         return Commands.run(() -> {
-        double getterspeed = controller.getLeftTriggerAxis() * Constants.Intaker.IntakeGetterK + Constants.Intaker.Getterminspeed;
-        double conveyoyspeedforintake = 10;
-        if (controller.getLeftTriggerAxis() < 0.1) {
-            getterspeed = 0;
-            conveyoyspeedforintake = 0;
+        double getterspeed = 0;
+        double conveyoyspeedforintake = 15;
+        if (controller.getLeftTriggerAxis() > 0.1) {
+            //getterspeed = controller.getLeftTriggerAxis() * Constants.Intaker.IntakeGetterK + Constants.Intaker.Getterminspeed;
+            ShooterSubsystem.setConveyorSpeedByRPS(conveyoyspeedforintake);
             }
         IntakerSubsystem.setIntakerGetterSpeed(getterspeed);
-        ShooterSubsystem.setConveyorSpeedByRPS(conveyoyspeedforintake);
         
         if(controller.getLeftY() < -0.5){
                     IntakerSubsystem.IntakerUpNonStop();
