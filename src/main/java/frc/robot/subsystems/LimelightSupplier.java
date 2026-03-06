@@ -17,7 +17,7 @@ import frc.robot.subsystems.LimelightHelpers.RawFiducial;
 public class LimelightSupplier extends SubsystemBase {
 
     public LimelightSupplier() {
-        setPipeline(1);
+        setPipeline(8);
     }
 
     public static double getTX() {

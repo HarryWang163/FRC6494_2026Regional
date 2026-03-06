@@ -80,9 +80,28 @@ public final class Constants {
         public static final Boolean UsingMetaTag2 = true;
         public static final int climbPipelineIndex = 8;
         public static final int locatePipelineIndex = 0;
-        public static final double AutoClimbAlignSpeed = 0.5;//等查资料
-        public static final double AutoClimbAlignTolerance = 0.1;//？
-        public static final double AutoClimbmaxAngularVelocity  = 0.5;//等查资料
+
+        // 误差死区 / 对齐判定
+        public static final double AutoClimbToleranceTX = 1.5;   // deg
+        public static final double AutoClimbToleranceTZ = 0.10;  // m
+        public static final double AutoClimbToleranceRY = 2.0;   // deg
+
+        // P 控制系数
+        public static final double AutoClimbKpTX = 0.020;   // deg -> rad/s
+        public static final double AutoClimbKpTZ = 0.90;    // m -> m/s
+        public static final double AutoClimbKpRY = 0.015;   // deg -> rad/s
+
+        // 最小输出（防止快到目标时推不动）
+        public static final double AutoClimbMinVX = 0.18;      // m/s
+        public static final double AutoClimbMinOmega = 0.10;   // rad/s
+
+        // 最大输出（防止冲太猛）
+        public static final double AutoClimbMaxVX = 1.20;      // m/s
+        public static final double AutoClimbMaxOmega = 0.60;   // rad/s
+
+        // 远距离 / 大角度时额外限速，可后续微调
+        public static final double AutoClimbFastTurnThresholdTX = 15.0; // deg
+        public static final double AutoClimbFastTurnOmega = 0.45;       // rad/s
     }
 
     public class Field {

@@ -135,10 +135,12 @@ public class DriveControls {
                 vomega = 0;
                 break;
             case PassingBall:
+                LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
                 vomega = calculateRotationSpeedFromRotationAngle(calculateDistanceAndRotationToPassBall()[1]);
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(vomega);
                 break;
             case AutoAimming:
+                LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
                 vomega = calculateRotationSpeedFromRotationAngle(distanceAndRotation[1]);
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(vomega);
                 break;

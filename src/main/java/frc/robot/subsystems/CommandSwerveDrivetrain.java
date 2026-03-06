@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants.DriveMode;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+import frc.robot.subsystems.LimelightHelpers.RawFiducial;
 import frc.robot.Constants;
 
 import edu.wpi.first.networktables.*;
@@ -269,81 +270,131 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // 2) 转太快：拒绝（角速度你可以从 Pigeon2 或 drivetrain state 拿）
         double omegaDegPerSec = getPigeon2().getAngularVelocityZWorld().getValueAsDouble(); // 若你有这个信号
         if (Math.abs(omegaDegPerSec) > kMaxOmegaDegPerSec) {
-            System.out.println("NoUsingMetaTag2ForTooFastRotationSpeed");
+            //System.out.println("NoUsingMetaTag2ForTooFastRotationSpeed");
             return false;
         }      
 
         // 3) 跳变太大：拒绝（Phoenix6 推荐的稳定策略）
         //Pose2d current = getState().Pose;
         if (currentPose.getTranslation().getDistance(mt2.pose.getTranslation()) > kMaxVisionJumpMeters) {
-            System.out.println("NoUsingMetaTag2ForTooChangingPose");
+            //System.out.println("NoUsingMetaTag2ForTooChangingPose");
             return false;
         }
 
         return true;
     }
-    public String driveToAprilTag(){
-        //Rotation2d targetHeading = getPose().getRotation();
-        if(!LimelightSupplier.isTargetVisible() ){
-            return "No Target";
-        }
-        boolean ifRightTag = false;
-        int trueId = LimelightSupplier.getAprilTagID();
-        for(int id : new int[]{16,32}){
-            if(id == trueId){
-                ifRightTag = true;
-                System.out.println("Target get.");
-                break;
-            }
-        }
-        if(!ifRightTag){
-            System.out.println("No Target.");
-            return "No Target";
-        }
-        double tx = LimelightSupplier.getTX() ;
-        double targetTz = -LimelightSupplier.getTargetTZ();
-        double ry = LimelightSupplier.getTargetRotationY();
-
-        double multiply = Constants.Limelight.AutoClimbAlignSpeed;
-        if(Math.abs(tx)<Constants.Limelight.AutoClimbAlignTolerance){
-            tx = 0;
-        }
-        else{
-            tx *= multiply ;
-        }
-        
-        if(Math.abs(targetTz)<Constants.Limelight.AutoClimbAlignTolerance){
-            targetTz = 0;
-        }
-        else{
-            targetTz*= multiply ;
-            targetTz*= 5;
-        }
-
-        if(Math.abs(ry)<Constants.Limelight.AutoClimbAlignTolerance){
-            ry = 0;
-        }
-        else{
-            ry/=10;
-            ry = Math.min(ry, Constants.Limelight.AutoClimbmaxAngularVelocity);
-            ry = Math.max(ry, -Constants.Limelight.AutoClimbmaxAngularVelocity);
-        }
-        isAlignedToAprilTag = Math.abs(tx) < Constants.Limelight.AutoClimbAlignTolerance && Math.abs(targetTz) < Constants.Limelight.AutoClimbAlignTolerance && Math.abs(ry) < Constants.Limelight.AutoClimbAlignTolerance;
-        ChassisSpeeds scaled = new ChassisSpeeds(
-            tx,                 // X 不变
-            targetTz,                 // Y 不变
-            ry
-        );
-        driveRobotRelative(scaled);
-        // drive(
-        //     new Translation2d(tx, targetTz),
-        //     ry,
-        //     false,
-        //     false
-        // );
-
-        return "Driving to AprilTag";
+    private double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
     }
+
+    public String driveToAprilTag() {
+        System.out.println("Pipeline = " + LimelightHelpers.getCurrentPipelineIndex(Constants.Limelight.LIMELIGHT_NAME_Intaker));
+        System.out.println("TV = " + LimelightSupplier.isTargetVisible());
+
+    if (!LimelightSupplier.isTargetVisible()) {
+        isAlignedToAprilTag = false;
+        //stop();
+        return "No Target";
+    }
+
+    RawFiducial[] fiducials =
+        LimelightHelpers.getRawFiducials(Constants.Limelight.LIMELIGHT_NAME_Intaker);
+
+    boolean foundDesiredTag = false;
+    for (RawFiducial fiducial : fiducials) {
+        if (fiducial.id == 16 || fiducial.id == 32) {
+            foundDesiredTag = true;
+            break;
+        }
+    }
+
+    if (!foundDesiredTag) {
+        isAlignedToAprilTag = false;
+        stop();
+        return "No Desired Tag";
+    }
+
+    // ===== 读取原始误差 =====
+    double tx = LimelightSupplier.getTX();                 // deg
+    double tz = -LimelightSupplier.getTargetTZ();          // m，方向按你当前经验保留负号
+    double ry = LimelightSupplier.getTargetRotationY();    // deg
+
+    // ===== 用原始误差判断是否已对齐 =====
+    isAlignedToAprilTag =
+        Math.abs(tx) < Constants.Limelight.AutoClimbToleranceTX &&
+        Math.abs(tz) < Constants.Limelight.AutoClimbToleranceTZ &&
+        Math.abs(ry) < Constants.Limelight.AutoClimbToleranceRY;
+
+    if (isAlignedToAprilTag) {
+        stop();
+        return "Aligned";
+    }
+
+    // ===== 计算输出 =====
+    double vx = 0.0;
+    double vy = 0.0;
+    double omega = 0.0;
+
+    // 1) 前后控制：根据 tz 前进/后退
+    if (Math.abs(tz) > Constants.Limelight.AutoClimbToleranceTZ) {
+        vx = tz * Constants.Limelight.AutoClimbKpTZ;
+
+        // 最小输出，避免快到目标时不动
+        if (Math.abs(vx) < Constants.Limelight.AutoClimbMinVX) {
+            vx = Math.copySign(Constants.Limelight.AutoClimbMinVX, vx);
+        }
+
+        // 最大输出限幅
+        vx = clamp(vx,
+            -Constants.Limelight.AutoClimbMaxVX,
+             Constants.Limelight.AutoClimbMaxVX);
+    }
+
+    // 2) 旋转控制：tx 为主，ry 为辅
+    //    tx 负责“镜头中心对准 tag”
+    //    ry 负责“机器人姿态微调”
+    double omegaFromTx = 0.0;
+    double omegaFromRy = 0.0;
+
+    if (Math.abs(tx) > Constants.Limelight.AutoClimbToleranceTX) {
+        omegaFromTx = -tx * Constants.Limelight.AutoClimbKpTX;
+    }
+
+    if (Math.abs(ry) > Constants.Limelight.AutoClimbToleranceRY) {
+        omegaFromRy = ry * Constants.Limelight.AutoClimbKpRY;
+    }
+
+    omega = omegaFromTx + omegaFromRy;
+
+    // 大偏角时直接给较明显的转速，先把朝向拉回来
+    if (Math.abs(tx) > Constants.Limelight.AutoClimbFastTurnThresholdTX) {
+        omega = Math.copySign(Constants.Limelight.AutoClimbFastTurnOmega, omega);
+    }
+
+    // 最小输出，避免转不动
+    if (Math.abs(omega) > 1e-6 && Math.abs(omega) < Constants.Limelight.AutoClimbMinOmega) {
+        omega = Math.copySign(Constants.Limelight.AutoClimbMinOmega, omega);
+    }
+
+    // 最大输出限幅
+    omega = clamp(omega,
+        -Constants.Limelight.AutoClimbMaxOmega,
+         Constants.Limelight.AutoClimbMaxOmega);
+
+    // ===== 调试输出 =====
+    driveNetworkTable.getEntry("ClimbTX").setDouble(tx);
+    driveNetworkTable.getEntry("ClimbTZ").setDouble(tz);
+    driveNetworkTable.getEntry("ClimbRY").setDouble(ry);
+    driveNetworkTable.getEntry("ClimbVXCmd").setDouble(vx);
+    driveNetworkTable.getEntry("ClimbOmegaCmd").setDouble(omega);
+    driveNetworkTable.getEntry("ClimbAligned").setBoolean(isAlignedToAprilTag);
+
+    // ===== 下发到底盘 =====
+    driveRobotRelative(new ChassisSpeeds(vx, vy, omega));
+
+    return "Driving to AprilTag";
+}
+
     public boolean isAlignedToAprilTag(){
         return isAlignedToAprilTag;
     }
