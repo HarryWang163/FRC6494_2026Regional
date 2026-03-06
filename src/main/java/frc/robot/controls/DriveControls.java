@@ -160,6 +160,7 @@ public class DriveControls {
                         Math.max(Math.abs(raw), 0.4),
                         raw
                     );
+                    vy = isRedAlliance ? -vy : vy;
                 }
                 autoControlNetworkTable.getEntry("BumpDifference").setDouble(differenceBump);
 
@@ -189,6 +190,7 @@ public class DriveControls {
                         Math.max(Math.abs(raw), 0.4),
                         raw
                     );
+                    vy = isRedAlliance ? -vy : vy;
                 }
                 autoControlNetworkTable.getEntry("TrenchDifference").setDouble(differenceTrench);
                 Rotation2d currentAngle = drivetrain.getState().Pose.getRotation();
@@ -212,7 +214,8 @@ public class DriveControls {
         if (fieldCentricEnabled || isAutoLike) {
 
     // 自动状态用 BlueAlliance（不翻转），手柄 field-centric 仍用原 fieldCentric（OperatorPerspective）
-        var chosen = isAutoLike ? fieldCentricAuto : fieldCentric;
+        //var chosen = isAutoLike ? fieldCentricAuto : fieldCentric;
+        var chosen = fieldCentric;
         return chosen
                 .withVelocityX(vx)
                 .withVelocityY(vy)
