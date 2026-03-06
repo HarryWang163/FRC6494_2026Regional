@@ -47,6 +47,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
+    private boolean isAlignedToAprilTag = false;
 
     private DriveMode m_driveMode = DriveMode.OTHER;
     
@@ -63,6 +64,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private Field2d m_field;
     private Field2d shooter_ll_field;
     private Field2d intaker_ll_field;
+
 
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
@@ -128,6 +130,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         setControl(
             new SwerveRequest.ApplyRobotSpeeds().withSpeeds(scaled)
+        ); 
+    }
+    
+    public void stop() {
+        setControl(
+            new SwerveRequest.ApplyRobotSpeeds().withSpeeds(new ChassisSpeeds(0, 0, 0))
         ); 
     }
 
@@ -324,8 +332,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             ry = Math.min(ry, Constants.Limelight.AutoClimbmaxAngularVelocity);
             ry = Math.max(ry, -Constants.Limelight.AutoClimbmaxAngularVelocity);
         }
-        
-        
+        isAlignedToAprilTag = Math.abs(tx) < Constants.Limelight.AutoClimbAlignTolerance && Math.abs(targetTz) < Constants.Limelight.AutoClimbAlignTolerance && Math.abs(ry) < Constants.Limelight.AutoClimbAlignTolerance;
         ChassisSpeeds scaled = new ChassisSpeeds(
             tx,                 // X 不变
             targetTz,                 // Y 不变
@@ -341,6 +348,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         return "Driving to AprilTag";
     }
+    public boolean isAlignedToAprilTag(){
+        return isAlignedToAprilTag;
+    }
     @Override
     public void periodic() {
 
@@ -352,7 +362,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         driveNetworkTable.getEntry("YawFromState").setDouble(getState().Pose.getRotation().getDegrees());
         driveNetworkTable.getEntry("DriveMode").setString(m_driveMode.name());
         driveNetworkTable.getEntry("IsFieldCentric").setBoolean(m_driveMode == DriveMode.FIELD_CENTRIC);
-
+        positioningNetworkTable.getEntry("isAlignedToAprilTag").setBoolean(isAlignedToAprilTag());
+        positioningNetworkTable.getEntry("interestPointsClimber TX").setDouble(LimelightSupplier.getTX());
+        positioningNetworkTable.getEntry("interestPointsClimber RY").setDouble(LimelightSupplier.getTargetRotationY());
+        positioningNetworkTable.getEntry("interestPointsClimber TZ").setDouble(-LimelightSupplier.getTargetTZ());
+        positioningNetworkTable.getEntry("interestPointsCl").setBoolean(false);
         // 1) 每帧喂给 LL：机器人当前 yaw（度），其余先全 0
         LimelightHelpers.SetRobotOrientation(
             Constants.Limelight.LIMELIGHT_NAME_Shooter,
