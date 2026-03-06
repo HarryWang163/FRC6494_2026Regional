@@ -20,6 +20,7 @@ import frc.robot.Constants.DriveMode;
 import frc.robot.Constants.RobotStatus;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.LimelightSupplier;
 
 import java.util.Optional;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -145,7 +146,7 @@ public class DriveControls {
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(Double.NaN);
                 break;
             case Climbing:
-                drivetrain.driveToAprilTag();
+                alignToClimb();
                 break;
             case CrossingBump:
                 double differenceBump = calculateDifferenceToTwoTarget(drivetrain.getState().Pose.getY(), Constants.AutoPositioning.bumpY[0], Constants.AutoPositioning.bumpY[1]);
@@ -394,6 +395,17 @@ public class DriveControls {
     }
     public Command getAllianceColorCommand() {
         return Commands.runOnce(this::setTeamColors);
-}
+    }
+    public void alignToClimb(){
+        LimelightSupplier.setPipeline(Constants.Limelight.climbPipelineIndex);
+        if(!drivetrain.isAlignedToAprilTag()){
+            drivetrain.driveToAprilTag();
+        }
+        else{
+            LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
+            drivetrain.stop();
+        }
+    }
+
 
 }

@@ -78,6 +78,8 @@ public final class Constants {
         public static final String LIMELIGHT_NAME_Shooter = "limelight-shooter";
         public static final String LIMELIGHT_NAME_Intaker = "limelight-intaker";
         public static final Boolean UsingMetaTag2 = true;
+        public static final int climbPipelineIndex = 8;
+        public static final int locatePipelineIndex = 0;
         public static final double AutoClimbAlignSpeed = 0.5;//等查资料
         public static final double AutoClimbAlignTolerance = 0.1;//？
         public static final double AutoClimbmaxAngularVelocity  = 0.5;//等查资料
