@@ -24,9 +24,9 @@ public class ClimberControls {
         return Commands.run(()->{
             //climber.climbUp();
                 if(controller.getRightY() < -0.5){
-                    climber.climbDownNonStop();
-                } else if(controller.getRightY() > 0.5){
                     climber.climbUpNonStop();
+                } else if(controller.getRightY() > 0.5){
+                    climber.climbDownNonStop();
                 } else if (controller.y().getAsBoolean()) {
                     climber.climbUp();
                 } else if (controller.x().getAsBoolean()) {

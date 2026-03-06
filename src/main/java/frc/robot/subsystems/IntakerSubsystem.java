@@ -97,7 +97,7 @@ public class IntakerSubsystem extends SubsystemBase{
     public void IntakerUpNonStop(){
         double currentPosition = getIntakerotaterPosition();
         if (currentPosition < Constants.Intaker.intakeRotaterUpLimit) {
-        intakerotater.set(0.1);}
+        intakerotater.set(0.2);}
         
         // if (currentPosition < Constants.Intaker.intakeRotaterUpLimit) {
         //     intakerotater.setControl(velocityRequest.withVelocity(-Constants.Intaker.intakeRotaterVelocity));
