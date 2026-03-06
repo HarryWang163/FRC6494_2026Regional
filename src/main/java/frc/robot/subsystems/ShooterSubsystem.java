@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -31,7 +32,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private NetworkTable shooterNetworkTable;
 
-    private final VelocityDutyCycle velocityRequest = new VelocityDutyCycle(0);
+    private final VelocityVoltage velocityRequest = new VelocityVoltage(0);
 
 
     // 初始化各个部件
@@ -94,9 +95,17 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setConveyorSpeedByRPS(double speed) {
         conveyorMotor.setControl(velocityRequest.withVelocity(speed));  // 设置传动电机速度
     }
+    public void setConveyorSpeedOpen(double speed){
+        conveyorMotor.set(speed);
+    }
 
     //调试用
     public void setBackboardSpeedByRPS(double speed){
+         if (speed > 0 && speed < 10) {
+        speed = 10;
+        } else if (speed < 0 && speed > -10) {
+        speed = -10;
+        }
         backboardMotor.setControl(velocityRequest.withVelocity(speed));
     }
 
@@ -149,6 +158,10 @@ public class ShooterSubsystem extends SubsystemBase {
     public void resetbackboardencoder(){
         backboardEncoder.reset();
     }
+    public double getConveyorStatorCurrent(){
+        double statorCurrent = conveyorMotor.getStatorCurrent().getValueAsDouble();
+        return statorCurrent;
+    }
 
     @Override
     public void periodic() {
@@ -160,11 +173,16 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterNetworkTable.getEntry("backboardCurrentRate").setDouble(getBackboardPosition());
         shooterNetworkTable.getEntry("backboardTargetRate").setDouble(backboardPID.getSetpoint().position);
         shooterNetworkTable.getEntry("isBackboardAtTarget").setBoolean(isBackboardAtTarget());
-        shooterNetworkTable.getEntry("distanceGetted").setDouble(getDistance());
+        shooterNetworkTable.getEntry("distanceGetted").setDouble(getDistanceToHub());
+        shooterNetworkTable.getEntry("distancetopassball").setDouble(getDistanceToPassball());
+        shooterNetworkTable.getEntry("statorCurrent").setDouble(getConveyorStatorCurrent());
     }
 
-    public double getDistance(){
+    public double getDistanceToHub(){
         //获得车子距离Hub的距离
         return NetworkTableInstance.getDefault().getTable("AutoControl").getEntry("distanceToHub").getDouble(0.0);
+    }
+    public double getDistanceToPassball(){
+        return NetworkTableInstance.getDefault().getTable("AutoControl").getEntry("distanceToPassball").getDouble(0.0);
     }
 }

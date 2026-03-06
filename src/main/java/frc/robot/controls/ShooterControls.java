@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.RobotStatusManager;
 import frc.robot.Constants.Intaker;
+import frc.robot.Constants.RobotStatus;
 import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
@@ -37,7 +38,7 @@ public class ShooterControls {
                     break;
                 case AllTelop:
                 case PassingBall:
-                    var xP = shooterSubsystem.getDistance();
+                    var xP = shooterSubsystem.getDistanceToPassball();
                     //xP = Math.max(1.2, Math.min(4.5, xP));
                     flywheelSpeed = 0.6956596811733782*xP*xP*xP*xP*xP*xP*xP-14.164408860183267*xP*xP*xP*xP*xP*xP+119.7115375240918*xP*xP*xP*xP*xP-543.0984876677477*xP*xP*xP*xP+1425.1928543240738*xP*xP*xP-2156.199296490315*xP*xP+1736.568139600292*xP-516.097598057351;
                     flywheelSpeed += flywheelSpeedOffset;
@@ -48,12 +49,9 @@ public class ShooterControls {
                         flywheelSpeed = 0;
                         conveyorSpeed = 0;
                     }
-                    if(shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble()<flywheelSpeed*0.7){
+                    if(shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble()<flywheelSpeed*0.95){
                         conveyorSpeed = 0;
                     }
-                    // flywheelSpeed = calculateFlywheelSpeedOnlywithOffset(60);
-                    // double flywheelSpeed = calculateFlywheelSpeed(0);
-                    // double BackboardPosition = calculateBackboardPosition(0);
                     shooterControlTable.getEntry("flywheelTargetSpeed").setDouble(flywheelSpeed);
                     shooterControlTable.getEntry("conveyerTargetSpeed").setDouble(conveyorSpeed);
                     shooterControlTable.getEntry("backboardTargetPosition").setDouble(backboardPosition);
@@ -67,7 +65,7 @@ public class ShooterControls {
                     }  
                     break;
                 case AutoAimming:
-                    var x = shooterSubsystem.getDistance();
+                    var x = shooterSubsystem.getDistanceToHub();
                     x = Math.max(1.2, Math.min(4.5, x));
                     flywheelSpeed = 0.6956596811733782*x*x*x*x*x*x*x-14.164408860183267*x*x*x*x*x*x+119.7115375240918*x*x*x*x*x-543.0984876677477*x*x*x*x+1425.1928543240738*x*x*x-2156.199296490315*x*x+1736.568139600292*x-516.097598057351;
                     flywheelSpeed += flywheelSpeedOffset;
@@ -78,17 +76,14 @@ public class ShooterControls {
                         flywheelSpeed = 0;
                         conveyorSpeed = 0;
                     }
-                    if(shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble()<flywheelSpeed*0.7){
+                    if(shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble()<flywheelSpeed*0.95){
                         conveyorSpeed = 0;
                     }
-                    // flywheelSpeed = calculateFlywheelSpeedOnlywithOffset(60);
-                    // double flywheelSpeed = calculateFlywheelSpeed(0);
-                    // double BackboardPosition = calculateBackboardPosition(0);
                     shooterControlTable.getEntry("flywheelTargetSpeed").setDouble(flywheelSpeed);
                     shooterControlTable.getEntry("conveyerTargetSpeed").setDouble(conveyorSpeed);
                     shooterControlTable.getEntry("backboardTargetPosition").setDouble(backboardPosition);
                     shooterSubsystem.setFlywheelSpeedByRPS(flywheelSpeed);
-                    shooterSubsystem.setConveyorSpeedByRPS(conveyorSpeed);
+                    shooterSubsystem.setConveyorSpeedOpen(5);
                     shooterSubsystem.setBackboardPosition(backboardPosition);  
                     if(shooterSubsystem.isBackboardAtTarget()){
                         shooterSubsystem.backboardMotor.set(0);

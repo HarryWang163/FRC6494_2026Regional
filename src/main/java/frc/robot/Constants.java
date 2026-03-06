@@ -15,34 +15,29 @@ public final class Constants {
         CrossingTrench
     }
     public class Shooter {
-        public static final double conveyorSpeed = 20;
+        public static final double conveyorSpeed =25;
         public static final Slot0Configs flyWheelSlot0Configs = new Slot0Configs()
             .withKP(0.0).withKI(0).withKD(0)
-            .withKV(0.0088).withKA(0.0).withKS(0.0);
+            .withKV(0.099).withKA(0.0).withKS(0.0);
 
         public static final Slot0Configs conveyorSlot0Configs = new Slot0Configs()
             .withKP(0.0).withKI(0).withKD(0)
-            .withKV(0.02).withKA(0.15).withKS(0);
+            .withKV(0.16).withKA(0.15).withKS(0);
 
         public static final Slot0Configs backboardSlot0Configs = new Slot0Configs()
             .withKP(0.01).withKI(0).withKD(0)
-            .withKV(0.008).withKA(0.0).withKS(0.010);
+            .withKV(0.03).withKA(0.0).withKS(0.010);
 
         public class backboardPositionPID {
-            public static final double kP = 0.1;
+            public static final double kP = 0.3;
             public static final double kI = 0.0;
             public static final double kD = 0.0;
             
         }
-        public static final double backboardSpeedMax = 30; //也就是output
+        public static final double backboardSpeedMax = 60; //也就是output
         // 背板的上下限位角度
         public static final double backboardUpLimit = 3000.0;  // 背板上限角度（根据实际需求设置）
         public static final double backboardDownLimit = 0.0;  // 背板下限角度（根据实际需求设置）
-    }
-    public class ShooterCalculation{
-        public static final double positionNear = 0;  // 近距离背板角度
-        public static final double positionMid  = 1600;  // 中距离背板角度
-        public static final double postionFar  = 3200;  // 远距离背板角度
     }
     public class AutoPositioning {
         public static final double autoRotationkP = 0.1;
@@ -83,14 +78,41 @@ public final class Constants {
         public static final String LIMELIGHT_NAME_Shooter = "limelight-shooter";
         public static final String LIMELIGHT_NAME_Intaker = "limelight-intaker";
         public static final Boolean UsingMetaTag2 = true;
+        public static final int climbPipelineIndex = 8;
+        public static final int locatePipelineIndex = 0;
+
+        // 误差死区 / 对齐判定
+        public static final double AutoClimbToleranceTX = 1.5;   // deg
+        public static final double AutoClimbToleranceTZ = 0.10;  // m
+        public static final double AutoClimbToleranceRY = 2.0;   // deg
+
+        // P 控制系数
+        public static final double AutoClimbKpTX = 0.020;   // deg -> rad/s
+        public static final double AutoClimbKpTZ = 0.90;    // m -> m/s
+        public static final double AutoClimbKpRY = 0.015;   // deg -> rad/s
+
+        // 最小输出（防止快到目标时推不动）
+        public static final double AutoClimbMinVX = 0.18;      // m/s
+        public static final double AutoClimbMinOmega = 0.10;   // rad/s
+
+        // 最大输出（防止冲太猛）
+        public static final double AutoClimbMaxVX = 1.20;      // m/s
+        public static final double AutoClimbMaxOmega = 0.60;   // rad/s
+
+        // 远距离 / 大角度时额外限速，可后续微调
+        public static final double AutoClimbFastTurnThresholdTX = 15.0; // deg
+        public static final double AutoClimbFastTurnOmega = 0.45;       // rad/s
     }
 
     public class Field {
         public static final double RedHubPositionX = 11.914;
         public static final double RedHubPositionY = 4.034;
-        public static final double PassingBallPosX = 0;
-        public static final double PassingBallPosY1 = 2.51;
-        public static final double PassingBallPosY2 = 5.556;
+        public static final double BlueHubPositionX = 4.625;
+        public static final double BlueHubPositionY = 4.034;
+        public static final double PassingBallPosY1 = 1.405;
+        public static final double PassingBallPosY2 = 6.664;
+        public static final double RedPassingBallPosX = 13.355;
+        public static final double BluePassingBallPosX = 3.184;
     }
     
 
@@ -111,12 +133,12 @@ public final class Constants {
         .withKV(0.00).withKA(0.00).withKS(0.00);
     //如果 rotater 受重力影响明显，可能需要用 withKG/withGravityType/withGravityArmPositionOffset（看机构形式）(这句fromAI)
 
-    public static final double IntakeGetterSpeedforAuto = 0.0;
+    public static final double IntakeGetterSpeedforAuto = 0.4;
     // 单位RPS
     public static final double positionToleranceRotations = 0.00;
     //rotater容差
     public static final double IntakeGetterK = 0.3; // intake getter速度与触发器输入的比例
-    public static final double Getterminspeed = 0.2; // intake getter的基础速度（即触发器输入为0时的速度，正值表示默认向内转）
+    public static final double Getterminspeed = 0.3; // intake getter的基础速度（即触发器输入为0时的速度，正值表示默认向内转）
     }   
     public static class Climber {
 

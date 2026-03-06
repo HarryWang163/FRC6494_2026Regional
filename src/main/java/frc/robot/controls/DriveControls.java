@@ -19,12 +19,14 @@ import frc.robot.Constants.DriveMode;
 import frc.robot.Constants.RobotStatus;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.LimelightSupplier;
 
 import java.util.Optional;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance; 
 
 public class DriveControls {
+
     public boolean isRedAlliance;
 
     private final CommandSwerveDrivetrain drivetrain;
@@ -122,7 +124,9 @@ public class DriveControls {
         // 将距离值写入 NetworkTable
         autoControlNetworkTable.getEntry("distanceToHub").setDouble(distanceAndRotation[0]);
         autoControlNetworkTable.getEntry("angleDifferenceToHub").setDouble(distanceAndRotation[1]);
-
+        autoControlNetworkTable.getEntry("distanceToPassball").setDouble(calculateDistanceAndRotationToPassBall()[0]);
+        autoControlNetworkTable.getEntry("angleDifferenceToPassball").setDouble(calculateDistanceAndRotationToPassBall()[1]);
+        
         switch (robotStatusManager.getStatus()) {
             case Stopped:
                 vx = 0;
@@ -130,10 +134,12 @@ public class DriveControls {
                 vomega = 0;
                 break;
             case PassingBall:
+                LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
                 vomega = calculateRotationSpeedFromRotationAngle(calculateDistanceAndRotationToPassBall()[1]);
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(vomega);
                 break;
             case AutoAimming:
+                LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
                 vomega = calculateRotationSpeedFromRotationAngle(distanceAndRotation[1]);
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(vomega);
                 break;
@@ -141,6 +147,7 @@ public class DriveControls {
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(Double.NaN);
                 break;
             case Climbing:
+                alignToClimb();
                 break;
             case CrossingBump:
                 double differenceBump = calculateDifferenceToTwoTarget(drivetrain.getState().Pose.getY(), Constants.AutoPositioning.bumpY[0], Constants.AutoPositioning.bumpY[1]);
@@ -152,6 +159,7 @@ public class DriveControls {
                         Math.max(Math.abs(raw), 0.4),
                         raw
                     );
+                    vy = isRedAlliance ? -vy : vy;
                 }
                 autoControlNetworkTable.getEntry("BumpDifference").setDouble(differenceBump);
 
@@ -181,6 +189,7 @@ public class DriveControls {
                         Math.max(Math.abs(raw), 0.4),
                         raw
                     );
+                    vy = isRedAlliance ? -vy : vy;
                 }
                 autoControlNetworkTable.getEntry("TrenchDifference").setDouble(differenceTrench);
                 Rotation2d currentAngle = drivetrain.getState().Pose.getRotation();
@@ -204,7 +213,8 @@ public class DriveControls {
         if (fieldCentricEnabled || isAutoLike) {
 
     // 自动状态用 BlueAlliance（不翻转），手柄 field-centric 仍用原 fieldCentric（OperatorPerspective）
-        var chosen = isAutoLike ? fieldCentricAuto : fieldCentric;
+        //var chosen = isAutoLike ? fieldCentricAuto : fieldCentric;
+        var chosen = fieldCentric;
         return chosen
                 .withVelocityX(vx)
                 .withVelocityY(vy)
@@ -233,8 +243,8 @@ public class DriveControls {
     }
     public double[] calculateDistanceAndRotationToHub() {
         Pose2d currentPose = drivetrain.getState().Pose; // 获取机器人当前的位置和角度
-        double targetX = Constants.Field.RedHubPositionX;  // 目标 X 坐标
-        double targetY = Constants.Field.RedHubPositionY;  // 目标 Y 坐标
+        double targetX = isRedAlliance ? Constants.Field.RedHubPositionX : Constants.Field.BlueHubPositionX;
+        double targetY = isRedAlliance ? Constants.Field.RedHubPositionY : Constants.Field.BlueHubPositionY;
 
         // 计算目标角度（相对于场地坐标系）
         double deltaX = targetX - currentPose.getX();
@@ -261,7 +271,7 @@ public class DriveControls {
     }
     public double[] calculateDistanceAndRotationToPassBall() {
         Pose2d currentPose = drivetrain.getState().Pose; // 获取机器人当前的位置和角度
-        double targetX = Constants.Field.PassingBallPosX;  // 目标 X 坐标
+        double targetX = isRedAlliance ? Constants.Field.RedPassingBallPosX : Constants.Field.BluePassingBallPosX;  // 目标 X 坐标
         double targetY1 = Constants.Field.PassingBallPosY1;  // 目标 Y 坐标
         double targetY2 = Constants.Field.PassingBallPosY2;  // 目标 Y 坐标
        
@@ -389,6 +399,17 @@ public class DriveControls {
     }
     public Command getAllianceColorCommand() {
         return Commands.runOnce(this::setTeamColors);
-}
+    }
+    public void alignToClimb(){
+        LimelightSupplier.setPipeline(Constants.Limelight.climbPipelineIndex);
+        if(!drivetrain.isAlignedToAprilTag()){
+            drivetrain.driveToAprilTag();
+        }
+        else{
+            LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
+            drivetrain.stop();
+        }
+    }
+
 
 }

@@ -1,5 +1,6 @@
 package frc.robot.controls;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -11,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.RobotStatusManager;
 import frc.robot.subsystems.IntakerSubsystem;
+import frc.robot.subsystems.LimelightSupplier;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.Constants;
@@ -58,7 +60,25 @@ import frc.robot.Constants.RobotStatus;
                 intaker.stopIntakerotater();;  // 停止旋转
             }, intaker));
         }
-        
+        public static Command autoAlignToClimb(CommandSwerveDrivetrain drivetrain) {
+        return Commands.sequence(
+            new InstantCommand(() -> {
+                LimelightSupplier.setPipeline(Constants.Limelight.climbPipelineIndex);
+            }),
+            Commands.runEnd(
+                () -> {
+                    drivetrain.driveToAprilTag();
+                },
+                () -> {
+                    LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
+                },
+                drivetrain
+            ).until(() -> drivetrain.isAlignedToAprilTag())
+        );
+    }
+    
+
+
     }
 
 

@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -58,7 +59,7 @@ public class RobotContainer {
   private final DriveControls driveControls = new DriveControls(drivetrain, controllerlower, robotStatusManager );
   private final ShooterControls shooterControls = new ShooterControls(shooterSubsystem, controllerupper,robotStatusManager);
   private final ClimberControls climberControls = new ClimberControls(climberSubsystem, controllerupper);
-  private final IntakerControls intakerControls = new IntakerControls(IntakerSubsystem, controllerupper);
+  private final IntakerControls intakerControls = new IntakerControls(IntakerSubsystem, shooterSubsystem, controllerupper);
   private final DriveGainsTuner driveGainsTuner = new DriveGainsTuner(drivetrain);
   private ConfigTalonFXMotorTuner configFlywheelTuner = new ConfigTalonFXMotorTuner(shooterSubsystem.flywheelMotorLeft, "flywheel", Constants.Shooter.flyWheelSlot0Configs);
   private ConfigTalonFXMotorTuner configConveyorTuner = new ConfigTalonFXMotorTuner(shooterSubsystem.conveyorMotor, "conveyor", Constants.Shooter.conveyorSlot0Configs);
@@ -118,9 +119,19 @@ public class RobotContainer {
     // Start：强行使用metaTag2全场定位
     controllerlower.start().whileTrue(drivetrain.run(drivetrain::forceUsingLimelightMT2));
 
-    //LM 按下时autoaimming
-    controllerlower.leftStick().onTrue(robotStatusManager.setStatusCommand(RobotStatus.AutoAimming));
-    controllerlower.leftStick().onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
+    //LM 按下时autoaimming，松开时alltelop
+    // controllerlower.leftStick().onTrue(robotStatusManager.setStatusCommand(RobotStatus.AutoAimming));
+    // controllerlower.leftStick().onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
+
+    //双操均可触发autoaimming模式，松开时alltelop
+    Trigger autoAim = controllerupper.rightBumper().or(controllerlower.rightStick());
+    autoAim.onTrue(robotStatusManager.setStatusCommand(RobotStatus.AutoAimming));
+    autoAim.onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
+
+    //双操均可触发passingball模式，松开时alltelop
+    Trigger autoAim2 = controllerupper.leftBumper().or(controllerlower.leftStick());
+    autoAim2.onTrue(robotStatusManager.setStatusCommand(RobotStatus.PassingBall));
+    autoAim2.onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
 
     controllerlower.leftTrigger()
     .onTrue(robotStatusManager.setStatusCommand(RobotStatus.CrossingTrench))
@@ -128,6 +139,10 @@ public class RobotContainer {
     
     controllerlower.rightTrigger()
     .onTrue(robotStatusManager.setStatusCommand(RobotStatus.CrossingBump))
+    .onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
+
+    controllerlower.a()
+    .onTrue(robotStatusManager.setStatusCommand(RobotStatus.Climbing))
     .onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
   }
 
