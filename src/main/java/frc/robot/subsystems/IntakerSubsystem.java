@@ -83,9 +83,24 @@ public class IntakerSubsystem extends SubsystemBase{
         stopIntakerotater();
     }
     public void IntakerDownNonStop(){
-        intakerotater.set(-0.05);
+        double currentPosition = getIntakerotaterPosition();
+        if (currentPosition > Constants.Intaker.intakeRotaterDownLimit) {
+            // move down (negative power) while above the lower limit
+            intakerotater.set(-0.05);
+        } else {
+            // at or below lower limit: stop
+            stopIntakerotater();
         }
+    }
+
     public void IntakerUpNonStop(){
-        intakerotater.set(0.1);
+        double currentPosition = getIntakerotaterPosition();
+        if (currentPosition < Constants.Intaker.intakeRotaterUpLimit) {
+            // move up while below the upper limit
+            intakerotater.set(0.1);
+        } else {
+            // at or above upper limit: stop
+            stopIntakerotater();
+        }
     }
 }
