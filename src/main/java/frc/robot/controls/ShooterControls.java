@@ -39,11 +39,11 @@ public class ShooterControls {
                 case AllTelop:
                 case PassingBall:
                     var xP = shooterSubsystem.getDistanceToPassball();
-                    //xP = Math.max(1.2, Math.min(4.5, xP));
+                    xP = Math.max(1.2, Math.min(4.5, xP));
                     flywheelSpeed = 0.6956596811733782*xP*xP*xP*xP*xP*xP*xP-14.164408860183267*xP*xP*xP*xP*xP*xP+119.7115375240918*xP*xP*xP*xP*xP-543.0984876677477*xP*xP*xP*xP+1425.1928543240738*xP*xP*xP-2156.199296490315*xP*xP+1736.568139600292*xP-516.097598057351;
                     flywheelSpeed += flywheelSpeedOffset;
                     backboardPosition = xP*xP;//todo:实测传球的时候的背板位置 打表
-                    backboardPosition += backboardPositionOffset;
+                    backboardPosition = -122.11889023593778*xP*xP*xP*xP*xP*xP*xP+2453.385583841308*xP*xP*xP*xP*xP*xP-20553.05413872581*xP*xP*xP*xP*xP+92963.33175750206*xP*xP*xP*xP-244905.25916147238*xP*xP*xP+375150.1363997868*xP*xP-308031.51715612336*xP+104203.52690842684;
                     conveyorSpeed = Constants.Shooter.conveyorSpeed;
                     if (controller.getRightTriggerAxis() < 0.1) {
                         flywheelSpeed = 0;

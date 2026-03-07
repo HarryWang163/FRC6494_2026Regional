@@ -353,33 +353,44 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // 2) 旋转控制：tx 为主，ry 为辅
     //    tx 负责“镜头中心对准 tag”
     //    ry 负责“机器人姿态微调”
-    double omegaFromTx = 0.0;
-    double omegaFromRy = 0.0;
+    // double omegaFromTx = 0.0;
+    // double omegaFromRy = 0.0;
 
-    if (Math.abs(tx) > Constants.Limelight.AutoClimbToleranceTX) {
-        omegaFromTx = -tx * Constants.Limelight.AutoClimbKpTX;
-    }
+    // if (Math.abs(tx) > Constants.Limelight.AutoClimbToleranceTX) {
+    //     omegaFromTx = -tx * Constants.Limelight.AutoClimbKpTX;
+    // }
 
-    if (Math.abs(ry) > Constants.Limelight.AutoClimbToleranceRY) {
-        omegaFromRy = ry * Constants.Limelight.AutoClimbKpRY;
-    }
+    // if (Math.abs(ry) > Constants.Limelight.AutoClimbToleranceRY) {
+    //     omegaFromRy = ry * Constants.Limelight.AutoClimbKpRY;
+    // }
 
-    omega = omegaFromTx + omegaFromRy;
+    // omega = omegaFromTx + omegaFromRy;
 
-    // 大偏角时直接给较明显的转速，先把朝向拉回来
-    if (Math.abs(tx) > Constants.Limelight.AutoClimbFastTurnThresholdTX) {
-        omega = Math.copySign(Constants.Limelight.AutoClimbFastTurnOmega, omega);
-    }
+    // // 大偏角时直接给较明显的转速，先把朝向拉回来
+    // if (Math.abs(tx) > Constants.Limelight.AutoClimbFastTurnThresholdTX) {
+    //     omega = Math.copySign(Constants.Limelight.AutoClimbFastTurnOmega, omega);
+    // }
 
-    // 最小输出，避免转不动
-    if (Math.abs(omega) > 1e-6 && Math.abs(omega) < Constants.Limelight.AutoClimbMinOmega) {
-        omega = Math.copySign(Constants.Limelight.AutoClimbMinOmega, omega);
-    }
+    // // 最小输出，避免转不动
+    // if (Math.abs(omega) > 1e-6 && Math.abs(omega) < Constants.Limelight.AutoClimbMinOmega) {
+    //     omega = Math.copySign(Constants.Limelight.AutoClimbMinOmega, omega);
+    // }
 
-    // 最大输出限幅
-    omega = clamp(omega,
-        -Constants.Limelight.AutoClimbMaxOmega,
-         Constants.Limelight.AutoClimbMaxOmega);
+    // // 最大输出限幅
+    // omega = clamp(omega,
+    //     -Constants.Limelight.AutoClimbMaxOmega,
+    //      Constants.Limelight.AutoClimbMaxOmega);
+
+    Rotation2d ClimbcurrentAngle = getState().Pose.getRotation();
+    double climbCurrentRad = ClimbcurrentAngle.getRadians();
+    double TargetAngleforClimbing = Math.toRadians(0);
+    double Climberror = TargetAngleforClimbing - climbCurrentRad;
+    if (Math.abs(Climberror) < Math.toRadians(Constants.AutoPositioning.autoPositioningAngleError)) {
+            omega = 0.0;
+        } else {
+            omega = Climberror * Constants.AutoPositioning.TurningkP;
+        }
+
 
     // ===== 调试输出 =====
     driveNetworkTable.getEntry("ClimbTX").setDouble(tx);

@@ -137,8 +137,7 @@ public final class Constants {
     // 单位RPS
     public static final double positionToleranceRotations = 0.00;
     //rotater容差
-    public static final double IntakeGetterK = 0.3; // intake getter速度与触发器输入的比例
-    public static final double Getterminspeed = 0.3; // intake getter的基础速度（即触发器输入为0时的速度，正值表示默认向内转）
+
     }   
     public static class Climber {
 

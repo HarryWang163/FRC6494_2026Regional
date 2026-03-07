@@ -101,6 +101,9 @@ public class IntakerSubsystem extends SubsystemBase{
         } else {
             // at or above upper limit: stop
             stopIntakerotater();
+            }
         }
+    public void setIntakerRotater(double rotaterspeed){
+        intakerotater.set(rotaterspeed);
     }
 }
