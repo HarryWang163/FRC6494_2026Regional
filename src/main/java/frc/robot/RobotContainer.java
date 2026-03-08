@@ -27,6 +27,7 @@ import frc.robot.tuning.ConfigTalonFXSMotorTuner;
 import frc.robot.tuning.DriveGainsTuner;
 import frc.robot.utils.LedBindings;
 import frc.robot.controls.ClimberControls;
+import frc.robot.controls.Autocommand;
 import frc.robot.subsystems.ClimberSubsystem;
 public class RobotContainer {
 
@@ -71,6 +72,13 @@ public class RobotContainer {
 
   
   public RobotContainer() {
+    Autocommand.preNameCommands(
+        climberSubsystem,
+        IntakerSubsystem,
+        drivetrain,
+        shooterSubsystem
+    );
+
     SignalLogger.enableAutoLogging(false);
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
