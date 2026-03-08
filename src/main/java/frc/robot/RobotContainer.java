@@ -117,19 +117,19 @@ public class RobotContainer {
     controllerlower.back().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
     
     // Start：强行使用metaTag2全场定位
-    controllerlower.start().whileTrue(drivetrain.run(drivetrain::forceUsingLimelightMT2));
+    controllerlower.start().whileTrue(drivetrain.run(drivetrain::forceUsingLimelightmt2));
 
     //LM 按下时autoaimming，松开时alltelop
     // controllerlower.leftStick().onTrue(robotStatusManager.setStatusCommand(RobotStatus.AutoAimming));
     // controllerlower.leftStick().onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
 
     //双操均可触发autoaimming模式，松开时alltelop
-    Trigger autoAim = controllerupper.rightBumper().or(controllerlower.rightStick());
+    Trigger autoAim = controllerupper.rightBumper();//.or(controllerlower.rightStick());
     autoAim.onTrue(robotStatusManager.setStatusCommand(RobotStatus.AutoAimming));
     autoAim.onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
 
     //双操均可触发passingball模式，松开时alltelop
-    Trigger autoAim2 = controllerupper.leftBumper().or(controllerlower.leftStick());
+    Trigger autoAim2 = controllerupper.leftBumper();//.or(controllerlower.leftStick());
     autoAim2.onTrue(robotStatusManager.setStatusCommand(RobotStatus.PassingBall));
     autoAim2.onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
 

@@ -78,8 +78,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putData("Field", m_field);
         SmartDashboard.putData("PositioningShooterll", shooter_ll_field);
         SmartDashboard.putData("PositioningIntakerll", intaker_ll_field);
-        LimelightHelpers.SetIMUMode(Constants.Limelight.LIMELIGHT_NAME_Shooter, 1);
-        LimelightHelpers.SetIMUMode(Constants.Limelight.LIMELIGHT_NAME_Intaker, 1);
+        LimelightHelpers.SetIMUMode(Constants.Limelight.LIMELIGHT_NAME_Shooter, 0);
+        LimelightHelpers.SetIMUMode(Constants.Limelight.LIMELIGHT_NAME_Intaker, 0);
         positioningNetworkTable = NetworkTableInstance.getDefault().getTable("Positioning");
         driveNetworkTable = NetworkTableInstance.getDefault().getTable("Drive");
         ll_shooter_NT = NetworkTableInstance.getDefault().getTable("Positioning/limelight-shooter");
@@ -161,7 +161,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         });
     }
     
-    public void forceUsingLimelightMT2() {
+    public void forceUsingLimelightmt2() {
         LimelightHelpers.PoseEstimate mt2 =
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.Limelight.LIMELIGHT_NAME_Shooter);
 
@@ -173,7 +173,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         addVisionMeasurement(mt2.pose, mt2.timestampSeconds, stdDevs);
     }
     
-    private void fuseLimelightMT2() {
+    private void fuseLimelightmt2() {
         Pose2d current = getState().Pose;
 
         LimelightHelpers.PoseEstimate mt2_shooter =
@@ -437,7 +437,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             0, 0, 0, 0, 0
         );
 
-        fuseLimelightMT2();
+        fuseLimelightmt2();
 
         if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
             DriverStation.getAlliance().ifPresent(allianceColor -> {

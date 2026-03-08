@@ -1,5 +1,7 @@
 package frc.robot.controls;
 
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -19,7 +21,23 @@ import frc.robot.Constants;
 import frc.robot.Constants.RobotStatus;
 
     public class Autocommand extends SequentialCommandGroup{
-        
+
+        public static void preNameCommands(
+            ClimberSubsystem climber,
+            IntakerSubsystem intaker,
+            CommandSwerveDrivetrain drivetrain,
+            ShooterSubsystem shooter
+    ) {
+        NamedCommands.registerCommand("climb_up", climb_up(climber));
+        NamedCommands.registerCommand("climb_down", climb_down(climber));
+        NamedCommands.registerCommand("start_intake", start_intake(intaker));
+        NamedCommands.registerCommand("stop_intake", stop_intake(intaker));
+        NamedCommands.registerCommand("intaker_down", intaker_down(intaker));
+        NamedCommands.registerCommand("intaker_up", intaker_up(intaker));
+        NamedCommands.registerCommand("auto_align_to_climb", autoAlignToClimb(drivetrain));
+        NamedCommands.registerCommand("shoot", shoot(shooter));
+    }
+
         public static Command climb_up(ClimberSubsystem climber) {
             return new RunCommand(() -> {
                 climber.climbUp();  // 控制爬升器上升
@@ -73,12 +91,23 @@ import frc.robot.Constants.RobotStatus;
                     LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
                 },
                 drivetrain
-            ).until(() -> drivetrain.isAlignedToAprilTag())
-        );
-    }
+            ).until(() -> drivetrain.isAlignedToAprilTag()));
+     }
+
+        public static Command shoot(ShooterSubsystem shooter) {
+            return new InstantCommand(() -> {
+                shooter.setFlywheelSpeedByRPS(60);
+                shooter.setBackboardPosition(200);  // 设置自动射击转速
+            }, shooter).withTimeout(1.0).andThen(new InstantCommand(() -> {
+                shooter.setConveyorSpeedByRPS(25);
+            }, shooter).withTimeout(5.0).andThen(new InstantCommand(() -> {
+                shooter.setFlywheelSpeedByRPS(0);  // 停止射击
+                shooter.setBackboardPosition(0);  // 恢复背板位置
+                shooter.setConveyorSpeedByRPS(0);  // 停止输送
+            }, shooter)));
     
 
-
+        }
     }
 
 

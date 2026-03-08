@@ -1,5 +1,7 @@
 package frc.robot;
 
+import javax.net.ssl.TrustManager;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.math.geometry.Pose2d;
 
@@ -77,7 +79,7 @@ public final class Constants {
     public class Limelight {
         public static final String LIMELIGHT_NAME_Shooter = "limelight-shooter";
         public static final String LIMELIGHT_NAME_Intaker = "limelight-intaker";
-        public static final Boolean UsingMetaTag2 = true;
+        public static final Boolean UsingMetaTag2 = true; // 是否使用 MetaTag2（如果你们的 pipeline 配置了这个功能的话）
         public static final int climbPipelineIndex = 8;
         public static final int locatePipelineIndex = 0;
 
