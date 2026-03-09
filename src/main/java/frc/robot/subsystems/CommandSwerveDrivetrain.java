@@ -163,7 +163,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     
     public void forceUsingLimelightmt2() {
         LimelightHelpers.PoseEstimate mt2 =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.Limelight.LIMELIGHT_NAME_Shooter);
+        LimelightHelpers.getBotPoseEstimate_wpiBlue(Constants.Limelight.LIMELIGHT_NAME_Shooter);
 
         if (mt2 == null || mt2.tagCount == 0) {
             return;
@@ -258,7 +258,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private LimelightHelpers.PoseEstimate getLimelightPoseEstimate(String limelightName) {
         if (Constants.Limelight.UsingMetaTag2) {
-           return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+           return LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
         }
         return LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
     }
@@ -415,8 +415,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Pose2d pose = getState().Pose;
         m_field.setRobotPose(pose);
         posePub.set(pose);
-        shooter_ll_field.setRobotPose(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.Limelight.LIMELIGHT_NAME_Shooter).pose);
-        intaker_ll_field.setRobotPose(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.Limelight.LIMELIGHT_NAME_Intaker).pose);
+        shooter_ll_field.setRobotPose(LimelightHelpers.getBotPoseEstimate_wpiBlue(Constants.Limelight.LIMELIGHT_NAME_Shooter).pose);
+        intaker_ll_field.setRobotPose(LimelightHelpers.getBotPoseEstimate_wpiBlue(Constants.Limelight.LIMELIGHT_NAME_Intaker).pose);
         driveNetworkTable.getEntry("YawFromState").setDouble(getState().Pose.getRotation().getDegrees());
         driveNetworkTable.getEntry("DriveMode").setString(m_driveMode.name());
         driveNetworkTable.getEntry("IsFieldCentric").setBoolean(m_driveMode == DriveMode.FIELD_CENTRIC);

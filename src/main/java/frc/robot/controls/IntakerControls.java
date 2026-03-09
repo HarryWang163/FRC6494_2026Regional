@@ -73,7 +73,7 @@ public class IntakerControls {
     public Command defaultIntakerCommand() {
         return Commands.run(() -> {
         double getterspeed = 0;
-        double conveyoyspeedforintake = 15;
+        double conveyoyspeedforintake = 0;
         double statorCurrent = ShooterSubsystem.getConveyorStatorCurrent();
         
         if (controller.getLeftTriggerAxis() > 0.1) {

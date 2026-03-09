@@ -147,4 +147,8 @@ public class ShooterControls {
         flywheelSpeedOffset = 0.0;
         backboardPositionOffset = 0.0;
     }
+    public void startconveyor(){
+        shooterSubsystem.setConveyorSpeedByRPS(10);
+
+    }
 }

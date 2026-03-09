@@ -162,6 +162,7 @@ public class RobotContainer {
     controllerupper.povDown().onTrue(Commands.runOnce(() -> shooterControls.adjustBackboardRateOffset(-100)));
     controllerupper.back().onTrue(Commands.runOnce(() -> shooterControls.resetOffsets()));
     controllerupper.start().onTrue(Commands.runOnce(() -> shooterControls.resetBackboardCommand()));
+    controllerupper.b().onTrue(Commands.runOnce(() -> shooterControls.resetBackboardCommand()));
   }
   /* ====================== */
   /*        LED 绑定          */
@@ -187,7 +188,7 @@ public class RobotContainer {
   private void configueClimber() {
     enableTrigger.onTrue(climberControls.enableInitCommand());
     climberSubsystem.setDefaultCommand(climberControls.defaultClimberCommand());
-    controllerupper.b().onTrue(climberControls.resetClimberEncoderCommand(climberSubsystem));
+    //controllerupper.b().onTrue(climberControls.resetClimberEncoderCommand(climberSubsystem));
   }
 
   private void configueIntaker() {

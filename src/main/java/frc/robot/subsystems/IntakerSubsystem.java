@@ -97,7 +97,7 @@ public class IntakerSubsystem extends SubsystemBase{
         double currentPosition = getIntakerotaterPosition();
         if (currentPosition < Constants.Intaker.intakeRotaterUpLimit) {
             // move up while below the upper limit
-            intakerotater.set(0.2);
+            intakerotater.set(0.3);
         } else {
             // at or above upper limit: stop
             stopIntakerotater();
