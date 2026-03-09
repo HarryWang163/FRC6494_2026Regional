@@ -41,6 +41,13 @@ public class ShooterControls {
                     shooterSubsystem.stopMotors();
                     break;
                 case AllTelop:
+                    shooterSubsystem.setBackboardPosition(0); 
+                    if(shooterSubsystem.isBackboardAtTarget()){
+                        shooterSubsystem.backboardMotor.set(0);
+                    }else{
+                        shooterSubsystem.outputBackboard();
+                    }  
+                    break;
                 case PassingBall:
                     var xP = shooterSubsystem.getDistanceToPassball();
                     xP = Math.max(1.2, Math.min(4.5, xP));
