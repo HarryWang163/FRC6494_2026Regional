@@ -78,7 +78,8 @@ public class RobotContainer {
         IntakerSubsystem,
         drivetrain,
         shooterSubsystem,
-        driveControls
+        driveControls,
+        shooterControls
     );
 
     SignalLogger.enableAutoLogging(false);
