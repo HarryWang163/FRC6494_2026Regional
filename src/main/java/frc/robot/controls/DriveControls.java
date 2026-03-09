@@ -24,7 +24,8 @@ import frc.robot.subsystems.LimelightSupplier;
 
 import java.util.Optional;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance; 
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer; 
 
 public class DriveControls {
 
@@ -430,7 +431,29 @@ public class DriveControls {
             drivetrain.stop();
         }, drivetrain));
     }
+    public Command shakeCommand(double amplitude, double switchPeriod, double totalTime) {
+        Timer timer = new Timer();
 
-
-
+        return Commands.sequence(
+            new InstantCommand(timer::restart),
+            drivetrain.applyRequest(() -> {
+                double t = timer.get();
+                boolean positive = ((int) (t / switchPeriod)) % 2 == 0;
+                double vy = positive ? amplitude : -amplitude;
+                return robotCentric
+                    .withVelocityX(0.0)
+                    .withVelocityY(vy)
+                    .withRotationalRate(0.0);
+            }, () -> DriveMode.ROBOT_CENTRIC).withTimeout(totalTime),
+            new InstantCommand(() -> {
+                timer.stop();
+                autoControlNetworkTable.getEntry("ShakeVy").setDouble(0.0);
+                drivetrain.stop();
+            }, drivetrain)
+        );
+    }
+    public Command shakeCommand() {
+        return shakeCommand(0.25, 0.2, 3.0);
+    }
+    
 }

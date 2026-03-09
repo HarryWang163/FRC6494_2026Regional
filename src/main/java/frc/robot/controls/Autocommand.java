@@ -40,7 +40,10 @@ import frc.robot.Constants.RobotStatus;
         NamedCommands.registerCommand("intaker_up", intaker_up(intaker));
         NamedCommands.registerCommand("auto_align_to_climb", autoAlignToClimb(drivetrain));
         NamedCommands.registerCommand("shoot", shoot(shooter));
-        NamedCommands.registerCommand("auto_aim_and_shoot", autoAimAndShoot(driveControls, shooterControls));
+        NamedCommands.registerCommand("Shake", Autocommand.shake(driveControls));
+        NamedCommands.registerCommand("AutoAim", Autocommand.autoAim(driveControls));
+        NamedCommands.registerCommand("AutoShoot", Autocommand.autoShoot(shooterControls));
+
     }
 
         public static Command climb_up(ClimberSubsystem climber) {
@@ -131,10 +134,14 @@ import frc.robot.Constants.RobotStatus;
                 shooter.setConveyorSpeedByRPS(0);  // 停止输送
             }, shooter)));
         }
-        
-        public static Command autoAimAndShoot(DriveControls driveControls, ShooterControls shooterControl) {
-            return driveControls.autoAimCommand()
-            .andThen(shooterControl.autoShootToHubCommand());
+        public static Command autoAim(DriveControls driveControls) {
+            return driveControls.autoAimCommand();
+        }
+        public static Command autoShoot(ShooterControls shooterControl) {
+            return shooterControl.autoShootToHubCommand();
+        }
+        public static Command shake(DriveControls driveControls) {
+            return driveControls.shakeCommand();
         }
 
 
