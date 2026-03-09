@@ -42,6 +42,8 @@ public class DriveControls {
     // 加速模式比例（按住 RB）
     private double boostDriveScale = 1.0;
     private double boostTurnScale  = 1.0;
+    //autoaim模式
+    private double slowDriveScale =0.1;
 
     private boolean boostEnabled = false;
 
@@ -142,6 +144,8 @@ public class DriveControls {
                 LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
                 vomega = calculateRotationSpeedFromRotationAngle(distanceAndRotation[1]);
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(vomega);
+                vx = -driver.getLeftY() * maxSpeed * slowDriveScale;
+                vy = -driver.getLeftX() * maxSpeed * slowDriveScale;
                 break;
             case AllTelop:
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(Double.NaN);

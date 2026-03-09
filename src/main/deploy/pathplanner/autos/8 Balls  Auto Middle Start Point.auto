@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Climb Path step2"
+            "pathName": "redBackAndShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
           }
         }
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

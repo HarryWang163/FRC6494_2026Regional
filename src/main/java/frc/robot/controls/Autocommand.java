@@ -31,6 +31,7 @@ import frc.robot.Constants.RobotStatus;
         NamedCommands.registerCommand("climb_up", climb_up(climber));
         NamedCommands.registerCommand("climb_down", climb_down(climber));
         NamedCommands.registerCommand("start_intake", start_intake(intaker));
+        NamedCommands.registerCommand("start_intake_timelimit", start_intake_timelimit(intaker));
         NamedCommands.registerCommand("stop_intake", stop_intake(intaker));
         NamedCommands.registerCommand("intaker_down", intaker_down(intaker));
         NamedCommands.registerCommand("intaker_up", intaker_up(intaker));
@@ -55,9 +56,16 @@ import frc.robot.Constants.RobotStatus;
             }, climber));
         }
         public static Command start_intake(IntakerSubsystem intaker) {
-            return new InstantCommand(() -> {
+            return new RunCommand(() -> {
                 intaker.setIntakerGetterSpeed(Constants.Intaker.IntakeGetterSpeedforAuto);  // 启动吸球
             }, intaker);
+        }
+        public static Command start_intake_timelimit(IntakerSubsystem intaker) {
+            return new RunCommand(() -> {
+                intaker.setIntakerGetterSpeed(Constants.Intaker.IntakeGetterSpeedforAuto);  // 吸球机构下降
+            }, intaker).withTimeout(3).andThen(new InstantCommand(() -> {
+                intaker.setIntakerGetterSpeed(0);  // 停止旋转
+            }, intaker));
         }
         public static Command stop_intake(IntakerSubsystem intaker) {
             return new InstantCommand(() -> {
@@ -65,16 +73,16 @@ import frc.robot.Constants.RobotStatus;
             }, intaker);
         }
         public static Command intaker_down(IntakerSubsystem intaker) {
-            return new InstantCommand(() -> {
+            return new RunCommand(() -> {
                 intaker.IntakerDownNonStop();  // 吸球机构下降
-            }, intaker).withTimeout(0.5).andThen(new InstantCommand(() -> {
-                intaker.stopIntakerotater();;  // 停止旋转
+            }, intaker).withTimeout(1.0).andThen(new InstantCommand(() -> {
+                intaker.stopIntakerotater();  // 停止旋转
             }, intaker));
         }
         public static Command intaker_up(IntakerSubsystem intaker) {
             return new InstantCommand(() -> {
                 intaker.IntakerUpNonStop();  // 吸球机构上升
-            }, intaker).withTimeout(0.5).andThen(new InstantCommand(() -> {
+            }, intaker).withTimeout(0.8).andThen(new InstantCommand(() -> {
                 intaker.stopIntakerotater();;  // 停止旋转
             }, intaker));
         }
@@ -95,14 +103,26 @@ import frc.robot.Constants.RobotStatus;
      }
 
         public static Command shoot(ShooterSubsystem shooter) {
-            return new InstantCommand(() -> {
-                shooter.setFlywheelSpeedByRPS(60);
-                shooter.setBackboardPosition(200);  // 设置自动射击转速
-            }, shooter).withTimeout(1.0).andThen(new InstantCommand(() -> {
+            return new RunCommand(() -> {
+                shooter.setFlywheelSpeedByRPS(64);
+                shooter.setBackboardPosition(175);  // 设置自动射击转速
+                if(shooter.isBackboardAtTarget()){
+                        shooter.backboardMotor.set(0);
+                    }else{
+                        shooter.outputBackboard();
+                    }  
+            }, shooter).withTimeout(1.0).andThen(new RunCommand(() -> {
+                shooter.setFlywheelSpeedByRPS(64);
+                shooter.setBackboardPosition(175);
+                if(shooter.isBackboardAtTarget()){
+                        shooter.backboardMotor.set(0);
+                    }else{
+                        shooter.outputBackboard();
+                    }  
                 shooter.setConveyorSpeedByRPS(25);
-            }, shooter).withTimeout(5.0).andThen(new InstantCommand(() -> {
+            }, shooter).withTimeout(3.0).andThen(new InstantCommand(() -> {
                 shooter.setFlywheelSpeedByRPS(0);  // 停止射击
-                shooter.setBackboardPosition(0);  // 恢复背板位置
+                //shooter.setBackboardPosition(0);  // 恢复背板位置
                 shooter.setConveyorSpeedByRPS(0);  // 停止输送
             }, shooter)));
     
