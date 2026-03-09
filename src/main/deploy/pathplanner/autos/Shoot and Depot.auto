@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Back To Shoot"
+                  "pathName": "Back To Shoot Red"
                 }
               },
               {
@@ -36,7 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Shoot to Red Depot"
+                  "pathName": "Shoot to Depot Red"
                 }
               },
               {
@@ -61,7 +61,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Depot Intake"
+                  "pathName": "Depot Intake Red"
                 }
               }
             ]
@@ -80,7 +80,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Depot to Shoot"
+                  "pathName": "Depot to Shoot Red"
                 }
               }
             ]
@@ -96,6 +96,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Red Middle",
   "choreoAuto": false
 }

@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Back To Shoot"
+            "pathName": "Back To Shoot Red"
           }
         },
         {
@@ -19,25 +19,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Shoot to Climb Step1"
+            "pathName": "Shoot to Climb Step1 Red"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Climb Step2"
+            "pathName": "Climb Step2 Red"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Climb Step3"
+            "pathName": "Climb Step3 Red"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Red Middle",
   "choreoAuto": false
 }
