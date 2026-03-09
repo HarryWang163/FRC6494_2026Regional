@@ -149,6 +149,7 @@ public final class Constants {
 
     public static double climbUpTicks = 94; // TODO: 实测后调整
     public static double climbDownTicks = 0; // TODO: 实测后调整
+    public static double climbDownAutoTicks = -5; // TODO: 实测后调整，自动爬时可能不需要完全降到底
     public static final double climbVelocity = -200;
     public static final double holdToleranceRot = 0.5; 
     public static final double deltaDownTicks = 1;

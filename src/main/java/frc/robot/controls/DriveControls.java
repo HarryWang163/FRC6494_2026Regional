@@ -12,6 +12,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.RobotStatusManager;
@@ -414,6 +415,22 @@ public class DriveControls {
             drivetrain.stop();
         }
     }
+    public Command autoAimCommand() {
+        return drivetrain.applyRequest(() -> {
+        double[] distanceAndRotation = calculateDistanceAndRotationToHub();
+        double vomega = calculateRotationSpeedFromRotationAngle(distanceAndRotation[1]);
+        return fieldCentric
+            .withVelocityX(0.0)
+            .withVelocityY(0.0)
+            .withRotationalRate(vomega);
+        }, () -> DriveMode.FIELD_CENTRIC)
+        .until(() -> Math.abs(calculateDistanceAndRotationToHub()[1]) < 1.5)
+        .withTimeout(1.0)
+        .andThen(new InstantCommand(() -> {
+            drivetrain.stop();
+        }, drivetrain));
+    }
+
 
 
 }

@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -76,7 +77,8 @@ public class RobotContainer {
         climberSubsystem,
         IntakerSubsystem,
         drivetrain,
-        shooterSubsystem
+        shooterSubsystem,
+        driveControls
     );
 
     SignalLogger.enableAutoLogging(false);
@@ -162,7 +164,8 @@ public class RobotContainer {
     controllerupper.povDown().onTrue(Commands.runOnce(() -> shooterControls.adjustBackboardRateOffset(-100)));
     controllerupper.back().onTrue(Commands.runOnce(() -> shooterControls.resetOffsets()));
     controllerupper.start().onTrue(Commands.runOnce(() -> shooterControls.resetBackboardCommand()));
-    controllerupper.b().onTrue(Commands.runOnce(() -> shooterControls.resetBackboardCommand()));
+    controllerupper.b().whileTrue(new RunCommand(() -> shooterSubsystem.setConveyorSpeedByRPS(10), shooterSubsystem));
+    controllerupper.a().whileTrue(new RunCommand(() -> shooterSubsystem.setConveyorSpeedByRPS(-25), shooterSubsystem));
   }
   /* ====================== */
   /*        LED 绑定          */

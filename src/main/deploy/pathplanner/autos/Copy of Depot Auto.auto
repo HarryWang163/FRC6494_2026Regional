@@ -5,9 +5,28 @@
     "data": {
       "commands": [
         {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Back To Shoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intaker_down"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "intaker_down"
+            "name": "shoot"
           }
         },
         {
@@ -17,16 +36,16 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "To Red Depot"
+                  "pathName": "Shoot to Red Depot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "start_intake_timelimit"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "start_intake_timelimit"
           }
         },
         {
@@ -46,12 +65,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
           }
         },
         {

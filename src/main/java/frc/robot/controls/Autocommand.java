@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.RobotStatusManager;
 import frc.robot.subsystems.IntakerSubsystem;
@@ -26,7 +27,9 @@ import frc.robot.Constants.RobotStatus;
             ClimberSubsystem climber,
             IntakerSubsystem intaker,
             CommandSwerveDrivetrain drivetrain,
-            ShooterSubsystem shooter
+            ShooterSubsystem shooter,
+            DriveControls driveControls,
+            ShooterControls shooterControls
     ) {
         NamedCommands.registerCommand("climb_up", climb_up(climber));
         NamedCommands.registerCommand("climb_down", climb_down(climber));
@@ -37,20 +40,22 @@ import frc.robot.Constants.RobotStatus;
         NamedCommands.registerCommand("intaker_up", intaker_up(intaker));
         NamedCommands.registerCommand("auto_align_to_climb", autoAlignToClimb(drivetrain));
         NamedCommands.registerCommand("shoot", shoot(shooter));
+        NamedCommands.registerCommand("auto_aim_and_shoot", autoAimAndShoot(driveControls, shooterControls));
     }
 
         public static Command climb_up(ClimberSubsystem climber) {
             return new RunCommand(() -> {
                 climber.climbUp();  // 控制爬升器上升
-            }, climber).withTimeout(1.0)  // 
-            .andThen(new InstantCommand(() -> {
+            }, climber).withTimeout(1.0).andThen(new RunCommand(() -> {
+                climber.climbUpNonStopforAuto();
+            }, climber).withTimeout(0.5)).andThen(new InstantCommand(() -> {
                 climber.holdPosition();  // 停止并锁定当前爬升器位置
             }, climber));
         }
         public static Command climb_down(ClimberSubsystem climber) {
             return new RunCommand(() -> {
-                climber.climbDown();  // 控制爬升器下降
-            }, climber).withTimeout(1.0)  //
+                climber.climbDownAuto();  // 控制爬升器下降
+            }, climber).withTimeout(2.0)  //
             .andThen(new InstantCommand(() -> {
                 climber.holdPosition();  // 停止并锁定当前爬升器位置
             }, climber));
@@ -100,7 +105,7 @@ import frc.robot.Constants.RobotStatus;
                 },
                 drivetrain
             ).until(() -> drivetrain.isAlignedToAprilTag()));
-     }
+        }
 
         public static Command shoot(ShooterSubsystem shooter) {
             return new RunCommand(() -> {
@@ -125,9 +130,14 @@ import frc.robot.Constants.RobotStatus;
                 //shooter.setBackboardPosition(0);  // 恢复背板位置
                 shooter.setConveyorSpeedByRPS(0);  // 停止输送
             }, shooter)));
-    
-
         }
+        
+        public static Command autoAimAndShoot(DriveControls driveControls, ShooterControls shooterControl) {
+            return driveControls.autoAimCommand()
+            .andThen(shooterControl.autoShootToHubCommand());
+        }
+
+
     }
 
 

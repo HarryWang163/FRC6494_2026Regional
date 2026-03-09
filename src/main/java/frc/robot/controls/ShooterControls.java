@@ -1,9 +1,13 @@
 package frc.robot.controls;
 
+import java.util.Set;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.RobotStatusManager;
@@ -147,8 +151,50 @@ public class ShooterControls {
         flywheelSpeedOffset = 0.0;
         backboardPositionOffset = 0.0;
     }
-    public void startconveyor(){
-        shooterSubsystem.setConveyorSpeedByRPS(10);
 
+    public Command autoShootToHubCommand() {
+        return Commands.defer(() -> {
+            double x = shooterSubsystem.getDistanceToHub();
+            x = Math.max(1.2, Math.min(4.5, x));
+
+            double flywheelTargetSpeed = -1.4964026859575532*x*x*x*x*x*x*x+29.82445640241506*x*x*x*x*x*x-247.71603153159896*x*x*x*x*x+1108.8727302184625*x*x*x*x-2881.517500617481*x*x*x+4332.05363145275*x*x-3467.2508337871454*x+1192.1508062663759;
+            double backboardTargetPosition = +34.5286998307899*x*x*x*x*x*x*x*x-788.5788623683884*x*x*x*x*x*x*x+7658.073303693148*x*x*x*x*x*x-41191.69338972519*x*x*x*x*x+133870.54588688645*x*x*x*x-268559.6987062158*x*x*x+324254.6530324262*x*x-215015.48893131423*x+59977.46545382827;
+            double conveyorTargetSpeed = Constants.Shooter.conveyorSpeed;
+
+            return new RunCommand(() -> {
+                shooterSubsystem.setFlywheelSpeedByRPS(flywheelTargetSpeed);
+                shooterSubsystem.setConveyorSpeedByRPS(0.0);
+                shooterSubsystem.setBackboardPosition(backboardTargetPosition);
+                if (shooterSubsystem.isBackboardAtTarget()) {
+                    shooterSubsystem.backboardMotor.set(0);
+                } else {
+                    shooterSubsystem.outputBackboard();
+                }
+            }, shooterSubsystem)
+            .until(() ->
+                shooterSubsystem.isBackboardAtTarget()
+                && shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble() >= flywheelTargetSpeed * 0.9
+            )
+            .withTimeout(1.0)
+            .andThen(new RunCommand(() -> {
+                shooterSubsystem.setFlywheelSpeedByRPS(flywheelTargetSpeed);
+                shooterSubsystem.setBackboardPosition(backboardTargetPosition);
+                if (shooterSubsystem.isBackboardAtTarget()) {
+                    shooterSubsystem.backboardMotor.set(0);
+                } else {
+                    shooterSubsystem.outputBackboard();
+                }
+                if (shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble() >= flywheelTargetSpeed * 0.9) {
+                    shooterSubsystem.setConveyorSpeedByRPS(conveyorTargetSpeed);
+                } else {
+                    shooterSubsystem.setConveyorSpeedByRPS(0.0);
+                }
+            }, shooterSubsystem).withTimeout(3.0))
+            .andThen(new InstantCommand(() -> {
+                shooterSubsystem.setFlywheelSpeedByRPS(0.0);
+                shooterSubsystem.setConveyorSpeedByRPS(0.0);
+                shooterSubsystem.backboardMotor.set(0.0);
+            }, shooterSubsystem));
+        }, Set.of(shooterSubsystem));
     }
 }

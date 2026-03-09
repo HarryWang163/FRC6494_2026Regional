@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "redBackAndShoot"
+            "pathName": "Back To Shoot"
           }
         },
         {
@@ -19,13 +19,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Climb Path step1"
+            "pathName": "Shoot to Climb Step1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Climb Path step2"
+            "pathName": "Climb Step2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Climb Step3"
           }
         }
       ]
