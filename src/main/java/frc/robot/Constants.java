@@ -42,7 +42,7 @@ public final class Constants {
         public static final double backboardDownLimit = 0.0;  // 背板下限角度（根据实际需求设置）
     }
     public class AutoPositioning {
-        public static final double autoRotationkP = 0.1;
+        public static final double autoRotationkP = 0.08;
         public static final double autoRotationForBumpTargetDegrees = 45;
         public static final double autoRotationForTrenchTargetDegrees = 0;
         public static final boolean teleopOffsetEnabled = true;

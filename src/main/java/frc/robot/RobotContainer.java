@@ -70,9 +70,19 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
   
   private final Trigger enableTrigger = new Trigger(DriverStation::isEnabled);
+  private final Trigger teleopStartTrigger = new Trigger(DriverStation::isTeleopEnabled);
 
   
   public RobotContainer() {
+
+    Pose2d startingPose = Constants.StartingPoints.Red.Point2;
+    drivetrain.resetPose(startingPose);
+    configueSwerve();
+    configueShooter();
+    configueClimber();
+    bingdingLED();
+    configueIntaker();
+    //configureBindings();
     Autocommand.preNameCommands(
         climberSubsystem,
         IntakerSubsystem,
@@ -81,15 +91,9 @@ public class RobotContainer {
         driveControls,
         shooterControls
     );
-
     SignalLogger.enableAutoLogging(false);
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    configueSwerve();
-    configueShooter();
-    configueClimber();
-    bingdingLED();
-    configueIntaker();
   }
 
   /* ====================== */
@@ -199,5 +203,22 @@ public class RobotContainer {
     IntakerSubsystem.setDefaultCommand(intakerControls.defaultIntakerCommand());
     controllerupper.a().onTrue(intakerControls.resetIntakerRotaterEncoderCommand(IntakerSubsystem));
   }
+
+  // private void configureBindings() {
+  //       teleopStartTrigger.onTrue(handleClimberAtTeleopStartCommand());
+  //   }
+
+  // private Command handleClimberAtTeleopStartCommand() {
+  //       return new InstantCommand(() -> {
+  //           if (climberSubsystem.wasAutoClimbUsedInAuto()) {
+  //               climberSubsystem.climbUp();
+  //               climberSubsystem.clearAutoClimbUsedInAutoFlag();
+  //           }
+  //       }, climberSubsystem);
+  //   }
+
+  //   public ClimberSubsystem getClimberSubsystem() {
+  //       return climberSubsystem;
+  //   }
 
 }

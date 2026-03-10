@@ -16,6 +16,8 @@ import frc.robot.Constants;
 
 public class ClimberSubsystem extends SubsystemBase {
 
+    // private boolean autoClimbUsedInAuto = false;
+
     private final TalonFX climberMotor;
     private double targetPositionTicks;
 
@@ -99,6 +101,18 @@ public class ClimberSubsystem extends SubsystemBase {
     public void stopMotor() {
         climberMotor.set(0);
     }
+
+    // public void markAutoClimbUsedInAuto() {
+    //     autoClimbUsedInAuto = true;
+    // }
+
+    // public boolean wasAutoClimbUsedInAuto() {
+    //     return autoClimbUsedInAuto;
+    // }
+
+    // public void clearAutoClimbUsedInAutoFlag() {
+    //     autoClimbUsedInAuto = false;
+    // }
 
     @Override
     public void periodic() {
