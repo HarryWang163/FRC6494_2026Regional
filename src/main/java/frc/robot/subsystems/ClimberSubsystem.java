@@ -10,13 +10,15 @@ import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 
 public class ClimberSubsystem extends SubsystemBase {
 
-    // private boolean autoClimbUsedInAuto = false;
+    private boolean autoClimbUsedInAuto = false;
 
     private final TalonFX climberMotor;
     private double targetPositionTicks;
@@ -48,11 +50,6 @@ public class ClimberSubsystem extends SubsystemBase {
     }
     public void initialize() {
         climberMotor.set(-0.07);
-    }
-    
-    public void zeroEncoder(){
-        climberMotor.setPosition(0);
-        stopMotor();
     }
 
     public double getPositionTicks() {
@@ -101,18 +98,33 @@ public class ClimberSubsystem extends SubsystemBase {
     public void stopMotor() {
         climberMotor.set(0);
     }
+    public void setMotor(double speed) {
+        climberMotor.set(speed);
+    }
 
-    // public void markAutoClimbUsedInAuto() {
-    //     autoClimbUsedInAuto = true;
-    // }
+    public Command initCommand() {
+        return Commands.sequence(
+            Commands.run(() -> climberMotor.set(-0.07), this).withTimeout(0.5),
+            Commands.runOnce(this::zeroEncoder, this)
+        );
+    }
 
-    // public boolean wasAutoClimbUsedInAuto() {
-    //     return autoClimbUsedInAuto;
-    // }
+    public void zeroEncoder() {
+        climberMotor.setPosition(0);
+        stopMotor();
+    }
 
-    // public void clearAutoClimbUsedInAutoFlag() {
-    //     autoClimbUsedInAuto = false;
-    // }
+    public void markAutoClimbUsedInAuto() {
+        autoClimbUsedInAuto = true;
+    }
+
+    public boolean wasAutoClimbUsedInAuto() {
+        return autoClimbUsedInAuto;
+    }
+
+    public void clearAutoClimbUsedInAutoFlag() {
+        autoClimbUsedInAuto = false;
+    }
 
     @Override
     public void periodic() {

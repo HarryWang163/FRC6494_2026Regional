@@ -82,7 +82,7 @@ public class RobotContainer {
     configueClimber();
     bingdingLED();
     configueIntaker();
-    //configureBindings();
+    configureBindings();
     Autocommand.preNameCommands(
         climberSubsystem,
         IntakerSubsystem,
@@ -194,9 +194,7 @@ public class RobotContainer {
   }
 
   private void configueClimber() {
-    //enableTrigger.onTrue(climberControls.enableInitCommand());
     climberSubsystem.setDefaultCommand(climberControls.defaultClimberCommand());
-    //controllerupper.b().onTrue(climberControls.resetClimberEncoderCommand(climberSubsystem));
   }
 
   private void configueIntaker() {
@@ -204,21 +202,21 @@ public class RobotContainer {
     controllerupper.a().onTrue(intakerControls.resetIntakerRotaterEncoderCommand(IntakerSubsystem));
   }
 
-  // private void configureBindings() {
-  //       teleopStartTrigger.onTrue(handleClimberAtTeleopStartCommand());
-  //   }
+  private void configureBindings() {
+        teleopStartTrigger.onTrue(handleClimberAtTeleopStartCommand());
+    }
 
-  // private Command handleClimberAtTeleopStartCommand() {
-  //       return new InstantCommand(() -> {
-  //           if (climberSubsystem.wasAutoClimbUsedInAuto()) {
-  //               climberSubsystem.climbUp();
-  //               climberSubsystem.clearAutoClimbUsedInAutoFlag();
-  //           }
-  //       }, climberSubsystem);
-  //   }
+  private Command handleClimberAtTeleopStartCommand() {
+        return new InstantCommand(() -> {
+            if (climberSubsystem.wasAutoClimbUsedInAuto()) {
+                climberSubsystem.climbUp();
+                climberSubsystem.clearAutoClimbUsedInAutoFlag();
+            }
+        }, climberSubsystem);
+    }
 
-  //   public ClimberSubsystem getClimberSubsystem() {
-  //       return climberSubsystem;
-  //   }
+  public ClimberSubsystem getClimberSubsystem() {
+      return climberSubsystem;
+  }
 
 }

@@ -50,11 +50,6 @@ public class ClimberControls {
 
     }
 
-    public Command enableInitCommand() {
-        return Commands.run(climber::initialize, climber)
-                .withTimeout(0.5)
-                .andThen(Commands.runOnce(climber::zeroEncoder, climber));
-    }
     public Command resetClimberEncoderCommand(ClimberSubsystem climber) {
         return Commands.runOnce(climber::zeroEncoder, climber);
     }
