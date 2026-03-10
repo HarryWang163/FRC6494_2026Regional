@@ -91,7 +91,7 @@ public class RobotContainer {
     configueClimber();
     bingdingLED();
     configueIntaker();
-    configureBindings();
+    //configureBindings();
   }
 
   /* ====================== */
@@ -202,21 +202,21 @@ public class RobotContainer {
     controllerupper.a().onTrue(intakerControls.resetIntakerRotaterEncoderCommand(IntakerSubsystem));
   }
 
-  private void configureBindings() {
-        teleopStartTrigger.onTrue(handleClimberAtTeleopStartCommand());
-    }
+  // private void configureBindings() {
+  //       teleopStartTrigger.onTrue(handleClimberAtTeleopStartCommand());
+  //   }
 
-  private Command handleClimberAtTeleopStartCommand() {
-        return new InstantCommand(() -> {
-            if (climberSubsystem.wasAutoClimbUsedInAuto()) {
-                climberSubsystem.climbUp();
-                climberSubsystem.clearAutoClimbUsedInAutoFlag();
-            }
-        }, climberSubsystem);
-    }
+  // private Command handleClimberAtTeleopStartCommand() {
+  //       return new InstantCommand(() -> {
+  //           if (climberSubsystem.wasAutoClimbUsedInAuto()) {
+  //               climberSubsystem.climbUp();
+  //               climberSubsystem.clearAutoClimbUsedInAutoFlag();
+  //           }
+  //       }, climberSubsystem);
+  //   }
 
-    public ClimberSubsystem getClimberSubsystem() {
-        return climberSubsystem;
-    }
+  //   public ClimberSubsystem getClimberSubsystem() {
+  //       return climberSubsystem;
+  //   }
 
 }

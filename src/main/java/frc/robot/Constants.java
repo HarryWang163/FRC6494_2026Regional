@@ -42,7 +42,7 @@ public final class Constants {
         public static final double backboardDownLimit = 0.0;  // 背板下限角度（根据实际需求设置）
     }
     public class AutoPositioning {
-        public static final double autoRotationkP = 0.1;
+        public static final double autoRotationkP = 0.08;
         public static final double autoRotationForBumpTargetDegrees = 45;
         public static final double autoRotationForTrenchTargetDegrees = 0;
         public static final boolean teleopOffsetEnabled = true;
@@ -149,7 +149,7 @@ public final class Constants {
 
     public static double climbUpTicks = 94; // TODO: 实测后调整
     public static double climbDownTicks = 0; // TODO: 实测后调整
-    public static double climbDownAutoTicks = -5; // TODO: 实测后调整，自动爬时可能不需要完全降到底
+    public static double climbDownAutoTicks = 0; // TODO: 实测后调整，自动爬时可能不需要完全降到底
     public static final double climbVelocity = -200;
     public static final double holdToleranceRot = 0.5; 
     public static final double deltaDownTicks = 1;

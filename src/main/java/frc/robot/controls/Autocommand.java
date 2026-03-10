@@ -32,7 +32,7 @@ import frc.robot.Constants.RobotStatus;
             ShooterControls shooterControls
     ) {
         NamedCommands.registerCommand("climb_up", climb_up(climber));
-        NamedCommands.registerCommand("climb_down", climb_down(climber));
+        //NamedCommands.registerCommand("climb_down", climb_down(climber));
         NamedCommands.registerCommand("start_intake", start_intake(intaker));
         NamedCommands.registerCommand("start_intake_timelimit", start_intake_timelimit(intaker));
         NamedCommands.registerCommand("stop_intake", stop_intake(intaker));
@@ -40,32 +40,30 @@ import frc.robot.Constants.RobotStatus;
         NamedCommands.registerCommand("intaker_up", intaker_up(intaker));
         NamedCommands.registerCommand("auto_align_to_climb", autoAlignToClimb(drivetrain));
         NamedCommands.registerCommand("shoot", shoot(shooter));
-        NamedCommands.registerCommand("Shake", Autocommand.shake(driveControls));
-        NamedCommands.registerCommand("AutoAim", Autocommand.autoAim(driveControls));
-        NamedCommands.registerCommand("AutoShoot", Autocommand.autoShoot(shooterControls));
+        // NamedCommands.registerCommand("Shake", Autocommand.shake(driveControls));
+        // NamedCommands.registerCommand("AutoAim", Autocommand.autoAim(driveControls));
+        // NamedCommands.registerCommand("AutoShoot", Autocommand.autoShoot(shooterControls));
 
     }
 
         public static Command climb_up(ClimberSubsystem climber) {
             return new RunCommand(() -> {
                 climber.climbUp();  // 控制爬升器上升
-            }, climber).withTimeout(1.0).andThen(new RunCommand(() -> {
-                climber.climbUpNonStopforAuto();
-            }, climber).withTimeout(0.5)).andThen(new InstantCommand(() -> {
+            }, climber).withTimeout(1.0).andThen(new InstantCommand(() -> {
                 climber.holdPosition();  // 停止并锁定当前爬升器位置
             }, climber));
         }
-        public static Command climb_down(ClimberSubsystem climber) {
-            return Commands.sequence(
-                new InstantCommand(climber::markAutoClimbUsedInAuto),
-                new RunCommand(() -> {
-                    climber.climbDownAuto();
-                }, climber).withTimeout(2.0),
-                new InstantCommand(() -> {
-                    climber.holdPosition();
-                }, climber)
-            );
-        }
+        // public static Command climb_down(ClimberSubsystem climber) {
+        //     return Commands.sequence(
+        //         new InstantCommand(climber::markAutoClimbUsedInAuto),
+        //         new RunCommand(() -> {
+        //             climber.climbDownAuto();
+        //         }, climber).withTimeout(2.0),
+        //         new InstantCommand(() -> {
+        //             climber.holdPosition();
+        //         }, climber)
+        //     );
+        // }
 
         public static Command start_intake(IntakerSubsystem intaker) {
             return new RunCommand(() -> {
@@ -138,15 +136,15 @@ import frc.robot.Constants.RobotStatus;
                 shooter.setConveyorSpeedByRPS(0);  // 停止输送
             }, shooter)));
         }
-        public static Command autoAim(DriveControls driveControls) {
-            return driveControls.autoAimCommand();
-        }
-        public static Command autoShoot(ShooterControls shooterControl) {
-            return shooterControl.autoShootToHubCommand();
-        }
-        public static Command shake(DriveControls driveControls) {
-            return driveControls.shakeCommand();
-        }
+        // public static Command autoAim(DriveControls driveControls) {
+        //     return driveControls.autoAimCommand();
+        // }
+        // public static Command autoShoot(ShooterControls shooterControl) {
+        //     return shooterControl.autoShootToHubCommand();
+        // }
+        // public static Command shake(DriveControls driveControls) {
+        //     return driveControls.shakeCommand();
+        // }
 
 
     }
