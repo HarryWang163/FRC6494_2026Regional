@@ -58,7 +58,5 @@ public class ClimberControls {
     public Command resetClimberEncoderCommand(ClimberSubsystem climber) {
         return Commands.runOnce(climber::zeroEncoder, climber);
     }
-
-    
     
 }

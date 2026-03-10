@@ -56,13 +56,17 @@ import frc.robot.Constants.RobotStatus;
             }, climber));
         }
         public static Command climb_down(ClimberSubsystem climber) {
-            return new RunCommand(() -> {
-                climber.climbDownAuto();  // 控制爬升器下降
-            }, climber).withTimeout(2.0)  //
-            .andThen(new InstantCommand(() -> {
-                climber.holdPosition();  // 停止并锁定当前爬升器位置
-            }, climber));
+            return Commands.sequence(
+                new InstantCommand(climber::markAutoClimbUsedInAuto),
+                new RunCommand(() -> {
+                    climber.climbDownAuto();
+                }, climber).withTimeout(2.0),
+                new InstantCommand(() -> {
+                    climber.holdPosition();
+                }, climber)
+            );
         }
+
         public static Command start_intake(IntakerSubsystem intaker) {
             return new RunCommand(() -> {
                 intaker.setIntakerGetterSpeed(Constants.Intaker.IntakeGetterSpeedforAuto);  // 启动吸球
