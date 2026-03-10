@@ -185,4 +185,9 @@ public class ShooterSubsystem extends SubsystemBase {
     public double getDistanceToPassball(){
         return NetworkTableInstance.getDefault().getTable("AutoControl").getEntry("distanceToPassball").getDouble(0.0);
     }
+    public void stopAll() {
+        setFlywheelSpeedByRPS(0);
+        setConveyorSpeedByRPS(0);
+        backboardMotor.set(0);
+    }
 }

@@ -126,6 +126,10 @@ public class ClimberSubsystem extends SubsystemBase {
         autoClimbUsedInAuto = false;
     }
 
+    public void stopAll() {
+        climberMotor.set(0);
+    }
+
     @Override
     public void periodic() {
         climberTable.getEntry("velocityRps").setDouble(getVelocityRps());

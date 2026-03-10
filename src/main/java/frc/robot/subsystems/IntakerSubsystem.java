@@ -106,4 +106,8 @@ public class IntakerSubsystem extends SubsystemBase{
     public void setIntakerRotater(double rotaterspeed){
         intakerotater.set(rotaterspeed);
     }
+    public void stopAll() {
+        stopIntakerotater();
+        setIntakerGetterSpeed(0);
+    }
 }
