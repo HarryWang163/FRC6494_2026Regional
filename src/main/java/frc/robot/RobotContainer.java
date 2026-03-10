@@ -74,6 +74,15 @@ public class RobotContainer {
 
   
   public RobotContainer() {
+
+    Pose2d startingPose = Constants.StartingPoints.Red.Point2;
+    drivetrain.resetPose(startingPose);
+    configueSwerve();
+    configueShooter();
+    configueClimber();
+    bingdingLED();
+    configueIntaker();
+    //configureBindings();
     Autocommand.preNameCommands(
         climberSubsystem,
         IntakerSubsystem,
@@ -82,16 +91,9 @@ public class RobotContainer {
         driveControls,
         shooterControls
     );
-
     SignalLogger.enableAutoLogging(false);
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    configueSwerve();
-    configueShooter();
-    configueClimber();
-    bingdingLED();
-    configueIntaker();
-    //configureBindings();
   }
 
   /* ====================== */
