@@ -190,7 +190,7 @@ public class RobotContainer {
   }
 
   private void configueClimber() {
-    enableTrigger.onTrue(climberControls.enableInitCommand());
+    //enableTrigger.onTrue(climberControls.enableInitCommand());
     climberSubsystem.setDefaultCommand(climberControls.defaultClimberCommand());
     //controllerupper.b().onTrue(climberControls.resetClimberEncoderCommand(climberSubsystem));
   }

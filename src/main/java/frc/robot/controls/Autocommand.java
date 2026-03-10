@@ -49,17 +49,19 @@ import frc.robot.Constants.RobotStatus;
         public static Command climb_up(ClimberSubsystem climber) {
             return new RunCommand(() -> {
                 climber.climbUp();  // 控制爬升器上升
-            }, climber).withTimeout(1.0).andThen(new RunCommand(() -> {
+            }, climber).withTimeout(2).andThen(new RunCommand(() -> {
                 climber.climbUpNonStopforAuto();
             }, climber).withTimeout(0.5)).andThen(new InstantCommand(() -> {
+                climber.captureHoldPosition();  // 捕获当前爬升器位置以保持
                 climber.holdPosition();  // 停止并锁定当前爬升器位置
             }, climber));
         }
         public static Command climb_down(ClimberSubsystem climber) {
             return new RunCommand(() -> {
-                climber.climbDownAuto();  // 控制爬升器下降
+                climber.climbDown();  // 控制爬升器下降
             }, climber).withTimeout(2.0)  //
             .andThen(new InstantCommand(() -> {
+                climber.captureHoldPosition();  // 捕获当前爬升器位置以保持
                 climber.holdPosition();  // 停止并锁定当前爬升器位置
             }, climber));
         }
