@@ -17,7 +17,8 @@ public final class Constants {
         CrossingTrench
     }
     public class Shooter {
-        public static final double conveyorSpeed =25;
+        public static final double conveyorSpeed = 25;
+        public static final double conveyorSpeedForAuto = 10;
         public static final Slot0Configs flyWheelSlot0Configs = new Slot0Configs()
             .withKP(0.0).withKI(0).withKD(0)
             .withKV(0.099).withKA(0.0).withKS(0.0);
@@ -135,7 +136,7 @@ public final class Constants {
         .withKV(0.00).withKA(0.00).withKS(0.00);
     //如果 rotater 受重力影响明显，可能需要用 withKG/withGravityType/withGravityArmPositionOffset（看机构形式）(这句fromAI)
 
-    public static final double IntakeGetterSpeedforAuto = 0.4;
+    public static final double IntakeGetterSpeedforAuto = 0.5;
     // 单位RPS
     public static final double positionToleranceRotations = 0.00;
     //rotater容差

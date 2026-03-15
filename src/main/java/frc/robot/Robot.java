@@ -50,7 +50,9 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void autonomousPeriodic() {}
+    public void autonomousPeriodic() {
+        m_robotContainer.driveControls.pushDistanceData();
+    }
 
     @Override
     public void autonomousExit() {}

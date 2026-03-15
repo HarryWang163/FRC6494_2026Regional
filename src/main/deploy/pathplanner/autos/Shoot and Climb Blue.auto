@@ -1,0 +1,67 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Back To Shoot Blue"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.25
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Shoot to Climb Step1 Blue"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "climb_up"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Climb Step2 Blue"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Climb Step3 Blue"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.25
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "climb_down"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Blue Middle",
+  "choreoAuto": false
+}

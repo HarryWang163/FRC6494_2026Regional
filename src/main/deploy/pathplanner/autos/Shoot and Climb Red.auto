@@ -5,9 +5,22 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Back To Shoot Red"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Back To Shoot Red"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "climber_init"
+                }
+              }
+            ]
           }
         },
         {
@@ -17,15 +30,15 @@
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "Shoot to Climb Step1 Red"
+            "waitTime": 0.25
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 1.0
+            "pathName": "Shoot to Climb Step1 Red"
           }
         },
         {
@@ -35,21 +48,9 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Climb Step2 Red"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
           }
         },
         {
@@ -61,7 +62,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 0.25
           }
         },
         {

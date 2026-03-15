@@ -19,6 +19,12 @@
                 "data": {
                   "name": "intaker_down"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "climber_init"
+                }
               }
             ]
           }
@@ -30,6 +36,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "start_intake_and_conveyor"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -37,12 +49,6 @@
                 "type": "path",
                 "data": {
                   "pathName": "Shoot to Depot Red"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "start_intake_timelimit"
                 }
               }
             ]
@@ -52,12 +58,6 @@
           "type": "parallel",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "start_intake_timelimit"
-                }
-              },
               {
                 "type": "path",
                 "data": {
@@ -74,13 +74,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "intaker_up"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Depot to Shoot Red"
+                  "name": "AutoAim"
                 }
               }
             ]
@@ -89,7 +83,69 @@
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "stop_intake_and_conveyor"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoShoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intaker_up"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Depot To Climb Red"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "climb_up"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Climb Step2 Red"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Climb Step3 Red"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "climb_down"
           }
         }
       ]

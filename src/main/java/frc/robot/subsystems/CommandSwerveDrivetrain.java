@@ -173,6 +173,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         addVisionMeasurement(mt2.pose, mt2.timestampSeconds, stdDevs);
     }
     
+    public void forceUsingLimelightmt2WithllName(String llString) {
+        LimelightHelpers.PoseEstimate mt2 =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(llString);
+
+        if (mt2 == null || mt2.tagCount == 0) {
+            return;
+        }
+
+        var stdDevs = VecBuilder.fill(0.7, 0.7, 9999999);
+        addVisionMeasurement(mt2.pose, mt2.timestampSeconds, stdDevs);
+    }
     private void fuseLimelightmt2() {
         Pose2d current = getState().Pose;
 
@@ -276,10 +287,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         // 3) 跳变太大：拒绝（Phoenix6 推荐的稳定策略）
         //Pose2d current = getState().Pose;
-        if (currentPose.getTranslation().getDistance(mt2.pose.getTranslation()) > kMaxVisionJumpMeters) {
-            //System.out.println("NoUsingMetaTag2ForTooChangingPose");
-            return false;
-        }
+        // if (currentPose.getTranslation().getDistance(mt2.pose.getTranslation()) > kMaxVisionJumpMeters) {
+        //     //System.out.println("NoUsingMetaTag2ForTooChangingPose");
+        //     return false;
+        // }
 
         return true;
     }
@@ -287,128 +298,128 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return Math.max(min, Math.min(max, value));
     }
 
-    public String driveToAprilTag() {
-        System.out.println("Pipeline = " + LimelightHelpers.getCurrentPipelineIndex(Constants.Limelight.LIMELIGHT_NAME_Intaker));
-        System.out.println("TV = " + LimelightSupplier.isTargetVisible());
+//     public String driveToAprilTag() {
+//         System.out.println("Pipeline = " + LimelightHelpers.getCurrentPipelineIndex(Constants.Limelight.LIMELIGHT_NAME_Intaker));
+//         System.out.println("TV = " + LimelightSupplier.isTargetVisible());
 
-    if (!LimelightSupplier.isTargetVisible()) {
-        isAlignedToAprilTag = false;
-        //stop();
-        return "No Target";
-    }
+//     if (!LimelightSupplier.isTargetVisible()) {
+//         isAlignedToAprilTag = false;
+//         //stop();
+//         return "No Target";
+//     }
 
-    RawFiducial[] fiducials =
-        LimelightHelpers.getRawFiducials(Constants.Limelight.LIMELIGHT_NAME_Intaker);
+//     RawFiducial[] fiducials =
+//         LimelightHelpers.getRawFiducials(Constants.Limelight.LIMELIGHT_NAME_Intaker);
 
-    boolean foundDesiredTag = false;
-    for (RawFiducial fiducial : fiducials) {
-        if (fiducial.id == 16 || fiducial.id == 32) {
-            foundDesiredTag = true;
-            break;
-        }
-    }
+//     boolean foundDesiredTag = false;
+//     for (RawFiducial fiducial : fiducials) {
+//         if (fiducial.id == 16 || fiducial.id == 32) {
+//             foundDesiredTag = true;
+//             break;
+//         }
+//     }
 
-    if (!foundDesiredTag) {
-        isAlignedToAprilTag = false;
-        stop();
-        return "No Desired Tag";
-    }
+//     if (!foundDesiredTag) {
+//         isAlignedToAprilTag = false;
+//         stop();
+//         return "No Desired Tag";
+//     }
 
-    // ===== 读取原始误差 =====
-    double tx = LimelightSupplier.getTX();                 // deg
-    double tz = -LimelightSupplier.getTargetTZ();          // m，方向按你当前经验保留负号
-    double ry = LimelightSupplier.getTargetRotationY();    // deg
+//     // ===== 读取原始误差 =====
+//     double tx = LimelightSupplier.getTX();                 // deg
+//     double tz = -LimelightSupplier.getTargetTZ();          // m，方向按你当前经验保留负号
+//     double ry = LimelightSupplier.getTargetRotationY();    // deg
 
-    // ===== 用原始误差判断是否已对齐 =====
-    isAlignedToAprilTag =
-        Math.abs(tx) < Constants.Limelight.AutoClimbToleranceTX &&
-        Math.abs(tz) < Constants.Limelight.AutoClimbToleranceTZ &&
-        Math.abs(ry) < Constants.Limelight.AutoClimbToleranceRY;
+//     // ===== 用原始误差判断是否已对齐 =====
+//     isAlignedToAprilTag =
+//         Math.abs(tx) < Constants.Limelight.AutoClimbToleranceTX &&
+//         Math.abs(tz) < Constants.Limelight.AutoClimbToleranceTZ &&
+//         Math.abs(ry) < Constants.Limelight.AutoClimbToleranceRY;
 
-    if (isAlignedToAprilTag) {
-        stop();
-        return "Aligned";
-    }
+//     if (isAlignedToAprilTag) {
+//         stop();
+//         return "Aligned";
+//     }
 
-    // ===== 计算输出 =====
-    double vx = 0.0;
-    double vy = 0.0;
-    double omega = 0.0;
+//     // ===== 计算输出 =====
+//     double vx = 0.0;
+//     double vy = 0.0;
+//     double omega = 0.0;
 
-    // 1) 前后控制：根据 tz 前进/后退
-    if (Math.abs(tz) > Constants.Limelight.AutoClimbToleranceTZ) {
-        vx = tz * Constants.Limelight.AutoClimbKpTZ;
+//     // 1) 前后控制：根据 tz 前进/后退
+//     if (Math.abs(tz) > Constants.Limelight.AutoClimbToleranceTZ) {
+//         vx = tz * Constants.Limelight.AutoClimbKpTZ;
 
-        // 最小输出，避免快到目标时不动
-        if (Math.abs(vx) < Constants.Limelight.AutoClimbMinVX) {
-            vx = Math.copySign(Constants.Limelight.AutoClimbMinVX, vx);
-        }
+//         // 最小输出，避免快到目标时不动
+//         if (Math.abs(vx) < Constants.Limelight.AutoClimbMinVX) {
+//             vx = Math.copySign(Constants.Limelight.AutoClimbMinVX, vx);
+//         }
 
-        // 最大输出限幅
-        vx = clamp(vx,
-            -Constants.Limelight.AutoClimbMaxVX,
-             Constants.Limelight.AutoClimbMaxVX);
-    }
+//         // 最大输出限幅
+//         vx = clamp(vx,
+//             -Constants.Limelight.AutoClimbMaxVX,
+//              Constants.Limelight.AutoClimbMaxVX);
+//     }
 
-    // 2) 旋转控制：tx 为主，ry 为辅
-    //    tx 负责“镜头中心对准 tag”
-    //    ry 负责“机器人姿态微调”
-    // double omegaFromTx = 0.0;
-    // double omegaFromRy = 0.0;
+//     // 2) 旋转控制：tx 为主，ry 为辅
+//     //    tx 负责“镜头中心对准 tag”
+//     //    ry 负责“机器人姿态微调”
+//     // double omegaFromTx = 0.0;
+//     // double omegaFromRy = 0.0;
 
-    // if (Math.abs(tx) > Constants.Limelight.AutoClimbToleranceTX) {
-    //     omegaFromTx = -tx * Constants.Limelight.AutoClimbKpTX;
-    // }
+//     // if (Math.abs(tx) > Constants.Limelight.AutoClimbToleranceTX) {
+//     //     omegaFromTx = -tx * Constants.Limelight.AutoClimbKpTX;
+//     // }
 
-    // if (Math.abs(ry) > Constants.Limelight.AutoClimbToleranceRY) {
-    //     omegaFromRy = ry * Constants.Limelight.AutoClimbKpRY;
-    // }
+//     // if (Math.abs(ry) > Constants.Limelight.AutoClimbToleranceRY) {
+//     //     omegaFromRy = ry * Constants.Limelight.AutoClimbKpRY;
+//     // }
 
-    // omega = omegaFromTx + omegaFromRy;
+//     // omega = omegaFromTx + omegaFromRy;
 
-    // // 大偏角时直接给较明显的转速，先把朝向拉回来
-    // if (Math.abs(tx) > Constants.Limelight.AutoClimbFastTurnThresholdTX) {
-    //     omega = Math.copySign(Constants.Limelight.AutoClimbFastTurnOmega, omega);
-    // }
+//     // // 大偏角时直接给较明显的转速，先把朝向拉回来
+//     // if (Math.abs(tx) > Constants.Limelight.AutoClimbFastTurnThresholdTX) {
+//     //     omega = Math.copySign(Constants.Limelight.AutoClimbFastTurnOmega, omega);
+//     // }
 
-    // // 最小输出，避免转不动
-    // if (Math.abs(omega) > 1e-6 && Math.abs(omega) < Constants.Limelight.AutoClimbMinOmega) {
-    //     omega = Math.copySign(Constants.Limelight.AutoClimbMinOmega, omega);
-    // }
+//     // // 最小输出，避免转不动
+//     // if (Math.abs(omega) > 1e-6 && Math.abs(omega) < Constants.Limelight.AutoClimbMinOmega) {
+//     //     omega = Math.copySign(Constants.Limelight.AutoClimbMinOmega, omega);
+//     // }
 
-    // // 最大输出限幅
-    // omega = clamp(omega,
-    //     -Constants.Limelight.AutoClimbMaxOmega,
-    //      Constants.Limelight.AutoClimbMaxOmega);
+//     // // 最大输出限幅
+//     // omega = clamp(omega,
+//     //     -Constants.Limelight.AutoClimbMaxOmega,
+//     //      Constants.Limelight.AutoClimbMaxOmega);
 
-    Rotation2d ClimbcurrentAngle = getState().Pose.getRotation();
-    double climbCurrentRad = ClimbcurrentAngle.getRadians();
-    double TargetAngleforClimbing = Math.toRadians(0);
-    double Climberror = TargetAngleforClimbing - climbCurrentRad;
-    if (Math.abs(Climberror) < Math.toRadians(Constants.AutoPositioning.autoPositioningAngleError)) {
-            omega = 0.0;
-        } else {
-            omega = Climberror * Constants.AutoPositioning.TurningkP;
-        }
+//     Rotation2d ClimbcurrentAngle = getState().Pose.getRotation();
+//     double climbCurrentRad = ClimbcurrentAngle.getRadians();
+//     double TargetAngleforClimbing = Math.toRadians(0);
+//     double Climberror = TargetAngleforClimbing - climbCurrentRad;
+//     if (Math.abs(Climberror) < Math.toRadians(Constants.AutoPositioning.autoPositioningAngleError)) {
+//             omega = 0.0;
+//         } else {
+//             omega = Climberror * Constants.AutoPositioning.TurningkP;
+//         }
 
 
-    // ===== 调试输出 =====
-    driveNetworkTable.getEntry("ClimbTX").setDouble(tx);
-    driveNetworkTable.getEntry("ClimbTZ").setDouble(tz);
-    driveNetworkTable.getEntry("ClimbRY").setDouble(ry);
-    driveNetworkTable.getEntry("ClimbVXCmd").setDouble(vx);
-    driveNetworkTable.getEntry("ClimbOmegaCmd").setDouble(omega);
-    driveNetworkTable.getEntry("ClimbAligned").setBoolean(isAlignedToAprilTag);
+//     // ===== 调试输出 =====
+//     driveNetworkTable.getEntry("ClimbTX").setDouble(tx);
+//     driveNetworkTable.getEntry("ClimbTZ").setDouble(tz);
+//     driveNetworkTable.getEntry("ClimbRY").setDouble(ry);
+//     driveNetworkTable.getEntry("ClimbVXCmd").setDouble(vx);
+//     driveNetworkTable.getEntry("ClimbOmegaCmd").setDouble(omega);
+//     driveNetworkTable.getEntry("ClimbAligned").setBoolean(isAlignedToAprilTag);
 
-    // ===== 下发到底盘 =====
-    driveRobotRelative(new ChassisSpeeds(vx, vy, omega));
+//     // ===== 下发到底盘 =====
+//     driveRobotRelative(new ChassisSpeeds(vx, vy, omega));
 
-    return "Driving to AprilTag";
-}
+//     return "Driving to AprilTag";
+// }
 
-    public boolean isAlignedToAprilTag(){
-        return isAlignedToAprilTag;
-    }
+//     public boolean isAlignedToAprilTag(){
+//         return isAlignedToAprilTag;
+//     }
     @Override
     public void periodic() {
 
@@ -420,10 +431,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         driveNetworkTable.getEntry("YawFromState").setDouble(getState().Pose.getRotation().getDegrees());
         driveNetworkTable.getEntry("DriveMode").setString(m_driveMode.name());
         driveNetworkTable.getEntry("IsFieldCentric").setBoolean(m_driveMode == DriveMode.FIELD_CENTRIC);
-        positioningNetworkTable.getEntry("isAlignedToAprilTag").setBoolean(isAlignedToAprilTag());
-        positioningNetworkTable.getEntry("interestPointsClimber TX").setDouble(LimelightSupplier.getTX());
-        positioningNetworkTable.getEntry("interestPointsClimber RY").setDouble(LimelightSupplier.getTargetRotationY());
-        positioningNetworkTable.getEntry("interestPointsClimber TZ").setDouble(-LimelightSupplier.getTargetTZ());
+        //positioningNetworkTable.getEntry("isAlignedToAprilTag").setBoolean(isAlignedToAprilTag());
+        // positioningNetworkTable.getEntry("interestPointsClimber TX").setDouble(LimelightSupplier.getTX());
+        // positioningNetworkTable.getEntry("interestPointsClimber RY").setDouble(LimelightSupplier.getTargetRotationY());
+        // positioningNetworkTable.getEntry("interestPointsClimber TZ").setDouble(-LimelightSupplier.getTargetTZ());
         positioningNetworkTable.getEntry("interestPointsCl").setBoolean(false);
         // 1) 每帧喂给 LL：机器人当前 yaw（度），其余先全 0
         LimelightHelpers.SetRobotOrientation(

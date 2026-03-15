@@ -114,18 +114,6 @@ public class ClimberSubsystem extends SubsystemBase {
         stopMotor();
     }
 
-    public void markAutoClimbUsedInAuto() {
-        autoClimbUsedInAuto = true;
-    }
-
-    public boolean wasAutoClimbUsedInAuto() {
-        return autoClimbUsedInAuto;
-    }
-
-    public void clearAutoClimbUsedInAutoFlag() {
-        autoClimbUsedInAuto = false;
-    }
-
     public void stopAll() {
         climberMotor.set(0);
     }

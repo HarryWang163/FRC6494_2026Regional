@@ -20,7 +20,6 @@ import frc.robot.Constants.DriveMode;
 import frc.robot.Constants.RobotStatus;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.LimelightSupplier;
 
 import java.util.Optional;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -138,12 +137,12 @@ public class DriveControls {
                 vomega = 0;
                 break;
             case PassingBall:
-                LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
+                //LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
                 vomega = calculateRotationSpeedFromRotationAngle(calculateDistanceAndRotationToPassBall()[1]);
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(vomega);
                 break;
             case AutoAimming:
-                LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
+                //LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
                 vomega = calculateRotationSpeedFromRotationAngle(distanceAndRotation[1]);
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(vomega);
                 vx = -driver.getLeftY() * maxSpeed * slowDriveScale;
@@ -153,7 +152,7 @@ public class DriveControls {
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(Double.NaN);
                 break;
             case Climbing:
-                alignToClimb();
+                // alignToClimb();
                 break;
             case CrossingBump:
                 double differenceBump = calculateDifferenceToTwoTarget(drivetrain.getState().Pose.getY(), Constants.AutoPositioning.bumpY[0], Constants.AutoPositioning.bumpY[1]);
@@ -406,16 +405,16 @@ public class DriveControls {
     public Command getAllianceColorCommand() {
         return Commands.runOnce(this::setTeamColors);
     }
-    public void alignToClimb(){
-        LimelightSupplier.setPipeline(Constants.Limelight.climbPipelineIndex);
-        if(!drivetrain.isAlignedToAprilTag()){
-            drivetrain.driveToAprilTag();
-        }
-        else{
-            LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
-            drivetrain.stop();
-        }
-    }
+    // public void alignToClimb(){
+    //     LimelightSupplier.setPipeline(Constants.Limelight.climbPipelineIndex);
+    //     if(!drivetrain.isAlignedToAprilTag()){
+    //         drivetrain.driveToAprilTag();
+    //     }
+    //     else{
+    //         LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
+    //         drivetrain.stop();
+    //     }
+    // }
     public Command autoAimCommand() {
         return drivetrain.applyRequest(() -> {
         double[] distanceAndRotation = calculateDistanceAndRotationToHub();
@@ -432,28 +431,60 @@ public class DriveControls {
         }, drivetrain));
     }
     public Command shakeCommand(double amplitude, double switchPeriod, double totalTime) {
-        Timer timer = new Timer();
+    Timer timer = new Timer();
 
-        return Commands.sequence(
-            new InstantCommand(timer::restart),
-            drivetrain.applyRequest(() -> {
-                double t = timer.get();
-                boolean positive = ((int) (t / switchPeriod)) % 2 == 0;
-                double vy = positive ? amplitude : -amplitude;
-                return robotCentric
-                    .withVelocityX(0.0)
-                    .withVelocityY(vy)
-                    .withRotationalRate(0.0);
-            }, () -> DriveMode.ROBOT_CENTRIC).withTimeout(totalTime),
-            new InstantCommand(() -> {
-                timer.stop();
-                autoControlNetworkTable.getEntry("ShakeVy").setDouble(0.0);
-                drivetrain.stop();
-            }, drivetrain)
-        );
-    }
-    public Command shakeCommand() {
-        return shakeCommand(0.25, 0.2, 3.0);
+    return Commands.sequence(
+        new InstantCommand(timer::restart),
+        drivetrain.applyRequest(() -> {
+            double t = timer.get();
+            int phase = ((int) (t / switchPeriod)) % 4;
+
+            double vx = 0.0;
+            double vy = 0.0;
+            double[] distanceAndRotation = calculateDistanceAndRotationToHub();
+            double vomega = calculateRotationSpeedFromRotationAngle(distanceAndRotation[1]);
+
+
+            switch (phase) {
+                case 0:
+                    vx = amplitude;   // 前
+                    vy = 0.0;
+                    break;
+                case 1:
+                    vx = 0.0;
+                    vy = amplitude;   // 右
+                    break;
+                case 2:
+                    vx = -amplitude;  // 后
+                    vy = 0.0;
+                    break;
+                case 3:
+                    vx = 0.0;
+                    vy = -amplitude;  // 左
+                    break;
+            }
+
+            return robotCentric
+                .withVelocityX(vx)
+                .withVelocityY(vy)
+                .withRotationalRate(vomega);
+        }, () -> DriveMode.ROBOT_CENTRIC).withTimeout(totalTime),
+        new InstantCommand(() -> {
+            timer.stop();
+            drivetrain.stop();
+        }, drivetrain)
+    );
+}
+
+        public Command shakeCommand() {
+            return shakeCommand(0.3, 0.15, 5.0);
+        }
+
+    public void pushDistanceData(){
+        double[] distanceAndRotation = calculateDistanceAndRotationToHub();
+        // 将距离值写入 NetworkTable
+        autoControlNetworkTable.getEntry("distanceToHub").setDouble(distanceAndRotation[0]);
+        autoControlNetworkTable.getEntry("angleDifferenceToHub").setDouble(distanceAndRotation[1]);
     }
     
 }

@@ -58,7 +58,7 @@ public class RobotContainer {
   /*     控制封装/日志        */
   /* ====================== */
 
-  private final DriveControls driveControls = new DriveControls(drivetrain, controllerlower, robotStatusManager );
+  public final DriveControls driveControls = new DriveControls(drivetrain, controllerlower, robotStatusManager );
   private final ShooterControls shooterControls = new ShooterControls(shooterSubsystem, controllerupper,robotStatusManager);
   private final ClimberControls climberControls = new ClimberControls(climberSubsystem, controllerupper);
   private final IntakerControls intakerControls = new IntakerControls(IntakerSubsystem, shooterSubsystem, controllerupper);
@@ -82,7 +82,6 @@ public class RobotContainer {
     configueClimber();
     bingdingLED();
     configueIntaker();
-    configureBindings();
     Autocommand.preNameCommands(
         climberSubsystem,
         IntakerSubsystem,
@@ -134,6 +133,12 @@ public class RobotContainer {
     // Start：强行使用metaTag2全场定位
     controllerlower.start().whileTrue(drivetrain.run(drivetrain::forceUsingLimelightmt2));
 
+    controllerlower.a().whileTrue(drivetrain.run(()->{drivetrain.forceUsingLimelightmt2WithllName(Constants.Limelight.LIMELIGHT_NAME_Shooter);
+                                                      System.out.println("Try using shooter for metatag2");
+                                                    }));
+    controllerlower.b().whileTrue(drivetrain.run(()->{drivetrain.forceUsingLimelightmt2WithllName(Constants.Limelight.LIMELIGHT_NAME_Intaker);
+                                                      System.out.println("Try using intaker for metatag2");
+                                                      }));
     //LM 按下时autoaimming，松开时alltelop
     // controllerlower.leftStick().onTrue(robotStatusManager.setStatusCommand(RobotStatus.AutoAimming));
     // controllerlower.leftStick().onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
@@ -169,8 +174,7 @@ public class RobotContainer {
     controllerupper.povDown().onTrue(Commands.runOnce(() -> shooterControls.adjustBackboardRateOffset(-100)));
     controllerupper.back().onTrue(Commands.runOnce(() -> shooterControls.resetOffsets()));
     controllerupper.start().onTrue(Commands.runOnce(() -> shooterControls.resetBackboardCommand()));
-    controllerupper.b().whileTrue(new RunCommand(() -> shooterSubsystem.setConveyorSpeedByRPS(10), shooterSubsystem));
-    controllerupper.a().whileTrue(new RunCommand(() -> shooterSubsystem.setConveyorSpeedByRPS(-25), shooterSubsystem));
+    
   }
   /* ====================== */
   /*        LED 绑定          */
@@ -201,19 +205,6 @@ public class RobotContainer {
     IntakerSubsystem.setDefaultCommand(intakerControls.defaultIntakerCommand());
     controllerupper.a().onTrue(intakerControls.resetIntakerRotaterEncoderCommand(IntakerSubsystem));
   }
-
-  private void configureBindings() {
-        teleopStartTrigger.onTrue(handleClimberAtTeleopStartCommand());
-    }
-
-  private Command handleClimberAtTeleopStartCommand() {
-        return new InstantCommand(() -> {
-            if (climberSubsystem.wasAutoClimbUsedInAuto()) {
-                climberSubsystem.climbUp();
-                climberSubsystem.clearAutoClimbUsedInAutoFlag();
-            }
-        }, climberSubsystem);
-    }
 
   public ClimberSubsystem getClimberSubsystem() {
       return climberSubsystem;

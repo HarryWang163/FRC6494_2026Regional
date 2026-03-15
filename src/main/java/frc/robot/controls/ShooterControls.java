@@ -47,14 +47,16 @@ public class ShooterControls {
                     }else{
                         shooterSubsystem.outputBackboard();
                     }  
+                    shooterSubsystem.setFlywheelSpeedByRPS(0);
+                    if(controller.a().getAsBoolean()) { shooterSubsystem.setConveyorSpeedByRPS(Constants.Shooter.conveyorSpeed);}
+                    else{shooterSubsystem.setConveyorSpeedByRPS(0);}
                     break;
                 case PassingBall:
                     var xP = shooterSubsystem.getDistanceToPassball();
-                    xP = Math.max(1.2, Math.min(4.5, xP));
-                    flywheelSpeed = -1.4964026859575532*xP*xP*xP*xP*xP*xP*xP+29.82445640241506*xP*xP*xP*xP*xP*xP-247.71603153159896*xP*xP*xP*xP*xP+1108.8727302184625*xP*xP*xP*xP-2881.517500617481*xP*xP*xP+4332.05363145275*xP*xP-3467.2508337871454*xP+1192.1508062663759;
+                    xP = Math.max(2.5, Math.min(10.0, xP));
+                    flywheelSpeed = +0.004960317456971805*xP*xP*xP*xP*xP*xP*xP-0.22361111097424535*xP*xP*xP*xP*xP*xP+4.234722219890569*xP*xP*xP*xP*xP-43.63194442298942*xP*xP*xP*xP+264.05555544032126*xP*xP*xP-938.6444440829168*xP*xP+1818.2047612908214*xP-1415.9999995643104;
                     flywheelSpeed += flywheelSpeedOffset;
-                    backboardPosition = +34.5286998307899*xP*xP*xP*xP*xP*xP*xP*xP-788.5788623683884*xP*xP*xP*xP*xP*xP*xP+7658.073303693148*xP*xP*xP*xP*xP*xP-41191.69338972519*xP*xP*xP*xP*xP+133870.54588688645*xP*xP*xP*xP-268559.6987062158*xP*xP*xP+324254.6530324262*xP*xP-215015.48893131423*xP+59977.46545382827;
-                    backboardPosition += backboardPositionOffset;
+                    backboardPosition = +0.10912698402591796*xP*xP*xP*xP*xP*xP*xP-5.277777773586415*xP*xP*xP*xP*xP*xP+105.55555548303796*xP*xP*xP*xP*xP-1125.6944437656143*xP*xP*xP*xP+6865.763885174154*xP*xP*xP-23769.027765888906*xP*xP+43328.57140795847*xP-31599.99998506075;
                     conveyorSpeed = Constants.Shooter.conveyorSpeed;
                     if (controller.getRightTriggerAxis() < 0.1) {
                         flywheelSpeed = 0;
@@ -63,6 +65,7 @@ public class ShooterControls {
                     if(shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble()<flywheelSpeed*0.9){
                         conveyorSpeed = 0;
                     }
+                    //if(controller.a().getAsBoolean()) { conveyorSpeed = Constants.Shooter.conveyorSpeed;}
                     shooterControlTable.getEntry("flywheelTargetSpeed").setDouble(flywheelSpeed);
                     shooterControlTable.getEntry("conveyerTargetSpeed").setDouble(conveyorSpeed);
                     shooterControlTable.getEntry("backboardTargetPosition").setDouble(backboardPosition);
@@ -90,6 +93,7 @@ public class ShooterControls {
                     if(shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble()<flywheelSpeed*0.9){
                         conveyorSpeed = 0;
                     }
+                    //if(controller.a().getAsBoolean()) { conveyorSpeed = Constants.Shooter.conveyorSpeed;}
                     shooterControlTable.getEntry("flywheelTargetSpeed").setDouble(flywheelSpeed);
                     shooterControlTable.getEntry("conveyerTargetSpeed").setDouble(conveyorSpeed);
                     shooterControlTable.getEntry("backboardTargetPosition").setDouble(backboardPosition);
@@ -182,7 +186,7 @@ public class ShooterControls {
                 shooterSubsystem.isBackboardAtTarget()
                 && shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble() >= flywheelTargetSpeed * 0.9
             )
-            .withTimeout(1.0)
+            .withTimeout(0.3)
             .andThen(new RunCommand(() -> {
                 shooterSubsystem.setFlywheelSpeedByRPS(flywheelTargetSpeed);
                 shooterSubsystem.setBackboardPosition(backboardTargetPosition);
@@ -191,12 +195,8 @@ public class ShooterControls {
                 } else {
                     shooterSubsystem.outputBackboard();
                 }
-                if (shooterSubsystem.flywheelMotorLeft.getVelocity().getValueAsDouble() >= flywheelTargetSpeed * 0.9) {
-                    shooterSubsystem.setConveyorSpeedByRPS(conveyorTargetSpeed);
-                } else {
-                    shooterSubsystem.setConveyorSpeedByRPS(0.0);
-                }
-            }, shooterSubsystem).withTimeout(3.0))
+                shooterSubsystem.setConveyorSpeedByRPS(25);
+            }, shooterSubsystem).withTimeout(5.0))
             .andThen(new InstantCommand(() -> {
                 shooterSubsystem.setFlywheelSpeedByRPS(0.0);
                 shooterSubsystem.setConveyorSpeedByRPS(0.0);
@@ -204,4 +204,22 @@ public class ShooterControls {
             }, shooterSubsystem));
         }, Set.of(shooterSubsystem));
     }
+    
+    public Command resetBackboard0Command() {
+        return new RunCommand(() -> {
+            shooterSubsystem.setBackboardPosition(0);
+
+            if (shooterSubsystem.isBackboardAtTarget()) {
+                shooterSubsystem.backboardMotor.set(0);
+            } else {
+                shooterSubsystem.outputBackboard();
+            }
+
+        }, shooterSubsystem)
+        .until(() -> shooterSubsystem.isBackboardAtTarget())
+        .andThen(new InstantCommand(() -> {
+            shooterSubsystem.backboardMotor.set(0);
+        }));
+    }
 }
+
