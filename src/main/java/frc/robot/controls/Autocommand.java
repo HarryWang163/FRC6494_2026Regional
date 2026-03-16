@@ -23,15 +23,15 @@ import frc.robot.Constants.RobotStatus;
     public class Autocommand extends SequentialCommandGroup{
 
         public static void preNameCommands(
-            ClimberSubsystem climber,
+            // ClimberSubsystem climber,
             IntakerSubsystem intaker,
             CommandSwerveDrivetrain drivetrain,
             ShooterSubsystem shooter,
             DriveControls driveControls,
             ShooterControls shooterControls
     ) {
-        NamedCommands.registerCommand("climb_up", climb_up(climber));
-        NamedCommands.registerCommand("climb_down", climb_down(climber));
+        // NamedCommands.registerCommand("climb_up", climb_up(climber));
+        // NamedCommands.registerCommand("climb_down", climb_down(climber));
         NamedCommands.registerCommand("start_intake", start_intake(intaker));
         NamedCommands.registerCommand("start_intake_and_conveyor", start_intake_and_conveyor(intaker,shooter));
         NamedCommands.registerCommand("stop_intake_and_conveyor", stop_intake_and_conveyor(intaker,shooter));
@@ -44,7 +44,7 @@ import frc.robot.Constants.RobotStatus;
         NamedCommands.registerCommand("Shake", shake(driveControls));
         NamedCommands.registerCommand("AutoAim", autoAim(driveControls));
         NamedCommands.registerCommand("AutoShoot", autoShoot(shooterControls));
-        NamedCommands.registerCommand("climber_init", climber_Zeroencoder(climber));
+        // NamedCommands.registerCommand("climber_init", climber_Zeroencoder(climber));
         NamedCommands.registerCommand("reset_backboard0", resetBackboard0Command(shooterControls));
 
     }

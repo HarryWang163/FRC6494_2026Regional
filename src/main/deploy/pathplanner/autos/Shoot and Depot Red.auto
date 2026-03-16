@@ -107,6 +107,12 @@
                 "data": {
                   "name": "Shake"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intaker_up"
+                }
               }
             ]
           }
@@ -125,6 +131,12 @@
                 "type": "named",
                 "data": {
                   "name": "Shake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intaker_up"
                 }
               }
             ]

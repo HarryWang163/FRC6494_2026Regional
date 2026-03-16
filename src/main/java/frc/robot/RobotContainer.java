@@ -46,7 +46,7 @@ public class RobotContainer {
 
   // Phoenix TunerX 生成的底盘
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-  public final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
+  //public final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   public final IntakerSubsystem IntakerSubsystem = new IntakerSubsystem();
 
@@ -60,7 +60,7 @@ public class RobotContainer {
 
   public final DriveControls driveControls = new DriveControls(drivetrain, controllerlower, robotStatusManager );
   private final ShooterControls shooterControls = new ShooterControls(shooterSubsystem, controllerupper,robotStatusManager);
-  private final ClimberControls climberControls = new ClimberControls(climberSubsystem, controllerupper);
+  //private final ClimberControls climberControls = new ClimberControls(climberSubsystem, controllerupper);
   private final IntakerControls intakerControls = new IntakerControls(IntakerSubsystem, shooterSubsystem, controllerupper);
   private final DriveGainsTuner driveGainsTuner = new DriveGainsTuner(drivetrain);
   private ConfigTalonFXMotorTuner configFlywheelTuner = new ConfigTalonFXMotorTuner(shooterSubsystem.flywheelMotorLeft, "flywheel", Constants.Shooter.flyWheelSlot0Configs);
@@ -79,11 +79,19 @@ public class RobotContainer {
     drivetrain.resetPose(startingPose);
     configueSwerve();
     configueShooter();
-    configueClimber();
+    // configueClimber();
     bingdingLED();
     configueIntaker();
+    // Autocommand.preNameCommands(
+    //     climberSubsystem,
+    //     IntakerSubsystem,
+    //     drivetrain,
+    //     shooterSubsystem,
+    //     driveControls,
+    //     shooterControls
+    // );
+
     Autocommand.preNameCommands(
-        climberSubsystem,
         IntakerSubsystem,
         drivetrain,
         shooterSubsystem,
@@ -197,17 +205,17 @@ public class RobotContainer {
     shooterSubsystem.setRightFollowLeft();
   }
 
-  private void configueClimber() {
-    climberSubsystem.setDefaultCommand(climberControls.defaultClimberCommand());
-  }
+  // private void configueClimber() {
+  //   climberSubsystem.setDefaultCommand(climberControls.defaultClimberCommand());
+  // }
 
   private void configueIntaker() {
     IntakerSubsystem.setDefaultCommand(intakerControls.defaultIntakerCommand());
-    controllerupper.a().onTrue(intakerControls.resetIntakerRotaterEncoderCommand(IntakerSubsystem));
+    //controllerupper.a().onTrue(intakerControls.resetIntakerRotaterEncoderCommand(IntakerSubsystem));
   }
 
-  public ClimberSubsystem getClimberSubsystem() {
-      return climberSubsystem;
-  }
+  // public ClimberSubsystem getClimberSubsystem() {
+  //     return climberSubsystem;
+  // }
 
 }

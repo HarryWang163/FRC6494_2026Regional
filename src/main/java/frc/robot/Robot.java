@@ -30,7 +30,7 @@ public class Robot extends TimedRobot {
     public void disabledInit() {
         System.out.println("Robot disabledInit called");
         m_robotContainer.shooterSubsystem.stopAll();
-        m_robotContainer.climberSubsystem.stopAll();
+        // m_robotContainer.climberSubsystem.stopAll();
         m_robotContainer.IntakerSubsystem.stopAll();
     }
 
