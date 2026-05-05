@@ -162,6 +162,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
     
     public void forceUsingLimelightmt2() {
+        if (Constants.DemoMode.ENABLED) {
+            return;
+        }
         LimelightHelpers.PoseEstimate mt2 =
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.Limelight.LIMELIGHT_NAME_Shooter);
 
@@ -174,6 +177,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
     
     public void forceUsingLimelightmt2WithllName(String llString) {
+        if (Constants.DemoMode.ENABLED) {
+            return;
+        }
         LimelightHelpers.PoseEstimate mt2 =
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(llString);
 
@@ -426,8 +432,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Pose2d pose = getState().Pose;
         m_field.setRobotPose(pose);
         posePub.set(pose);
-        shooter_ll_field.setRobotPose(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.Limelight.LIMELIGHT_NAME_Shooter).pose);
-        intaker_ll_field.setRobotPose(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.Limelight.LIMELIGHT_NAME_Intaker).pose);
+        LimelightHelpers.PoseEstimate shooterEstimate =
+            LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.Limelight.LIMELIGHT_NAME_Shooter);
+        LimelightHelpers.PoseEstimate intakerEstimate =
+            LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.Limelight.LIMELIGHT_NAME_Intaker);
+        if (shooterEstimate != null && shooterEstimate.tagCount > 0) {
+            shooter_ll_field.setRobotPose(shooterEstimate.pose);
+        }
+        if (intakerEstimate != null && intakerEstimate.tagCount > 0) {
+            intaker_ll_field.setRobotPose(intakerEstimate.pose);
+        }
         driveNetworkTable.getEntry("YawFromState").setDouble(getState().Pose.getRotation().getDegrees());
         driveNetworkTable.getEntry("DriveMode").setString(m_driveMode.name());
         driveNetworkTable.getEntry("IsFieldCentric").setBoolean(m_driveMode == DriveMode.FIELD_CENTRIC);
@@ -448,7 +462,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             0, 0, 0, 0, 0
         );
 
-        fuseLimelightmt2();
+        if (!Constants.DemoMode.ENABLED) {
+            fuseLimelightmt2();
+        }
 
         if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
             DriverStation.getAlliance().ifPresent(allianceColor -> {

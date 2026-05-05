@@ -6,6 +6,18 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.math.geometry.Pose2d;
 
 public final class Constants {
+    public static final class DemoMode {
+        public static final boolean ENABLED = true;
+
+        public static final double normalDriveScale = 0.12;
+        public static final double normalTurnScale = 0.20;
+        public static final double boostDriveScale = 0.25;
+        public static final double boostTurnScale = 0.30;
+
+        public static final double maxLinearSpeedMetersPerSecond = 1.20;
+        public static final double maxAngularRateRadiansPerSecond = 0.80;
+    }
+
     public static final boolean LEDUsing = false;
     public enum RobotStatus{
         Stopped,

@@ -139,7 +139,13 @@ public class RobotContainer {
     controllerlower.back().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
     
     // Start：强行使用metaTag2全场定位
-    controllerlower.start().whileTrue(drivetrain.run(drivetrain::forceUsingLimelightmt2));
+    if (Constants.DemoMode.ENABLED) {
+      controllerlower.start()
+          .onTrue(Commands.runOnce(driveControls::emergencyStop)
+          .andThen(robotStatusManager.setStatusCommand(RobotStatus.Stopped)))
+          .onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
+    } else {
+      controllerlower.start().whileTrue(drivetrain.run(drivetrain::forceUsingLimelightmt2));
 
     controllerlower.a().whileTrue(drivetrain.run(()->{drivetrain.forceUsingLimelightmt2WithllName(Constants.Limelight.LIMELIGHT_NAME_Shooter);
                                                       System.out.println("Try using shooter for metatag2");
@@ -172,6 +178,7 @@ public class RobotContainer {
     controllerlower.a()
     .onTrue(robotStatusManager.setStatusCommand(RobotStatus.Climbing))
     .onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
+    }
   }
 
   private void configueShooter(){
@@ -181,7 +188,7 @@ public class RobotContainer {
     controllerupper.povUp().onTrue(Commands.runOnce(() -> shooterControls.adjustBackboardRateOffset(100)));
     controllerupper.povDown().onTrue(Commands.runOnce(() -> shooterControls.adjustBackboardRateOffset(-100)));
     controllerupper.back().onTrue(Commands.runOnce(() -> shooterControls.resetOffsets()));
-    controllerupper.start().onTrue(Commands.runOnce(() -> shooterControls.resetBackboardCommand()));
+    controllerupper.start().onTrue(shooterControls.resetBackboardCommand());
     
   }
 
@@ -190,7 +197,9 @@ public class RobotContainer {
   }
   
   public Command getAutonomousCommand() {
-
+    if (Constants.DemoMode.ENABLED) {
+      return Commands.none();
+    }
     return autoChooser.getSelected();
   }
 

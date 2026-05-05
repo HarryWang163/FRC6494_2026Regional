@@ -107,9 +107,18 @@ public class DriveControls {
         SmartDashboard.putString("robotStatus",robotStatusManager.getStatus().name());
         double driveScale = boostEnabled ? boostDriveScale : normalDriveScale;
         double turnScale  = boostEnabled ? boostTurnScale  : normalTurnScale;
+        if (Constants.DemoMode.ENABLED) {
+            driveScale = boostEnabled ? Constants.DemoMode.boostDriveScale : Constants.DemoMode.normalDriveScale;
+            turnScale = boostEnabled ? Constants.DemoMode.boostTurnScale : Constants.DemoMode.normalTurnScale;
+        }
         double vx = -driver.getLeftY() * maxSpeed * driveScale;
         double vy = -driver.getLeftX() * maxSpeed * driveScale;
         double vomega = -driver.getRightX() * maxAngularRate * turnScale;
+        if (Constants.DemoMode.ENABLED) {
+            vx = clamp(vx, -Constants.DemoMode.maxLinearSpeedMetersPerSecond, Constants.DemoMode.maxLinearSpeedMetersPerSecond);
+            vy = clamp(vy, -Constants.DemoMode.maxLinearSpeedMetersPerSecond, Constants.DemoMode.maxLinearSpeedMetersPerSecond);
+            vomega = clamp(vomega, -Constants.DemoMode.maxAngularRateRadiansPerSecond, Constants.DemoMode.maxAngularRateRadiansPerSecond);
+        }
         // ====== execute 内替换 limiter：只限加速、不限减速 ======
         double limitedVx = limitAccelOnly(vx, lastVx, vxLimiter);
         double limitedVy = limitAccelOnly(vy, lastVy, vyLimiter);
@@ -130,7 +139,15 @@ public class DriveControls {
         autoControlNetworkTable.getEntry("distanceToPassball").setDouble(calculateDistanceAndRotationToPassBall()[0]);
         autoControlNetworkTable.getEntry("angleDifferenceToPassball").setDouble(calculateDistanceAndRotationToPassBall()[1]);
         
-        switch (robotStatusManager.getStatus()) {
+        RobotStatus currentStatus = robotStatusManager.getStatus();
+        if (Constants.DemoMode.ENABLED
+            && currentStatus != RobotStatus.Stopped
+            && currentStatus != RobotStatus.AllTelop
+            && currentStatus != RobotStatus.Climbing) {
+            currentStatus = RobotStatus.AllTelop;
+        }
+
+        switch (currentStatus) {
             case Stopped:
                 vx = 0;
                 vy = 0;
@@ -212,8 +229,9 @@ public class DriveControls {
         autoControlNetworkTable.getEntry("ActualVOmega").setDouble(vomega);
         
         boolean isAutoLike =
+            !Constants.DemoMode.ENABLED && (
             robotStatusManager.getStatus() == RobotStatus.CrossingBump ||
-            robotStatusManager.getStatus() == RobotStatus.CrossingTrench;
+            robotStatusManager.getStatus() == RobotStatus.CrossingTrench);
 
         if (fieldCentricEnabled || isAutoLike) {
 
@@ -231,8 +249,9 @@ public class DriveControls {
                 .withRotationalRate(vomega);
         }
         }, () -> fieldCentricEnabled || 
+            (!Constants.DemoMode.ENABLED && (
             robotStatusManager.getStatus() == RobotStatus.CrossingBump || 
-            robotStatusManager.getStatus() == RobotStatus.CrossingTrench
+            robotStatusManager.getStatus() == RobotStatus.CrossingTrench))
              ? DriveMode.FIELD_CENTRIC : DriveMode.ROBOT_CENTRIC);
     }
 
@@ -347,6 +366,10 @@ public class DriveControls {
         return limiter.calculate(target);
     }
 
+    private double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
         /** 紧急停止：清零限速器，让速度输出立刻归零 */
     public void emergencyStop() {
         vxLimiter.reset(0.0);
@@ -416,6 +439,9 @@ public class DriveControls {
     //     }
     // }
     public Command autoAimCommand() {
+        if (Constants.DemoMode.ENABLED) {
+            return Commands.runOnce(drivetrain::stop, drivetrain);
+        }
         return drivetrain.applyRequest(() -> {
         double[] distanceAndRotation = calculateDistanceAndRotationToHub();
         double vomega = calculateRotationSpeedFromRotationAngle(distanceAndRotation[1]);
@@ -431,6 +457,9 @@ public class DriveControls {
         }, drivetrain));
     }
     public Command shakeCommand(double amplitude, double switchPeriod, double totalTime) {
+    if (Constants.DemoMode.ENABLED) {
+        return Commands.runOnce(drivetrain::stop, drivetrain);
+    }
     Timer timer = new Timer();
 
     return Commands.sequence(
