@@ -70,7 +70,7 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
   
   private final Trigger enableTrigger = new Trigger(DriverStation::isEnabled);
-  private final Trigger teleopStartTrigger = new Trigger(DriverStation::isTeleopEnabled);
+
 
   
   public RobotContainer() {
@@ -184,9 +184,6 @@ public class RobotContainer {
     controllerupper.start().onTrue(Commands.runOnce(() -> shooterControls.resetBackboardCommand()));
     
   }
-  /* ====================== */
-  /*        LED 绑定          */
-  /* ====================== */
 
   private void bingdingLED() {
     LedBindings.bindModeIndicators(leds);
