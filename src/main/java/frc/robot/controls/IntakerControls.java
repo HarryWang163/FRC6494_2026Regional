@@ -81,6 +81,12 @@ public class IntakerControls {
 
         IntakerSubsystem.setIntakerGetterSpeed(getterspeed);
 
+        boolean demoModeEnabled = Constants.DemoMode.ENABLED;
+        if (demoModeEnabled) {
+            IntakerSubsystem.stopIntakerotater();
+            return;
+        }
+
         if(controller.getLeftY() < -0.5){
                     IntakerSubsystem.IntakerUpNonStop();
             } else if(controller.getLeftY() > 0.5){

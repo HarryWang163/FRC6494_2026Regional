@@ -48,7 +48,7 @@ public class ShooterControls {
                         shooterSubsystem.outputBackboard();
                     }  
                     shooterSubsystem.setFlywheelSpeedByRPS(0);
-                    if(controller.a().getAsBoolean()) { shooterSubsystem.setConveyorSpeedByRPS(Constants.Shooter.conveyorSpeed);}
+                    if(!Constants.DemoMode.ENABLED && controller.a().getAsBoolean()) { shooterSubsystem.setConveyorSpeedByRPS(Constants.Shooter.conveyorSpeed);}
                     else{shooterSubsystem.setConveyorSpeedByRPS(0);}
                     break;
                 case PassingBall:

@@ -36,9 +36,9 @@ public class RobotContainer {
   /*         手柄            */
   /* ====================== */
 
-  // 使用2个 Xbox 手柄（端口 0,1）
+  // Demo mode uses one Xbox controller on port 0.
   private final CommandXboxController controllerlower = new CommandXboxController(0);
-  private final CommandXboxController controllerupper = new CommandXboxController(1);
+  private final CommandXboxController controllerupper = controllerlower;
 
   /* ====================== */
   /*         子系统           */
@@ -124,6 +124,8 @@ public class RobotContainer {
     // Disabled 时进入 idle（防止模块乱动）
     RobotModeTriggers.disabled().whileTrue(driveControls.idleCommand());
 
+    if (!Constants.DemoMode.ENABLED) {
+
     
     //左保险：按住刹车
     controllerlower.leftBumper()
@@ -139,13 +141,7 @@ public class RobotContainer {
     controllerlower.back().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
     
     // Start：强行使用metaTag2全场定位
-    if (Constants.DemoMode.ENABLED) {
-      controllerlower.start()
-          .onTrue(Commands.runOnce(driveControls::emergencyStop)
-          .andThen(robotStatusManager.setStatusCommand(RobotStatus.Stopped)))
-          .onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
-    } else {
-      controllerlower.start().whileTrue(drivetrain.run(drivetrain::forceUsingLimelightmt2));
+    controllerlower.start().whileTrue(drivetrain.run(drivetrain::forceUsingLimelightmt2));
 
     controllerlower.a().whileTrue(drivetrain.run(()->{drivetrain.forceUsingLimelightmt2WithllName(Constants.Limelight.LIMELIGHT_NAME_Shooter);
                                                       System.out.println("Try using shooter for metatag2");
@@ -188,7 +184,13 @@ public class RobotContainer {
     controllerupper.povUp().onTrue(Commands.runOnce(() -> shooterControls.adjustBackboardRateOffset(100)));
     controllerupper.povDown().onTrue(Commands.runOnce(() -> shooterControls.adjustBackboardRateOffset(-100)));
     controllerupper.back().onTrue(Commands.runOnce(() -> shooterControls.resetOffsets()));
-    controllerupper.start().onTrue(shooterControls.resetBackboardCommand());
+    if (Constants.DemoMode.ENABLED) {
+      controllerupper.rightTrigger()
+          .onTrue(robotStatusManager.setStatusCommand(RobotStatus.AutoAimming))
+          .onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
+    } else {
+      controllerupper.start().onTrue(shooterControls.resetBackboardCommand());
+    }
     
   }
 
