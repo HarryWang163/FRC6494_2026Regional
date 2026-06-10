@@ -81,9 +81,11 @@ public class ShooterControls {
                 case AutoAimming:
                     var x = shooterSubsystem.getDistanceToHub();
                     x = Math.max(1.2, Math.min(4.5, x));
-                    flywheelSpeed = -1.4964026859575532*x*x*x*x*x*x*x+29.82445640241506*x*x*x*x*x*x-247.71603153159896*x*x*x*x*x+1108.8727302184625*x*x*x*x-2881.517500617481*x*x*x+4332.05363145275*x*x-3467.2508337871454*x+1192.1508062663759;
+                    //flywheelSpeed = -1.4964026859575532*x*x*x*x*x*x*x+29.82445640241506*x*x*x*x*x*x-247.71603153159896*x*x*x*x*x+1108.8727302184625*x*x*x*x-2881.517500617481*x*x*x+4332.05363145275*x*x-3467.2508337871454*x+1192.1508062663759;
+                    flywheelSpeed = 60;
                     flywheelSpeed += flywheelSpeedOffset;
-                    backboardPosition = +34.5286998307899*x*x*x*x*x*x*x*x-788.5788623683884*x*x*x*x*x*x*x+7658.073303693148*x*x*x*x*x*x-41191.69338972519*x*x*x*x*x+133870.54588688645*x*x*x*x-268559.6987062158*x*x*x+324254.6530324262*x*x-215015.48893131423*x+59977.46545382827;
+                    //backboardPosition = +34.5286998307899*x*x*x*x*x*x*x*x-788.5788623683884*x*x*x*x*x*x*x+7658.073303693148*x*x*x*x*x*x-41191.69338972519*x*x*x*x*x+133870.54588688645*x*x*x*x-268559.6987062158*x*x*x+324254.6530324262*x*x-215015.48893131423*x+59977.46545382827;
+                    backboardPosition = 500;
                     backboardPosition += backboardPositionOffset;
                     conveyorSpeed = Constants.Shooter.conveyorSpeed;
                     if (controller.getRightTriggerAxis() < 0.1) {

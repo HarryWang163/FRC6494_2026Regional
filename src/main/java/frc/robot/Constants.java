@@ -14,8 +14,8 @@ public final class Constants {
         public static final double boostDriveScale = 0.25;
         public static final double boostTurnScale = 0.30;
 
-        public static final double maxLinearSpeedMetersPerSecond = 1.20;
-        public static final double maxAngularRateRadiansPerSecond = 0.80;
+        public static final double maxLinearSpeedMetersPerSecond = 2.4;
+        public static final double maxAngularRateRadiansPerSecond = 1.6;
     }
 
     public static final boolean LEDUsing = false;
@@ -29,7 +29,7 @@ public final class Constants {
         CrossingTrench
     }
     public class Shooter {
-        public static final double conveyorSpeed = 150;
+        public static final double conveyorSpeed = 80;
         public static final double conveyorSpeedForAuto = 10;
         public static final Slot0Configs flyWheelSlot0Configs = new Slot0Configs()
             .withKP(0.0).withKI(0).withKD(0)
@@ -92,7 +92,7 @@ public final class Constants {
     public class Limelight {
         public static final String LIMELIGHT_NAME_Shooter = "limelight-shooter";
         public static final String LIMELIGHT_NAME_Intaker = "limelight-intaker";
-        public static final Boolean UsingMetaTag2 = true; // 是否使用 MetaTag2（如果你们的 pipeline 配置了这个功能的话）
+        public static final Boolean UsingMetaTag2 = false; // Use Limelight's own pose/yaw estimate instead of gyro-assisted MegaTag2.
         public static final int climbPipelineIndex = 8;
         public static final int locatePipelineIndex = 0;
 
