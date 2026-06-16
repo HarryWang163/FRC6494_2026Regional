@@ -30,6 +30,7 @@ import frc.robot.utils.LedBindings;
 import frc.robot.controls.ClimberControls;
 import frc.robot.controls.Autocommand;
 import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.utils.GameData2026;
 public class RobotContainer {
 
   /* ====================== */
@@ -63,6 +64,7 @@ public class RobotContainer {
   //private final ClimberControls climberControls = new ClimberControls(climberSubsystem, controllerupper);
   private final IntakerControls intakerControls = new IntakerControls(IntakerSubsystem, shooterSubsystem, controllerupper);
   private final DriveGainsTuner driveGainsTuner = new DriveGainsTuner(drivetrain);
+  private final GameData2026 gameData2026 = new GameData2026();
   private ConfigTalonFXMotorTuner configFlywheelTuner = new ConfigTalonFXMotorTuner(shooterSubsystem.flywheelMotorLeft, "flywheel", Constants.Shooter.flyWheelSlot0Configs);
   private ConfigTalonFXMotorTuner configConveyorTuner = new ConfigTalonFXMotorTuner(shooterSubsystem.conveyorMotor, "conveyor", Constants.Shooter.conveyorSlot0Configs);
   private ConfigTalonFXSMotorTuner configBackboardTuner = new ConfigTalonFXSMotorTuner(shooterSubsystem.backboardMotor, "backboard", Constants.Shooter.backboardSlot0Configs);
@@ -200,6 +202,10 @@ public class RobotContainer {
     configConveyorTuner.periodic(null);
     configBackboardTuner.periodic();
     shooterSubsystem.setRightFollowLeft();
+  }
+
+  public void dashboardPeriodic() {
+    gameData2026.periodic();
   }
 
   // private void configueClimber() {
