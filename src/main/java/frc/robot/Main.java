@@ -1,6 +1,6 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// 版权所有 (c) FIRST 和其他 WPILib 贡献者。
+// 本项目为开源软件；你可以依据项目根目录中的 WPILib BSD license 文件
+// 修改和/或分享本代码。
 
 package frc.robot;
 

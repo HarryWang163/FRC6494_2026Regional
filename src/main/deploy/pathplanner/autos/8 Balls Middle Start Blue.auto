@@ -7,31 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Line"
+            "pathName": "Back To Shoot Blue"
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 1.0
+            "name": "shoot"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "LineBack"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
+            "name": "shoot"
           }
         }
       ]
     }
   },
-  "resetOdom": false,
-  "folder": null,
+  "resetOdom": true,
+  "folder": "Blue Middle",
   "choreoAuto": false
 }

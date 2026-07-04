@@ -1,6 +1,6 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// 版权所有 (c) FIRST 和其他 WPILib 贡献者。
+// 本项目为开源软件；你可以依据项目根目录中的 WPILib BSD license 文件
+// 修改和/或分享本代码。
 
 package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -20,11 +20,21 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         CommandScheduler.getInstance().run(); 
         m_robotContainer.tunerPeriodic();
+        m_robotContainer.dashboardPeriodic();
 
     }
 
     @Override
-    public void disabledInit() {}
+    public void disabledInit() {
+        System.out.println("Robot disabledInit called");
+        // 进入 disabled 时强制所有重构后的机构回到安全状态，
+        // 即使上一周期还有手动或自动请求也不能继续动作。
+        m_robotContainer.superstructure.requestIdle();
+        m_robotContainer.shooterSubsystem.stopAll();
+        m_robotContainer.intakeRollerSubsystem.stop();
+        m_robotContainer.intakeRotaterSubsystem.stop();
+        m_robotContainer.conveyorSubsystem.stop();
+    }
 
     @Override
     public void disabledPeriodic() {}
@@ -42,7 +52,9 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void autonomousPeriodic() {}
+    public void autonomousPeriodic() {
+        m_robotContainer.driveControls.pushDistanceData();
+    }
 
     @Override
     public void autonomousExit() {}

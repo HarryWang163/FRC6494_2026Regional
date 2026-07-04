@@ -11,6 +11,8 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.RobotStatusManager;
@@ -19,7 +21,15 @@ import frc.robot.Constants.RobotStatus;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
+import java.util.Optional;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer; 
+
 public class DriveControls {
+
+    public boolean isRedAlliance;
+
     private final CommandSwerveDrivetrain drivetrain;
     private final CommandXboxController driver;
 
@@ -33,6 +43,8 @@ public class DriveControls {
     // 加速模式比例（按住 RB）
     private double boostDriveScale = 1.0;
     private double boostTurnScale  = 1.0;
+    //autoaim模式
+    private double slowDriveScale =0.1;
 
     private boolean boostEnabled = false;
 
@@ -115,6 +127,12 @@ public class DriveControls {
         // 将距离值写入 NetworkTable
         autoControlNetworkTable.getEntry("distanceToHub").setDouble(distanceAndRotation[0]);
         autoControlNetworkTable.getEntry("angleDifferenceToHub").setDouble(distanceAndRotation[1]);
+        autoControlNetworkTable.getEntry("distanceToPassball").setDouble(calculateDistanceAndRotationToPassBall()[0]);
+        autoControlNetworkTable.getEntry("angleDifferenceToPassball").setDouble(calculateDistanceAndRotationToPassBall()[1]);
+        // 把朝向 hub 的目标角同步给底盘，供 Superstructure 读取 isAimed() 做射击门控；
+        // 数据来源与 AutoAimming 自动旋转完全相同，保证门控和实际瞄准一致。
+        drivetrain.setTargetHeading(
+            drivetrain.getRotation().plus(Rotation2d.fromDegrees(distanceAndRotation[1])));
 
         switch (robotStatusManager.getStatus()) {
             case Stopped:
@@ -123,18 +141,19 @@ public class DriveControls {
                 vomega = 0;
                 break;
             case PassingBall:
+                //LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
                 vomega = calculateRotationSpeedFromRotationAngle(calculateDistanceAndRotationToPassBall()[1]);
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(vomega);
                 break;
-
             case AutoAimming:
+                //LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
                 vomega = calculateRotationSpeedFromRotationAngle(distanceAndRotation[1]);
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(vomega);
+                vx = -driver.getLeftY() * maxSpeed * slowDriveScale;
+                vy = -driver.getLeftX() * maxSpeed * slowDriveScale;
                 break;
             case AllTelop:
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(Double.NaN);
-                break;
-            case Climbing:
                 break;
             case CrossingBump:
                 double differenceBump = calculateDifferenceToTwoTarget(drivetrain.getState().Pose.getY(), Constants.AutoPositioning.bumpY[0], Constants.AutoPositioning.bumpY[1]);
@@ -146,6 +165,7 @@ public class DriveControls {
                         Math.max(Math.abs(raw), 0.4),
                         raw
                     );
+                    vy = isRedAlliance ? -vy : vy;
                 }
                 autoControlNetworkTable.getEntry("BumpDifference").setDouble(differenceBump);
 
@@ -161,15 +181,8 @@ public class DriveControls {
                 errorB = Math.atan2(Math.sin(errorB), Math.cos(errorB));
                 // 选误差绝对值更小的那个
                 double chosenError = (Math.abs(errorA) <= Math.abs(errorB)) ? errorA : errorB;
-
-                if (Math.abs(chosenError) < Math.toRadians(2.0)) {
-                    vomega = 0.0;
-                } else {
-                    vomega = chosenError * Constants.AutoPositioning.TurningkP;
-                }
-                // 限制最大角速度
-                vomega = Math.max(-maxAngularRate, Math.min(maxAngularRate, vomega));
-
+                vomega = calculatevomegaFromRotationAngle(chosenError);
+                autoControlNetworkTable.getEntry("BumpAutoRotationRate").setDouble(vomega);
                 //vomega = calculateRotationSpeedForBump();
                 break;
             case CrossingTrench:
@@ -182,20 +195,15 @@ public class DriveControls {
                         Math.max(Math.abs(raw), 0.4),
                         raw
                     );
+                    vy = isRedAlliance ? -vy : vy;
                 }
                 autoControlNetworkTable.getEntry("TrenchDifference").setDouble(differenceTrench);
                 Rotation2d currentAngle = drivetrain.getState().Pose.getRotation();
                 double currentRad = currentAngle.getRadians();
                 double targetRad = Math.toRadians(Constants.AutoPositioning.TrenchtargetAngle);
                 double TrenchAngleerror = targetRad - currentRad;
-                if (Math.abs(TrenchAngleerror) < Math.toRadians(1.0)) {
-                    vomega = 0.0;
-                } else {
-                    vomega = TrenchAngleerror * Constants.AutoPositioning.TurningkP;
-                }
-                // 限幅（防止转太快）
-                vomega = Math.max(-maxAngularRate, Math.min(maxAngularRate, vomega));
-
+                vomega = calculatevomegaFromRotationAngle(TrenchAngleerror);
+                autoControlNetworkTable.getEntry("TrenchAutoRotationRate").setDouble(vomega);
                 //vomega = calculateRotationSpeedForTrench();
                 break;
         }        
@@ -211,7 +219,8 @@ public class DriveControls {
         if (fieldCentricEnabled || isAutoLike) {
 
     // 自动状态用 BlueAlliance（不翻转），手柄 field-centric 仍用原 fieldCentric（OperatorPerspective）
-        var chosen = isAutoLike ? fieldCentricAuto : fieldCentric;
+        //var chosen = isAutoLike ? fieldCentricAuto : fieldCentric;
+        var chosen = fieldCentric;
         return chosen
                 .withVelocityX(vx)
                 .withVelocityY(vy)
@@ -238,37 +247,10 @@ public class DriveControls {
           double x2 = target2 - current;
           return Math.abs(x1) < Math.abs(x2) ? x1 : x2;
     }
-    public double calculateRotationSpeedForTrench(){
-        Pose2d currentPose = drivetrain.getState().Pose; // 获取机器人当前的位置和角度
-        double currentAngle = currentPose.getRotation().getDegrees();
-        double targetAngle = Constants.AutoPositioning.autoRotationForTrenchTargetDegrees; // 转换为度
-        double angleDifference = targetAngle - currentAngle;
-        // Normalize angle difference to the range [-180, 180]
-        if (angleDifference > 180) {
-            angleDifference -= 360;
-        } else if (angleDifference < -180) {
-            angleDifference += 360;
-        }
-        return calculateRotationSpeedFromRotationAngle(angleDifference);
-    }
-    public double calculateRotationSpeedForBump(){
-        Pose2d currentPose = drivetrain.getState().Pose; // 获取机器人当前的位置和角度
-        double currentAngle = currentPose.getRotation().getDegrees();
-        double targetAngle = Constants.AutoPositioning.autoRotationForBumpTargetDegrees; // 转换为度
-        double angleDifference = targetAngle - currentAngle;
-        // Normalize angle difference to the range [-180, 180]
-        if (angleDifference > 180) {
-            angleDifference -= 360;
-        } else if (angleDifference < -180) {
-            angleDifference += 360;
-        }
-        return calculateRotationSpeedFromRotationAngle(angleDifference);
-    }
-    // Calculate distance and rotation (angle difference)
     public double[] calculateDistanceAndRotationToHub() {
         Pose2d currentPose = drivetrain.getState().Pose; // 获取机器人当前的位置和角度
-        double targetX = Constants.Field.RedHubPositionX;  // 目标 X 坐标
-        double targetY = Constants.Field.RedHubPositionY;  // 目标 Y 坐标
+        double targetX = isRedAlliance ? Constants.Field.RedHubPositionX : Constants.Field.BlueHubPositionX;
+        double targetY = isRedAlliance ? Constants.Field.RedHubPositionY : Constants.Field.BlueHubPositionY;
 
         // 计算目标角度（相对于场地坐标系）
         double deltaX = targetX - currentPose.getX();
@@ -295,11 +277,10 @@ public class DriveControls {
     }
     public double[] calculateDistanceAndRotationToPassBall() {
         Pose2d currentPose = drivetrain.getState().Pose; // 获取机器人当前的位置和角度
-        double targetX = Constants.Field.PassingBallPosX;  // 目标 X 坐标
+        double targetX = isRedAlliance ? Constants.Field.RedPassingBallPosX : Constants.Field.BluePassingBallPosX;  // 目标 X 坐标
         double targetY1 = Constants.Field.PassingBallPosY1;  // 目标 Y 坐标
         double targetY2 = Constants.Field.PassingBallPosY2;  // 目标 Y 坐标
        
-
         // 计算目标角度（相对于场地坐标系）
         double deltaX = targetX - currentPose.getX();
         double deltaY = calculateDifferenceToTwoTarget(currentPose.getY(), targetY1, targetY2);
@@ -324,7 +305,6 @@ public class DriveControls {
         return distanceAndRotation;
     }
 
-    // Calculate rotation speed from rotation angle difference
     public double calculateRotationSpeedFromRotationAngle(double angleDifference) {
         double calDifference = angleDifference;
 
@@ -341,8 +321,18 @@ public class DriveControls {
             return 0;
         }
     }
-
-
+    
+    private double calculatevomegaFromRotationAngle(double error) {
+        double vomega;
+        if (Math.abs(error) < Math.toRadians(Constants.AutoPositioning.autoPositioningAngleError)) {
+                vomega = 0.0;
+            } else {
+                vomega = error * Constants.AutoPositioning.TurningkP;
+            }
+            // 限制最大角速度
+            vomega = Math.max(-maxAngularRate, Math.min(maxAngularRate, vomega));
+        return vomega;
+    }
 
         /**
      * 只限制“加速”（幅值变大），不限制“减速”（幅值变小）
@@ -395,5 +385,101 @@ public class DriveControls {
     public double getMaxAngularRate() {
         return maxAngularRate;
     }
+    public void setTeamColors() {
+        Optional<Alliance> ally = DriverStation.getAlliance(); // 获取队伍颜色
+        if (ally.isPresent()) {
+            // 根据队伍颜色设置布尔值
+            if (ally.get() == Alliance.Red) {
+                isRedAlliance = true; // 红队
+            } else if (ally.get() == Alliance.Blue) {
+                isRedAlliance = false; // 蓝队
+            }
+        } else {
+            isRedAlliance = true;
+        }
+        if (isRedAlliance) {
+            System.out.println("Robot is on the Red Alliance.");
+        } else {
+            System.out.println("Robot is on the Blue Alliance.");
+        }
+    }
+    public Command getAllianceColorCommand() {
+        return Commands.runOnce(this::setTeamColors);
+    }
+    public Command autoAimCommand() {
+        return drivetrain.applyRequest(() -> {
+        double[] distanceAndRotation = calculateDistanceAndRotationToHub();
+        double vomega = calculateRotationSpeedFromRotationAngle(distanceAndRotation[1]);
+        return fieldCentric
+            .withVelocityX(0.0)
+            .withVelocityY(0.0)
+            .withRotationalRate(vomega);
+        }, () -> DriveMode.FIELD_CENTRIC)
+        .until(() -> Math.abs(calculateDistanceAndRotationToHub()[1]) < 1.5)
+        .withTimeout(1.0)
+        .andThen(new InstantCommand(() -> {
+            drivetrain.stop();
+        }, drivetrain));
+    }
+    public Command shakeCommand(double amplitude, double switchPeriod, double totalTime) {
+    Timer timer = new Timer();
 
+    return Commands.sequence(
+        new InstantCommand(timer::restart),
+        drivetrain.applyRequest(() -> {
+            double t = timer.get();
+            int phase = ((int) (t / switchPeriod)) % 4;
+
+            double vx = 0.0;
+            double vy = 0.0;
+            double[] distanceAndRotation = calculateDistanceAndRotationToHub();
+            double vomega = calculateRotationSpeedFromRotationAngle(distanceAndRotation[1]);
+
+
+            switch (phase) {
+                case 0:
+                    vx = amplitude;   // 前
+                    vy = 0.0;
+                    break;
+                case 1:
+                    vx = 0.0;
+                    vy = amplitude;   // 右
+                    break;
+                case 2:
+                    vx = -amplitude;  // 后
+                    vy = 0.0;
+                    break;
+                case 3:
+                    vx = 0.0;
+                    vy = -amplitude;  // 左
+                    break;
+            }
+
+            return robotCentric
+                .withVelocityX(vx)
+                .withVelocityY(vy)
+                .withRotationalRate(vomega);
+        }, () -> DriveMode.ROBOT_CENTRIC).withTimeout(totalTime),
+        new InstantCommand(() -> {
+            timer.stop();
+            drivetrain.stop();
+        }, drivetrain)
+    );
+}
+
+        public Command shakeCommand() {
+            return shakeCommand(0.3, 0.15, 5.0);
+        }
+
+    public void pushDistanceData(){
+        double[] distanceAndRotation = calculateDistanceAndRotationToHub();
+        // 将距离值写入 NetworkTable
+        autoControlNetworkTable.getEntry("distanceToHub").setDouble(distanceAndRotation[0]);
+        autoControlNetworkTable.getEntry("angleDifferenceToHub").setDouble(distanceAndRotation[1]);
+        // 自动阶段默认驾驶命令不运行，这里同样保持目标朝向最新，
+        // 让自动程序里的射击门控 isAimed() 有效。
+        drivetrain.setTargetHeading(
+            drivetrain.getRotation().plus(Rotation2d.fromDegrees(distanceAndRotation[1])));
+    }
+    
 }

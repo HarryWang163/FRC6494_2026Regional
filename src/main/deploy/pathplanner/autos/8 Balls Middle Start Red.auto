@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Rotate"
+            "pathName": "Back To Shoot Red"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
           }
         }
       ]
     }
   },
-  "resetOdom": false,
-  "folder": null,
+  "resetOdom": true,
+  "folder": "Red Middle",
   "choreoAuto": false
 }
