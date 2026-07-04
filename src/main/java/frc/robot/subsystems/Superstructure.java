@@ -179,7 +179,7 @@ public class Superstructure extends SubsystemBase {
 
     private void handleIdle() {
         // 安全默认状态：传球不动，intake 收回，背板保持受控。
-        conveyor.hold();
+        conveyor.stop();
         intakeRoller.stop();
         intakeRotater.stop();
         shooter.stopFlywheel();
@@ -224,8 +224,8 @@ public class Superstructure extends SubsystemBase {
         }
 
         intakeRotater.moveToHandoff();
-        intakeRoller.hold();
-        conveyor.hold();
+        intakeRoller.stop();
+        conveyor.stop();
         shooter.stopShooterConveyor();
         // 距离到射速的映射由 LimelightSubsystem 提供；操作员 offset 用于现场微调，
         // 但不会绕过 Superstructure 状态机。

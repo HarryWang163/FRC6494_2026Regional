@@ -150,7 +150,6 @@ public final class Constants {
         public static final int mainConveyorID = 50;
         public static final double feedVoltage = 6.0;
         public static final double reverseVoltage = -5.0;
-        public static final double holdVoltage = 0.8;
     }
 
     public static class Superstructure {

@@ -18,15 +18,12 @@ import frc.robot.Constants;
  * 本类只负责成对 TalonFX 输出和 follower 关系。
  */
 public class IntakeRollerSubsystem extends SubsystemBase {
-    public final TalonFX leftIntakeRoller;
-    public final TalonFX rightIntakeRoller;
+    private final TalonFX leftIntakeRoller;
+    private final TalonFX rightIntakeRoller;
 
     private final VoltageOut voltageRequest = new VoltageOut(0);
     private final Follower rightFollower;
     private final NetworkTable table = NetworkTableInstance.getDefault().getTable("IntakeRoller");
-
-    private double leftVoltage = 0.0;
-    private double rightVoltage = 0.0;
 
     public IntakeRollerSubsystem() {
         leftIntakeRoller = new TalonFX(Constants.Intaker.leftIntakeRollerID);
@@ -36,30 +33,19 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     }
 
     public void intake() {
-        setVoltage(Constants.Intaker.intakeRollerVoltage, -Constants.Intaker.intakeRollerVoltage);
+        setVoltage(Constants.Intaker.intakeRollerVoltage);
     }
 
     public void outtake() {
-        setVoltage(Constants.Intaker.outtakeRollerVoltage, -Constants.Intaker.outtakeRollerVoltage);
-    }
-
-    public void hold() {
-        setVoltage(Constants.Intaker.holdRollerVoltage, -Constants.Intaker.holdRollerVoltage);
+        setVoltage(Constants.Intaker.outtakeRollerVoltage);
     }
 
     public void stop() {
-        setVoltage(0.0, 0.0);
+        setVoltage(0);
     }
 
-    public void setPercent(double left, double right) {
-        setVoltage(left * 12.0, right * 12.0);
-    }
-
-    public void setVoltage(double left, double right) {
-        // rightVoltage 仅用于 dashboard 显示；真实硬件通过反向 follower 跟随左侧电机。
-        leftVoltage = MathUtil.clamp(left, -12.0, 12.0);
-        rightVoltage = MathUtil.clamp(right, -12.0, 12.0);
-        leftIntakeRoller.setControl(voltageRequest.withOutput(leftVoltage));
+    public void setVoltage(double left) {
+        leftIntakeRoller.setControl(voltageRequest.withOutput(left));
         followLeft();
     }
 
@@ -67,11 +53,16 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         rightIntakeRoller.setControl(rightFollower);
     }
 
+    private double getVelocityDifference() {
+    double leftVelocity = leftIntakeRoller.getVelocity().getValueAsDouble();
+    double rightVelocity = rightIntakeRoller.getVelocity().getValueAsDouble();
+    return Math.abs(leftVelocity) - Math.abs(rightVelocity);
+    }
+
     @Override
     public void periodic() {
-        table.getEntry("leftVoltage").setDouble(leftVoltage);
-        table.getEntry("rightVoltage").setDouble(rightVoltage);
         table.getEntry("leftVelocity").setDouble(leftIntakeRoller.getVelocity().getValueAsDouble());
         table.getEntry("rightVelocity").setDouble(rightIntakeRoller.getVelocity().getValueAsDouble());
+        table.getEntry("velocityDifference").setDouble(getVelocityDifference());
     }
 }
