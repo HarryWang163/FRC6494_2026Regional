@@ -51,6 +51,15 @@ public class IntakeRotaterSubsystem extends SubsystemBase {
         rightIntakeRotater.getConfigurator().apply(Constants.Intaker.intakeRotaterSlot0Configs);
         rightFollower = new Follower(leftIntakeRotater.getDeviceID(), MotorAlignmentValue.Opposed).withUpdateFreqHz(50);
         followLeft();
+
+        if (Constants.Intaker.assumeZeroedOnBoot) {
+            // 开机默认机构处于收拢姿态，直接把当前位置记为零点，
+            // 让自动赛阶段的收球/射击门控可以工作；只标定编码器，不命令运动。
+            leftIntakeRotater.setPosition(0.0);
+            rightIntakeRotater.setPosition(0.0);
+            zeroed = true;
+            goal = IntakePosition.STOW;
+        }
     }
 
     public void setGoal(IntakePosition position) {
@@ -84,7 +93,17 @@ public class IntakeRotaterSubsystem extends SubsystemBase {
     }
 
     public boolean atGoal() {
+        // 未归零时编码器读数没有意义，一律视为未到位，
+        // 让上层射击门控和状态流转不会被假读数放行。
+        if (!zeroed) {
+            return false;
+        }
         return Math.abs(getPosition() - goal.rotations) <= Constants.Intaker.positionToleranceRotations;
+    }
+
+    public boolean isBlockedByNotZeroed() {
+        // 归零前收到了 SAFE 以外的位置请求：机构被安全逻辑拦下，需要先归零。
+        return !zeroed && goal != IntakePosition.SAFE;
     }
 
     public void zeroPosition() {
@@ -138,6 +157,7 @@ public class IntakeRotaterSubsystem extends SubsystemBase {
     public void periodic() {
         table.getEntry("goal").setString(goal.name());
         table.getEntry("zeroed").setBoolean(zeroed);
+        table.getEntry("blockedByNotZeroed").setBoolean(isBlockedByNotZeroed());
         table.getEntry("position").setDouble(getPosition());
         table.getEntry("atGoal").setBoolean(atGoal());
         table.getEntry("manualVoltage").setDouble(manualVoltage);

@@ -80,9 +80,9 @@ public class RobotContainer {
   private final DriveGainsTuner driveGainsTuner = new DriveGainsTuner(drivetrain);
   private final GameData2026 gameData2026 = new GameData2026();
   private ConfigTalonFXMotorTuner configFlywheelTuner =
-      new ConfigTalonFXMotorTuner(shooterSubsystem.flywheelMotorLeft, "flywheel", Constants.Shooter.flyWheelSlot0Configs);
+      new ConfigTalonFXMotorTuner(shooterSubsystem.leftFlywheel, "flywheel", Constants.Shooter.flyWheelSlot0Configs);
   private ConfigTalonFXMotorTuner configConveyorTuner =
-      new ConfigTalonFXMotorTuner(shooterSubsystem.conveyorMotor, "conveyor", Constants.Shooter.conveyorSlot0Configs);
+      new ConfigTalonFXMotorTuner(shooterSubsystem.leftConveyor, "conveyor", Constants.Shooter.conveyorSlot0Configs);
   private ConfigTalonFXSMotorTuner configBackboardTuner =
       new ConfigTalonFXSMotorTuner(shooterSubsystem.backboardMotor, "backboard", Constants.Shooter.backboardSlot0Configs);
 
@@ -175,15 +175,20 @@ public class RobotContainer {
   private void configueShooter() {
     // 射击相关按钮只请求 Superstructure 状态；是否喂球由 Superstructure
     // 根据飞轮速度、底盘瞄准和进球旋转机构位置统一判断。
-    controllerupper.rightTrigger()
+    // 这些命令 require Superstructure，与自动程序共用需求；
+    // 用 teleop 门控避免自动赛阶段误触直接取消整个 PathPlanner 自动。
+    Trigger teleopOnly = RobotModeTriggers.teleop();
+    controllerupper.rightTrigger().and(teleopOnly)
         .onTrue(operatorControls.requestShootCommand())
         .onFalse(operatorControls.requestIdleCommand());
-    controllerupper.y()
+    controllerupper.y().and(teleopOnly)
         .onTrue(operatorControls.requestPrepShootCommand())
         .onFalse(operatorControls.requestIdleCommand());
-    controllerupper.b()
+    controllerupper.b().and(teleopOnly)
         .onTrue(operatorControls.requestEjectCommand())
         .onFalse(operatorControls.requestIdleCommand());
+    // 持球状态是无传感器推断值，X 键允许操作员运行时纠正。
+    controllerupper.x().onTrue(operatorControls.toggleNotePresentCommand());
     controllerupper.povLeft().onTrue(Commands.runOnce(() -> operatorControls.adjustFlywheelSpeedOffset(-1)));
     controllerupper.povRight().onTrue(Commands.runOnce(() -> operatorControls.adjustFlywheelSpeedOffset(1)));
     controllerupper.povUp().onTrue(Commands.runOnce(() -> operatorControls.adjustBackboardRateOffset(100)));
@@ -215,7 +220,7 @@ public class RobotContainer {
   private void configueIntaker() {
     // 进球相关按钮也只请求 Superstructure 状态。
     // A 键是校准动作，只应在进球机构处于已知零点姿态时按下。
-    controllerupper.leftTrigger()
+    controllerupper.leftTrigger().and(RobotModeTriggers.teleop())
         .onTrue(operatorControls.requestIntakeCommand())
         .onFalse(operatorControls.requestIdleCommand());
     controllerupper.a().onTrue(operatorControls.resetIntakeRotaterEncoderCommand(intakeRotaterSubsystem));

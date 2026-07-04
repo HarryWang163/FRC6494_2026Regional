@@ -129,7 +129,11 @@ public class DriveControls {
         autoControlNetworkTable.getEntry("angleDifferenceToHub").setDouble(distanceAndRotation[1]);
         autoControlNetworkTable.getEntry("distanceToPassball").setDouble(calculateDistanceAndRotationToPassBall()[0]);
         autoControlNetworkTable.getEntry("angleDifferenceToPassball").setDouble(calculateDistanceAndRotationToPassBall()[1]);
-        
+        // 把朝向 hub 的目标角同步给底盘，供 Superstructure 读取 isAimed() 做射击门控；
+        // 数据来源与 AutoAimming 自动旋转完全相同，保证门控和实际瞄准一致。
+        drivetrain.setTargetHeading(
+            drivetrain.getRotation().plus(Rotation2d.fromDegrees(distanceAndRotation[1])));
+
         switch (robotStatusManager.getStatus()) {
             case Stopped:
                 vx = 0;
@@ -472,6 +476,10 @@ public class DriveControls {
         // 将距离值写入 NetworkTable
         autoControlNetworkTable.getEntry("distanceToHub").setDouble(distanceAndRotation[0]);
         autoControlNetworkTable.getEntry("angleDifferenceToHub").setDouble(distanceAndRotation[1]);
+        // 自动阶段默认驾驶命令不运行，这里同样保持目标朝向最新，
+        // 让自动程序里的射击门控 isAimed() 有效。
+        drivetrain.setTargetHeading(
+            drivetrain.getRotation().plus(Rotation2d.fromDegrees(distanceAndRotation[1])));
     }
     
 }

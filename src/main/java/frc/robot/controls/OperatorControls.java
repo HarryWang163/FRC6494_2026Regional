@@ -41,6 +41,14 @@ public class OperatorControls {
         return superstructure.requestEjectCommand();
     }
 
+    public Command requestManualCommand() {
+        return superstructure.requestManualCommand();
+    }
+
+    public Command toggleNotePresentCommand() {
+        return superstructure.toggleNotePresentCommand();
+    }
+
     public void adjustFlywheelSpeedOffset(double offset) {
         superstructure.adjustFlywheelSpeedOffset(offset);
     }
@@ -73,21 +81,9 @@ public class OperatorControls {
         );
     }
 
-    // 保留旧背板归零/回零命令，方便调参和现场恢复。
+    // 保留旧背板回零动作，方便调参和现场恢复；
+    // 具体电机操作在 ShooterSubsystem 内实现，这里只转发命令。
     public Command resetBackboard0Command() {
-        return Commands.sequence(
-            Commands.runOnce(() -> shooterSubsystem.setBackboardPosition(0.0), shooterSubsystem),
-            Commands.run(
-                () -> {
-                    if (shooterSubsystem.isBackboardAtTarget()) {
-                        shooterSubsystem.backboardMotor.set(0.0);
-                    } else {
-                        shooterSubsystem.outputBackboard();
-                    }
-                },
-                shooterSubsystem
-            ).until(shooterSubsystem::isBackboardAtTarget),
-            Commands.runOnce(() -> shooterSubsystem.backboardMotor.set(0.0), shooterSubsystem)
-        );
+        return shooterSubsystem.homeBackboardCommand();
     }
 }
