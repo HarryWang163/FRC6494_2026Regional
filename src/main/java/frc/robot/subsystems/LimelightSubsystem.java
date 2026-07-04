@@ -48,8 +48,7 @@ public class LimelightSubsystem extends SubsystemBase {
     }
 
     public double getShooterSetpointByDistance() {
-        // 初始测试用临时映射；飞轮和背板调好后应替换为实测射击表。
-        double distance = getDistanceToTarget();
-        return Constants.Shooter.defaultFlywheelTargetRps + (distance - 2.5) * 4.0;
+        // 查 Constants 里的插值射表；真车试射后往表里加实测点即可。
+        return Constants.Shooter.flywheelRpsByDistance.get(getDistanceToTarget());
     }
 }

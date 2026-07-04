@@ -3,6 +3,7 @@ package frc.robot;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
 public final class Constants {
     private Constants() {}
@@ -32,6 +33,16 @@ public final class Constants {
         public static final double shooterConveyorReverseVoltage = -4.0;
         public static final double flywheelSpeedToleranceRps = 5.0;
         public static final double defaultFlywheelTargetRps = 64.0;
+
+        // 距离(米) -> 飞轮转速(RPS) 射表。当前为占位点；
+        // 真车试射后按实测数据加点即可，查表自动线性插值并在两端取边界值。
+        public static final InterpolatingDoubleTreeMap flywheelRpsByDistance = new InterpolatingDoubleTreeMap();
+        static {
+            flywheelRpsByDistance.put(1.2, 58.8);
+            flywheelRpsByDistance.put(2.5, 64.0);
+            flywheelRpsByDistance.put(3.5, 68.0);
+            flywheelRpsByDistance.put(5.0, 74.0);
+        }
 
         public static final double conveyorSpeed = 150;
         public static final double conveyorSpeedForAuto = 10;
@@ -143,7 +154,9 @@ public final class Constants {
             .withKV(0.00).withKA(0.00).withKS(0.00);
 
         public static final double IntakeGetterSpeedforAuto = 0.5;
-        public static final double positionToleranceRotations = 0.00;
+        // atGoal 判定容差。为 0 会导致 atGoal 永远为 false、射击门控永远不通过；
+        // 这里给出可用的占位值，真车调好位置闭环后再收紧。
+        public static final double positionToleranceRotations = 0.3;
     }
 
     public static class Conveyor {
@@ -161,5 +174,15 @@ public final class Constants {
         public static final double shootTimeoutSeconds = 1.0;
         public static final double aimToleranceDegrees = 1.5;
         public static final double stationarySpeedToleranceMetersPerSecond = 0.5;
+
+        // 松开 intake 键后，INDEXING 状态继续收纳球的时长。
+        public static final double indexingSeconds = 0.5;
+        // 射击时背板的目标位置（外接编码器计数）。
+        public static final double backboardShootPosition = 175.0;
+        // 没有球检测传感器，持球状态由状态机跟踪推断。
+        // 若跟踪不可靠导致射击被卡，可临时置 false 旁路 hasNote 门控。
+        public static final boolean hasNoteGateEnabled = true;
+        // 射击门控是否要求底盘接近静止。
+        public static final boolean stationaryGateEnabled = true;
     }
 }

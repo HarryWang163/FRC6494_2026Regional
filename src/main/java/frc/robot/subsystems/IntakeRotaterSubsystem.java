@@ -84,7 +84,17 @@ public class IntakeRotaterSubsystem extends SubsystemBase {
     }
 
     public boolean atGoal() {
+        // 未归零时编码器读数没有意义，一律视为未到位，
+        // 让上层射击门控和状态流转不会被假读数放行。
+        if (!zeroed) {
+            return false;
+        }
         return Math.abs(getPosition() - goal.rotations) <= Constants.Intaker.positionToleranceRotations;
+    }
+
+    public boolean isBlockedByNotZeroed() {
+        // 归零前收到了 SAFE 以外的位置请求：机构被安全逻辑拦下，需要先归零。
+        return !zeroed && goal != IntakePosition.SAFE;
     }
 
     public void zeroPosition() {
@@ -138,6 +148,7 @@ public class IntakeRotaterSubsystem extends SubsystemBase {
     public void periodic() {
         table.getEntry("goal").setString(goal.name());
         table.getEntry("zeroed").setBoolean(zeroed);
+        table.getEntry("blockedByNotZeroed").setBoolean(isBlockedByNotZeroed());
         table.getEntry("position").setDouble(getPosition());
         table.getEntry("atGoal").setBoolean(atGoal());
         table.getEntry("manualVoltage").setDouble(manualVoltage);

@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -9,14 +9,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.IntakeRotaterSubsystem.IntakePosition;
 
 /**
  * 统一协调所有得分相关机构。
  *
  * subsystem 只暴露硬件级动作，OperatorControls 只表达操作员意图；
  * shooter、intake、conveyor、底盘瞄准和 Limelight 距离如何配合，
- * 统一由这里决定。
+ * 统一由这里决定。底盘瞄准本身仍由 DriveControls 的 AutoAimming
+ * 模式完成，这里只读取 drive.isAimed() 等状态，不直接控制底盘电机。
+ *
+ * 没有球检测传感器，持球状态按状态流程推断：INDEXING 完成置位，
+ * 射击/EJECT 后清空；跟踪不可靠时可用 Constants 里的开关旁路门控。
  */
 public class Superstructure extends SubsystemBase {
     // 操作员或自动程序请求的目标状态。
@@ -35,6 +38,8 @@ public class Superstructure extends SubsystemBase {
         STOWED,
         DEPLOYING_INTAKE,
         INTAKING,
+        INDEXING,
+        HOLDING_NOTE,
         SPINNING_UP,
         AIMING,
         READY_TO_SHOOT,
@@ -73,6 +78,10 @@ public class Superstructure extends SubsystemBase {
         this.drive = drive;
         this.limelight = limelight;
     }
+
+    /* ====================== */
+    /*     操作员意图入口       */
+    /* ====================== */
 
     public void requestIdle() {
         wantedState = WantedState.IDLE;
@@ -130,11 +139,29 @@ public class Superstructure extends SubsystemBase {
         return systemState;
     }
 
+    /* ====================== */
+    /*        射击门控          */
+    /* ====================== */
+
     public boolean canShoot() {
-        // 本赛季不使用球检测传感器，因此射击门控只检查机器人能实际测量的条件。
+        boolean noteGate = !Constants.Superstructure.hasNoteGateEnabled || conveyor.hasNote();
+        boolean stationaryGate = !Constants.Superstructure.stationaryGateEnabled || isDriveStationary();
         return shooter.atSpeed()
-            && drive.isAimed();
+            && drive.isAimed()
+            && intakeRotater.atGoal()
+            && noteGate
+            && stationaryGate;
     }
+
+    private boolean isDriveStationary() {
+        ChassisSpeeds speeds = drive.getChassisSpeeds();
+        double translationSpeed = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+        return translationSpeed <= Constants.Superstructure.stationarySpeedToleranceMetersPerSecond;
+    }
+
+    /* ====================== */
+    /*      现场微调 offset     */
+    /* ====================== */
 
     public void adjustFlywheelSpeedOffset(double offsetRps) {
         flywheelSpeedOffsetRps += offsetRps;
@@ -153,6 +180,10 @@ public class Superstructure extends SubsystemBase {
         shooter.resetbackboardencoder();
     }
 
+    /* ====================== */
+    /*        状态机主体        */
+    /* ====================== */
+
     @Override
     public void periodic() {
         // 禁用状态优先级最高，防止旧按钮输入或自动请求在禁用后继续驱动机构。
@@ -162,8 +193,6 @@ public class Superstructure extends SubsystemBase {
             publishTelemetry();
             return;
         }
-
-        updateAimingSetpoint();
 
         switch (wantedState) {
             case IDLE -> handleIdle();
@@ -178,15 +207,68 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void handleIdle() {
-        // 安全默认状态：传球不动，intake 收回，背板保持受控。
-        conveyor.hold();
+        // 从其他流程回到 IDLE 时的入口流转。
+        switch (systemState) {
+            // 松开 intake 键后先收纳，不直接回 STOWED。
+            // 未归零被安全逻辑拦下时滚轮从未启动，不可能有球，直接回 STOWED，
+            // 避免把 hasNote 误置为 true。
+            case DEPLOYING_INTAKE, INTAKING -> setSystemState(
+                intakeRotater.isBlockedByNotZeroed() ? SystemState.STOWED : SystemState.INDEXING);
+            // 喂球中途松开按键：球已经交给飞轮，按射完处理。
+            case SHOOTING -> {
+                conveyor.setNotePresent(false);
+                setSystemState(SystemState.CLEANUP);
+            }
+            // EJECT 结束：球路已排空。
+            case EJECTING -> {
+                conveyor.setNotePresent(false);
+                setSystemState(SystemState.STOWED);
+            }
+            default -> {}
+        }
+
+        if (systemState == SystemState.INDEXING) {
+            // 收纳中：intake 回 HANDOFF 交接位，滚轮低压保持，conveyor 继续送球。
+            intakeRotater.moveToHandoff();
+            intakeRoller.hold();
+            conveyor.feedToShooter();
+            shooter.stopFlywheel();
+            shooter.stopShooterConveyor();
+            shooter.holdBackboardAt(0.0);
+
+            if (timeInState() > Constants.Superstructure.indexingSeconds) {
+                conveyor.setNotePresent(true);
+                setSystemState(SystemState.HOLDING_NOTE);
+            }
+            return;
+        }
+
+        if (systemState == SystemState.CLEANUP) {
+            intakeRoller.stop();
+            conveyor.stop();
+            shooter.stopShooterConveyor();
+            shooter.stopFlywheel();
+            shooter.holdBackboardAt(0.0);
+            intakeRotater.stow();
+
+            if (timeInState() > Constants.Superstructure.cleanupSeconds) {
+                setSystemState(conveyor.hasNote() ? SystemState.HOLDING_NOTE : SystemState.STOWED);
+            }
+            return;
+        }
+
+        // 常规空闲姿态：有球时保持球位，无球时全部停止。
+        setSystemState(conveyor.hasNote() ? SystemState.HOLDING_NOTE : SystemState.STOWED);
+        intakeRotater.stow();
         intakeRoller.stop();
-        intakeRotater.stop();
+        if (conveyor.hasNote()) {
+            conveyor.hold();
+        } else {
+            conveyor.stop();
+        }
         shooter.stopFlywheel();
         shooter.stopShooterConveyor();
-        holdBackboardAtZero();
-
-        setSystemState(SystemState.STOWED);
+        shooter.holdBackboardAt(0.0);
     }
 
     private void handleIntake() {
@@ -197,20 +279,24 @@ public class Superstructure extends SubsystemBase {
 
         shooter.stopFlywheel();
         shooter.stopShooterConveyor();
+        shooter.holdBackboardAt(0.0);
         intakeRotater.deployToGround();
-        intakeRoller.intake();
-        conveyor.feedToShooter();
-        holdBackboardAtZero();
 
-        if (intakeRotater.atGoal()) {
-            setSystemState(SystemState.INTAKING);
+        if (intakeRotater.isBlockedByNotZeroed()) {
+            // 旋转机构未归零，安全逻辑拦下展开动作；
+            // 滚轮和 conveyor 也不启动，等待操作员先执行归零（A 键）。
+            intakeRoller.stop();
+            conveyor.stop();
+            return;
         }
 
-        // 本赛季没有球检测，因此 intake 通过时间退出。
-        // 真车确认 roller/conveyor 速度后，需要现场调整这个时间。
-        if (systemState == SystemState.INTAKING && timeInState() > 1.0) {
-            wantedState = WantedState.IDLE;
-            setSystemState(SystemState.STOWED);
+        // 展开过程中即允许进球，位置到位后进入 INTAKING。
+        // 没有球检测，收球何时结束由操作员松开按键决定（IDLE -> INDEXING）。
+        intakeRoller.intake();
+        conveyor.feedToShooter();
+
+        if (systemState == SystemState.DEPLOYING_INTAKE && intakeRotater.atGoal()) {
+            setSystemState(SystemState.INTAKING);
         }
     }
 
@@ -220,93 +306,87 @@ public class Superstructure extends SubsystemBase {
             && systemState != SystemState.READY_TO_SHOOT
             && systemState != SystemState.SHOOTING
             && systemState != SystemState.CLEANUP) {
+            // 从 intake 流程直接转射击：没有传感器，默认球已吸入。
+            if (systemState == SystemState.DEPLOYING_INTAKE
+                || systemState == SystemState.INTAKING
+                || systemState == SystemState.INDEXING) {
+                conveyor.setNotePresent(true);
+            }
             setSystemState(SystemState.SPINNING_UP);
         }
 
+        // 射击姿态：intake 到 HANDOFF 让出球路，滚轮低压保持球位。
         intakeRotater.moveToHandoff();
         intakeRoller.hold();
-        conveyor.hold();
-        shooter.stopShooterConveyor();
+
         // 距离到射速的映射由 LimelightSubsystem 提供；操作员 offset 用于现场微调，
         // 但不会绕过 Superstructure 状态机。
         double targetRps = limelight.getShooterSetpointByDistance() + flywheelSpeedOffsetRps;
         shooter.setFlywheelVelocity(targetRps, targetRps);
-        holdBackboardForShot();
-
-        if (shooter.atSpeed()) {
-            setSystemState(SystemState.AIMING);
-        }
-
-        if (shooter.atSpeed() && drive.isAimed() && intakeRotater.atGoal()) {
-            setSystemState(SystemState.READY_TO_SHOOT);
-        }
-
-        if (feedWhenReady && canShoot()) {
-            setSystemState(SystemState.SHOOTING);
-        }
+        shooter.holdBackboardAt(Constants.Superstructure.backboardShootPosition + backboardPositionOffset);
 
         if (systemState == SystemState.SHOOTING) {
-            // 只有 canShoot() 通过后才允许喂球。
+            // 只有 canShoot() 通过后才会进入本状态；喂球期间不再复查门控，
+            // 避免球接触飞轮导致的掉速中断喂球。
             conveyor.feedToShooter();
             shooter.runShooterConveyor(Constants.Superstructure.shooterFeedPercent);
 
             if (timeInState() > Constants.Superstructure.shootTimeoutSeconds) {
+                conveyor.setNotePresent(false);
                 setSystemState(SystemState.CLEANUP);
             }
+            return;
         }
 
         if (systemState == SystemState.CLEANUP) {
             conveyor.stop();
             shooter.stopShooterConveyor();
             if (timeInState() > Constants.Superstructure.cleanupSeconds) {
+                // 一次按键完成一次射击；再射需要重新请求。
                 wantedState = WantedState.IDLE;
-                setSystemState(SystemState.STOWED);
+                setSystemState(conveyor.hasNote() ? SystemState.HOLDING_NOTE : SystemState.STOWED);
             }
+            return;
+        }
+
+        // 未开始喂球前，球路保持静止。
+        conveyor.hold();
+        shooter.stopShooterConveyor();
+
+        // 门控条件实时刷新：条件回落时状态同步回退，仪表盘能看到卡在哪一关。
+        if (canShoot()) {
+            setSystemState(SystemState.READY_TO_SHOOT);
+        } else if (shooter.atSpeed()) {
+            setSystemState(SystemState.AIMING);
+        } else {
+            setSystemState(SystemState.SPINNING_UP);
+        }
+
+        if (feedWhenReady && systemState == SystemState.READY_TO_SHOOT) {
+            setSystemState(SystemState.SHOOTING);
         }
     }
 
     private void handleEject() {
-        // Eject 会反转整条球路，但飞轮保持停止。
+        // Eject 反转整条球路，飞轮保持停止。
+        // 旋转机构未归零时 setGoal 内部会自行拦下，滚轮反转不受影响。
         setSystemState(SystemState.EJECTING);
         intakeRotater.deployToGround();
         intakeRoller.outtake();
         conveyor.reverse();
         shooter.runShooterConveyor(Constants.Superstructure.shooterReversePercent);
         shooter.stopFlywheel();
-        holdBackboardAtZero();
+        shooter.holdBackboardAt(0.0);
     }
 
     private void handleManual() {
+        // 手动模式：状态机不再驱动机构，交给现场手动/调参工具；
+        // 只保持飞轮与喂球停止，避免意外射出。
         setSystemState(SystemState.MANUAL_OVERRIDE);
         shooter.stopFlywheel();
         shooter.stopShooterConveyor();
         conveyor.stop();
         intakeRoller.stop();
-    }
-
-    private void updateAimingSetpoint() {
-        // Superstructure 可以更新底盘目标朝向，但不直接下发 swerve 模块或底盘速度命令。
-        if (limelight.hasTarget()) {
-            drive.setTargetHeading(drive.getRotation().plus(Rotation2d.fromDegrees(limelight.getTargetYaw())));
-        }
-    }
-
-    private void holdBackboardAtZero() {
-        shooter.setBackboardPosition(0.0);
-        if (shooter.isBackboardAtTarget()) {
-            shooter.backboardMotor.set(0.0);
-        } else {
-            shooter.outputBackboard();
-        }
-    }
-
-    private void holdBackboardForShot() {
-        shooter.setBackboardPosition(175.0 + backboardPositionOffset);
-        if (shooter.isBackboardAtTarget()) {
-            shooter.backboardMotor.set(0.0);
-        } else {
-            shooter.outputBackboard();
-        }
     }
 
     private void stopAllMechanisms() {
@@ -328,15 +408,19 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void publishTelemetry() {
-        // 发布状态和门控信号，方便判断机器人为什么还没进入射击。
+        // 发布状态和各项门控信号，方便判断机器人为什么还没进入射击。
         table.getEntry("wantedState").setString(wantedState.name());
         table.getEntry("systemState").setString(systemState.name());
+        table.getEntry("timeInState").setDouble(timeInState());
         table.getEntry("canShoot").setBoolean(canShoot());
         table.getEntry("shooterAtSpeed").setBoolean(shooter.atSpeed());
         table.getEntry("driveAimed").setBoolean(drive.isAimed());
+        table.getEntry("driveHeadingError").setDouble(drive.getHeadingError());
+        table.getEntry("driveStationary").setBoolean(isDriveStationary());
         table.getEntry("intakeAtGoal").setBoolean(intakeRotater.atGoal());
+        table.getEntry("intakeBlockedByNotZeroed").setBoolean(intakeRotater.isBlockedByNotZeroed());
+        table.getEntry("hasNote").setBoolean(conveyor.hasNote());
         table.getEntry("flywheelSpeedOffsetRps").setDouble(flywheelSpeedOffsetRps);
         table.getEntry("backboardPositionOffset").setDouble(backboardPositionOffset);
     }
 }
-
