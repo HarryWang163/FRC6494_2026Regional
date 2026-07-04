@@ -132,18 +132,16 @@ public final class Constants {
 
         public static final double intakeRollerVoltage = 6.0;
         public static final double outtakeRollerVoltage = -5.0;
-        public static final double holdRollerVoltage = 1.0;
 
-        public static final double intakeRotaterStowPosition = 0.0;
-        public static final double intakeRotaterGroundPosition = -7.6;
-        public static final double intakeRotaterHandoffPosition = -2.5;
-        public static final double intakeRotaterSafePosition = 0.0;
-        public static final double intakeRotaterManualVoltage = 2.0;
+        public static final double intakeRotaterLoweredPosition = -7.6;
+        public static final double intakeRotaterShootAssistUpPosition = -2.5;
+        public static final double intakeRotaterManualRaiseVoltage = 2.0;
+        public static final double intakeRotaterManualLowerVoltage = -2.0;
+        public static final double intakeRotaterShootAssistPeriodSeconds = 0.4;
+        public static final double intakeRotaterShootAssistUpDutyCycle = 0.5;
 
         public static final double intakeRotaterUpLimit = 0.0;
         public static final double intakeRotaterDownLimit = -7.6;
-        public static final double intakeRotaterVelocity = 5;
-        public static final double IntakeRotaterGravityFF = 0.0;
 
         public static final Slot0Configs intakeGetterSlot0Configs = new Slot0Configs()
             .withKP(0.00).withKI(0.00).withKD(0.00)
@@ -154,16 +152,8 @@ public final class Constants {
             .withKV(0.00).withKA(0.00).withKS(0.00);
 
         public static final double IntakeGetterSpeedforAuto = 0.5;
-        // atGoal 判定容差。为 0 会导致 atGoal 永远为 false、射击门控永远不通过；
         // 这里给出可用的占位值，真车调好位置闭环后再收紧。
         public static final double positionToleranceRotations = 0.3;
-
-        // 上电时按机构处于收拢（STOW）姿态直接归零。
-        // 比赛规则要求开赛前机器人处于合法初始姿态，因此这是安全假设；
-        // 若维修后姿态不确定，置 false 并用操作员 A 键手动归零。
-        // 没有这个假设，自动赛阶段无人能按归零键，收球和射击会被
-        // 未归零保护永久拦下。
-        public static final boolean assumeZeroedOnBoot = true;
     }
 
     public static class Conveyor {
@@ -181,17 +171,8 @@ public final class Constants {
         public static final double aimToleranceDegrees = 1.5;
         public static final double stationarySpeedToleranceMetersPerSecond = 0.5;
 
-        // 松开 intake 键后，INDEXING 状态继续收纳球的时长。
-        public static final double indexingSeconds = 0.5;
         // 射击时背板的目标位置（外接编码器计数）。
         public static final double backboardShootPosition = 175.0;
-        // 没有球检测传感器，持球状态由状态机跟踪推断。
-        // 若跟踪不可靠导致射击被卡，可临时置 false 旁路 hasNote 门控。
-        public static final boolean hasNoteGateEnabled = true;
-        // 比赛开局机器人带预装球，开机默认持球为 true；
-        // 否则自动赛的第一发射击会被 hasNote 门控拦死。
-        // 空车调试时可置 false，或用操作员 X 键运行时翻转持球状态。
-        public static final boolean assumePreloadedAtBoot = true;
         // 射击门控是否要求底盘接近静止。
         public static final boolean stationaryGateEnabled = true;
     }

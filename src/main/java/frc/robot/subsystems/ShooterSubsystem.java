@@ -49,8 +49,6 @@ public class ShooterSubsystem extends SubsystemBase {
     private final NetworkTable shooterNetworkTable;
 
     private double targetFlywheelRps = 0.0;
-    private double targetLeftFlywheelRps = 0.0;
-    private double targetRightFlywheelRps = 0.0;
     private double shooterConveyorPercent = 0.0;
 
     public ShooterSubsystem() {
@@ -108,12 +106,10 @@ public class ShooterSubsystem extends SubsystemBase {
         rightFlywheel.getConfigurator().apply(configs);
     }
 
-    public void setFlywheelVelocity(double leftRps, double rightRps) {
-        // 对外接口使用 RPS，便于 Superstructure 阅读；实际下发仍是电压开环。
-        targetLeftFlywheelRps = leftRps;
-        targetRightFlywheelRps = rightRps;
-        targetFlywheelRps = (Math.abs(leftRps) + Math.abs(rightRps)) / 2.0;
-
+    public void setFlywheelVelocity(double targetRps) {
+        // 右飞轮是 follower，因此对外只暴露一个飞轮目标速度。
+        // 实际控制仍是左飞轮电压开环，右飞轮反向跟随左飞轮。
+        targetFlywheelRps = Math.abs(targetRps);
         double requestedVoltage = targetFlywheelRps * Constants.Shooter.flywheelVoltsPerRps;
         requestedVoltage = MathUtil.clamp(requestedVoltage, -12.0, 12.0);
         leftFlywheel.setControl(flywheelVoltageRequest.withOutput(requestedVoltage));
@@ -123,12 +119,10 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setFlywheelVelocityByDistance(double distance) {
         // 查 Constants 里的射表，两端自动取边界值。
         double targetRps = Constants.Shooter.flywheelRpsByDistance.get(distance);
-        setFlywheelVelocity(targetRps, targetRps);
+        setFlywheelVelocity(targetRps);
     }
 
     public void setFlywheelVoltage(double volts) {
-        targetLeftFlywheelRps = 0.0;
-        targetRightFlywheelRps = 0.0;
         targetFlywheelRps = 0.0;
         leftFlywheel.setControl(flywheelVoltageRequest.withOutput(MathUtil.clamp(volts, -12.0, 12.0)));
         setRightFollowLeft();
@@ -143,8 +137,8 @@ public class ShooterSubsystem extends SubsystemBase {
         if (targetFlywheelRps <= 1.0) {
             return false;
         }
-        return Math.abs(getLeftFlywheelVelocity() - targetLeftFlywheelRps) <= Constants.Shooter.flywheelSpeedToleranceRps
-            && Math.abs(Math.abs(getRightFlywheelVelocity()) - Math.abs(targetRightFlywheelRps)) <= Constants.Shooter.flywheelSpeedToleranceRps;
+        return Math.abs(Math.abs(getLeftFlywheelVelocity()) - targetFlywheelRps) <= Constants.Shooter.flywheelSpeedToleranceRps
+            && Math.abs(Math.abs(getRightFlywheelVelocity()) - targetFlywheelRps) <= Constants.Shooter.flywheelSpeedToleranceRps;
     }
 
     public double getLeftFlywheelVelocity() {

@@ -45,10 +45,6 @@ public class OperatorControls {
         return superstructure.requestManualCommand();
     }
 
-    public Command toggleNotePresentCommand() {
-        return superstructure.toggleNotePresentCommand();
-    }
-
     public void adjustFlywheelSpeedOffset(double offset) {
         superstructure.adjustFlywheelSpeedOffset(offset);
     }
@@ -65,8 +61,12 @@ public class OperatorControls {
         return Commands.runOnce(superstructure::resetBackboardEncoder, shooterSubsystem);
     }
 
-    public Command resetIntakeRotaterEncoderCommand(IntakeRotaterSubsystem intakeRotater) {
-        return Commands.runOnce(intakeRotater::zeroPosition, intakeRotater);
+    public Command manualRaiseIntakeRotaterCommand(IntakeRotaterSubsystem intakeRotater) {
+        return Commands.runEnd(intakeRotater::manualRaise, intakeRotater::stop, intakeRotater);
+    }
+
+    public Command manualLowerIntakeRotaterCommand(IntakeRotaterSubsystem intakeRotater) {
+        return Commands.runEnd(intakeRotater::manualLower, intakeRotater::stop, intakeRotater);
     }
 
     // PathPlanner 自动射击辅助：先预备到所有射击条件满足，再请求喂球，

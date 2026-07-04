@@ -98,6 +98,7 @@ public class RobotContainer {
     configueIntaker();
     Autocommand.preNameCommands(
         superstructure,
+        intakeRotaterSubsystem,
         driveControls,
         operatorControls
     );
@@ -174,7 +175,7 @@ public class RobotContainer {
 
   private void configueShooter() {
     // 射击相关按钮只请求 Superstructure 状态；是否喂球由 Superstructure
-    // 根据飞轮速度、底盘瞄准和进球旋转机构位置统一判断。
+    // 根据飞轮速度和底盘瞄准统一判断。
     // 这些命令 require Superstructure，与自动程序共用需求；
     // 用 teleop 门控避免自动赛阶段误触直接取消整个 PathPlanner 自动。
     Trigger teleopOnly = RobotModeTriggers.teleop();
@@ -187,8 +188,6 @@ public class RobotContainer {
     controllerupper.b().and(teleopOnly)
         .onTrue(operatorControls.requestEjectCommand())
         .onFalse(operatorControls.requestIdleCommand());
-    // 持球状态是无传感器推断值，X 键允许操作员运行时纠正。
-    controllerupper.x().onTrue(operatorControls.toggleNotePresentCommand());
     controllerupper.povLeft().onTrue(Commands.runOnce(() -> operatorControls.adjustFlywheelSpeedOffset(-1)));
     controllerupper.povRight().onTrue(Commands.runOnce(() -> operatorControls.adjustFlywheelSpeedOffset(1)));
     controllerupper.povUp().onTrue(Commands.runOnce(() -> operatorControls.adjustBackboardRateOffset(100)));
@@ -218,11 +217,22 @@ public class RobotContainer {
   }
 
   private void configueIntaker() {
-    // 进球相关按钮也只请求 Superstructure 状态。
-    // A 键是校准动作，只应在进球机构处于已知零点姿态时按下。
-    controllerupper.leftTrigger().and(RobotModeTriggers.teleop())
+    // 进球相关按钮也只请求 Superstructure 状态；intaker 开赛后默认保持下放。
+    Trigger teleopOnly = RobotModeTriggers.teleop();
+    controllerupper.leftTrigger().and(teleopOnly)
         .onTrue(operatorControls.requestIntakeCommand())
         .onFalse(operatorControls.requestIdleCommand());
-    controllerupper.a().onTrue(operatorControls.resetIntakeRotaterEncoderCommand(intakeRotaterSubsystem));
+
+    Trigger manualRaiseIntaker = controllerupper.x().and(teleopOnly);
+    manualRaiseIntaker
+        .onTrue(operatorControls.requestManualCommand())
+        .whileTrue(operatorControls.manualRaiseIntakeRotaterCommand(intakeRotaterSubsystem))
+        .onFalse(operatorControls.requestIdleCommand());
+
+    Trigger manualLowerIntaker = controllerupper.a().and(teleopOnly);
+    manualLowerIntaker
+        .onTrue(operatorControls.requestManualCommand())
+        .whileTrue(operatorControls.manualLowerIntakeRotaterCommand(intakeRotaterSubsystem))
+        .onFalse(operatorControls.requestIdleCommand());
   }
 }

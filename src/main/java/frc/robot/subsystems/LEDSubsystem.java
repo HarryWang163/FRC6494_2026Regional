@@ -18,6 +18,7 @@ public class LEDSubsystem extends SubsystemBase {
   private final AddressableLED led;
   private final AddressableLEDBuffer buffer;
   private final Timer timer = new Timer();
+  private final boolean enabled;
 
   // 左右灯带分段（左 0~71，右 72~143）
   private final int leftStart = 0;
@@ -50,11 +51,15 @@ public class LEDSubsystem extends SubsystemBase {
 
     led = new AddressableLED(pwmPort);
     buffer = new AddressableLEDBuffer(leftLen + rightLen);
+    enabled = Constants.LEDUsing;
 
-    led.setLength(buffer.getLength());
-    led.start();
-
-    timer.start();
+    if (enabled) {
+      led.setLength(buffer.getLength());
+      led.start();
+      timer.start();
+    } else {
+      led.close();
+    }
   }
 
   /* ====================== */
@@ -93,7 +98,9 @@ public class LEDSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if(!Constants.LEDUsing) {led.close(); return;}
+    if (!enabled) {
+      return;
+    }
     // 左段
     switch (leftMode) {
       case OFF -> setRange(leftStart, leftLen, 0, 0, 0);

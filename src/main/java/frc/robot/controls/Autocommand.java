@@ -5,6 +5,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.subsystems.IntakeRotaterSubsystem;
 import frc.robot.subsystems.Superstructure;
 
 /**
@@ -16,6 +17,7 @@ import frc.robot.subsystems.Superstructure;
 public class Autocommand extends SequentialCommandGroup {
     public static void preNameCommands(
         Superstructure superstructure,
+        IntakeRotaterSubsystem intakeRotater,
         DriveControls driveControls,
         OperatorControls operatorControls
     ) {
@@ -24,7 +26,7 @@ public class Autocommand extends SequentialCommandGroup {
         NamedCommands.registerCommand("stop_intake_and_conveyor", idle(superstructure));
         NamedCommands.registerCommand("start_intake_timelimit", timedIntake(superstructure));
         NamedCommands.registerCommand("stop_intake", idle(superstructure));
-        NamedCommands.registerCommand("intaker_down", startIntake(superstructure));
+        NamedCommands.registerCommand("intaker_down", lowerIntaker(intakeRotater));
         NamedCommands.registerCommand("intaker_up", idle(superstructure));
         NamedCommands.registerCommand("shoot", shoot(superstructure));
         NamedCommands.registerCommand("Shake", shake(driveControls));
@@ -47,6 +49,10 @@ public class Autocommand extends SequentialCommandGroup {
 
     public static Command idle(Superstructure superstructure) {
         return superstructure.requestIdleCommand();
+    }
+
+    public static Command lowerIntaker(IntakeRotaterSubsystem intakeRotater) {
+        return intakeRotater.lowerForMatchCommand();
     }
 
     // 自动射击和手动射击使用同一套 gated shooting 流程。
