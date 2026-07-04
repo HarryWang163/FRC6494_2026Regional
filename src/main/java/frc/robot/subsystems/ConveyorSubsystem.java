@@ -12,7 +12,8 @@ import frc.robot.Constants;
 /**
  * 主 conveyor 的开环控制封装。
  *
- * 本赛季没有球检测传感器，因此这里仅报告电机状态；
+ * 本赛季没有球检测传感器，持球状态由 Superstructure 按状态流程推断后
+ * 写入这里（INDEXING 完成置位，射击/EJECT 后清空）；
  * 所有动作顺序判断都放在 Superstructure。
  */
 public class ConveyorSubsystem extends SubsystemBase {
@@ -22,6 +23,8 @@ public class ConveyorSubsystem extends SubsystemBase {
     private final NetworkTable table = NetworkTableInstance.getDefault().getTable("Conveyor");
 
     private double voltage = 0.0;
+    // 开局带预装球时默认持球，否则自动赛第一发会被 hasNote 门控拦死。
+    private boolean notePresent = Constants.Superstructure.assumePreloadedAtBoot;
 
     public ConveyorSubsystem() {
         mainConveyor = new TalonFX(Constants.Conveyor.mainConveyorID);
@@ -52,9 +55,18 @@ public class ConveyorSubsystem extends SubsystemBase {
         mainConveyor.setControl(voltageRequest.withOutput(voltage));
     }
 
+    public boolean hasNote() {
+        return notePresent;
+    }
+
+    public void setNotePresent(boolean present) {
+        notePresent = present;
+    }
+
     @Override
     public void periodic() {
         table.getEntry("voltage").setDouble(voltage);
         table.getEntry("velocity").setDouble(mainConveyor.getVelocity().getValueAsDouble());
+        table.getEntry("hasNote").setBoolean(notePresent);
     }
 }
