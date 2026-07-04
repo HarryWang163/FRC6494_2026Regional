@@ -45,6 +45,10 @@ public class OperatorControls {
         return superstructure.requestManualCommand();
     }
 
+    public Command toggleNotePresentCommand() {
+        return superstructure.toggleNotePresentCommand();
+    }
+
     public void adjustFlywheelSpeedOffset(double offset) {
         superstructure.adjustFlywheelSpeedOffset(offset);
     }

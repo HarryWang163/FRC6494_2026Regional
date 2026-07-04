@@ -51,6 +51,15 @@ public class IntakeRotaterSubsystem extends SubsystemBase {
         rightIntakeRotater.getConfigurator().apply(Constants.Intaker.intakeRotaterSlot0Configs);
         rightFollower = new Follower(leftIntakeRotater.getDeviceID(), MotorAlignmentValue.Opposed).withUpdateFreqHz(50);
         followLeft();
+
+        if (Constants.Intaker.assumeZeroedOnBoot) {
+            // 开机默认机构处于收拢姿态，直接把当前位置记为零点，
+            // 让自动赛阶段的收球/射击门控可以工作；只标定编码器，不命令运动。
+            leftIntakeRotater.setPosition(0.0);
+            rightIntakeRotater.setPosition(0.0);
+            zeroed = true;
+            goal = IntakePosition.STOW;
+        }
     }
 
     public void setGoal(IntakePosition position) {

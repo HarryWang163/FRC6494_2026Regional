@@ -157,6 +157,13 @@ public final class Constants {
         // atGoal 判定容差。为 0 会导致 atGoal 永远为 false、射击门控永远不通过；
         // 这里给出可用的占位值，真车调好位置闭环后再收紧。
         public static final double positionToleranceRotations = 0.3;
+
+        // 上电时按机构处于收拢（STOW）姿态直接归零。
+        // 比赛规则要求开赛前机器人处于合法初始姿态，因此这是安全假设；
+        // 若维修后姿态不确定，置 false 并用操作员 A 键手动归零。
+        // 没有这个假设，自动赛阶段无人能按归零键，收球和射击会被
+        // 未归零保护永久拦下。
+        public static final boolean assumeZeroedOnBoot = true;
     }
 
     public static class Conveyor {
@@ -182,6 +189,10 @@ public final class Constants {
         // 没有球检测传感器，持球状态由状态机跟踪推断。
         // 若跟踪不可靠导致射击被卡，可临时置 false 旁路 hasNote 门控。
         public static final boolean hasNoteGateEnabled = true;
+        // 比赛开局机器人带预装球，开机默认持球为 true；
+        // 否则自动赛的第一发射击会被 hasNote 门控拦死。
+        // 空车调试时可置 false，或用操作员 X 键运行时翻转持球状态。
+        public static final boolean assumePreloadedAtBoot = true;
         // 射击门控是否要求底盘接近静止。
         public static final boolean stationaryGateEnabled = true;
     }

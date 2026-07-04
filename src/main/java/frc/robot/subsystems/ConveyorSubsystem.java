@@ -23,7 +23,8 @@ public class ConveyorSubsystem extends SubsystemBase {
     private final NetworkTable table = NetworkTableInstance.getDefault().getTable("Conveyor");
 
     private double voltage = 0.0;
-    private boolean notePresent = false;
+    // 开局带预装球时默认持球，否则自动赛第一发会被 hasNote 门控拦死。
+    private boolean notePresent = Constants.Superstructure.assumePreloadedAtBoot;
 
     public ConveyorSubsystem() {
         mainConveyor = new TalonFX(Constants.Conveyor.mainConveyorID);

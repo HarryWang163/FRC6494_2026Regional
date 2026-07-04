@@ -131,6 +131,12 @@ public class Superstructure extends SubsystemBase {
         return Commands.runOnce(this::requestManual, this);
     }
 
+    public Command toggleNotePresentCommand() {
+        // 持球状态是推断值，中途 disable 或漏吸球都可能让它失真；
+        // 给操作员一个运行时纠正入口（X 键），不用重启机器人。
+        return Commands.runOnce(() -> conveyor.setNotePresent(!conveyor.hasNote()));
+    }
+
     public WantedState getWantedState() {
         return wantedState;
     }
@@ -188,6 +194,13 @@ public class Superstructure extends SubsystemBase {
     public void periodic() {
         // 禁用状态优先级最高，防止旧按钮输入或自动请求在禁用后继续驱动机构。
         if (DriverStation.isDisabled()) {
+            // 进入禁用前先结算持球推断，避免中途 disable 留下失真的 hasNote：
+            // 喂球中被禁用视为球已交给飞轮；收纳中被禁用视为球已在传送带里。
+            if (systemState == SystemState.SHOOTING) {
+                conveyor.setNotePresent(false);
+            } else if (systemState == SystemState.INDEXING) {
+                conveyor.setNotePresent(true);
+            }
             setSystemState(SystemState.DISABLED);
             stopAllMechanisms();
             publishTelemetry();
@@ -307,9 +320,11 @@ public class Superstructure extends SubsystemBase {
             && systemState != SystemState.SHOOTING
             && systemState != SystemState.CLEANUP) {
             // 从 intake 流程直接转射击：没有传感器，默认球已吸入。
-            if (systemState == SystemState.DEPLOYING_INTAKE
+            // 未归零被安全逻辑拦下时滚轮从未启动，不可能有球，不置位。
+            if ((systemState == SystemState.DEPLOYING_INTAKE
                 || systemState == SystemState.INTAKING
-                || systemState == SystemState.INDEXING) {
+                || systemState == SystemState.INDEXING)
+                && !intakeRotater.isBlockedByNotZeroed()) {
                 conveyor.setNotePresent(true);
             }
             setSystemState(SystemState.SPINNING_UP);
@@ -342,8 +357,8 @@ public class Superstructure extends SubsystemBase {
             conveyor.stop();
             shooter.stopShooterConveyor();
             if (timeInState() > Constants.Superstructure.cleanupSeconds) {
-                // 一次按键完成一次射击；再射需要重新请求。
-                wantedState = WantedState.IDLE;
+                // 不强行改写 wantedState：清理窗口内重按/按住射击键的请求不会被吞掉，
+                // 而 hasNote 已清空，门控自然挡住空喂球，只会保持飞轮转速待命。
                 setSystemState(conveyor.hasNote() ? SystemState.HOLDING_NOTE : SystemState.STOWED);
             }
             return;
