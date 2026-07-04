@@ -1,24 +1,41 @@
 package frc.robot;
 
-import javax.net.ssl.TrustManager;
-
 import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 public final class Constants {
+    private Constants() {}
+
     public static final boolean LEDUsing = false;
-    public enum RobotStatus{
+
+    public enum RobotStatus {
         Stopped,
         AllTelop,
         PassingBall,
         AutoAimming,
-        Climbing,
         CrossingBump,
         CrossingTrench
     }
-    public class Shooter {
+
+    public static class Shooter {
+        // 机构 CAN ID 目前是占位值；季后赛最终接线确认后，只需要改这里。
+        public static final int leftFlywheelID = 41;
+        public static final int rightFlywheelID = 42;
+        public static final int leftConveyorID = 43;
+        public static final int rightConveyorID = 45;
+        public static final int backboardMotorID = 44;
+
+        public static final double flywheelVoltsPerRps = 0.12;
+        public static final double flywheelIdleVoltage = 0.0;
+        public static final double shooterConveyorVoltage = 6.0;
+        public static final double shooterConveyorReverseVoltage = -4.0;
+        public static final double flywheelSpeedToleranceRps = 5.0;
+        public static final double defaultFlywheelTargetRps = 64.0;
+
         public static final double conveyorSpeed = 150;
         public static final double conveyorSpeedForAuto = 10;
+
         public static final Slot0Configs flyWheelSlot0Configs = new Slot0Configs()
             .withKP(0.0).withKI(0).withKD(0)
             .withKV(0.099).withKA(0.0).withKS(0.0);
@@ -31,18 +48,18 @@ public final class Constants {
             .withKP(0.01).withKI(0).withKD(0)
             .withKV(0.03).withKA(0.0).withKS(0.010);
 
-        public class backboardPositionPID {
+        public static class backboardPositionPID {
             public static final double kP = 0.3;
             public static final double kI = 0.0;
             public static final double kD = 0.0;
-            
         }
-        public static final double backboardSpeedMax = 60; //也就是output
-        // 背板的上下限位角度
-        public static final double backboardUpLimit = 3000.0;  // 背板上限角度（根据实际需求设置）
-        public static final double backboardDownLimit = 0.0;  // 背板下限角度（根据实际需求设置）
+
+        public static final double backboardSpeedMax = 60;
+        public static final double backboardUpLimit = 3000.0;
+        public static final double backboardDownLimit = 0.0;
     }
-    public class AutoPositioning {
+
+    public static class AutoPositioning {
         public static final double autoRotationkP = 0.08;
         public static final double autoRotationForBumpTargetDegrees = 45;
         public static final double autoRotationForTrenchTargetDegrees = 0;
@@ -50,21 +67,20 @@ public final class Constants {
         public static final double teleopOffsetkP = 15;
 
         public static final double autoPositioningkP = 1.0;
-        public static final double autoPositioningAngleError = 1.0; // 角度误差容忍度，单位为度
+        public static final double autoPositioningAngleError = 1.0;
 
-        public static final double[] bumpY = {2.51,5.556};
-        public static final double[] trenchY = {0.639,7.43};
+        public static final double[] bumpY = {2.51, 5.556};
+        public static final double[] trenchY = {0.639, 7.43};
 
         public static final double TrenchtargetAngle = 0;
         public static final double TurningkP = 1.5;
     }
 
-    public class StartingPoints{
-        public class Red{
-            public static final Pose2d Point1 = new Pose2d(12.93, 7.47, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(0));
-            public static final Pose2d Point2 = new Pose2d(14.314, 4.15, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(-180));
+    public static class StartingPoints {
+        public static class Red {
+            public static final Pose2d Point1 = new Pose2d(12.93, 7.47, Rotation2d.fromDegrees(0));
+            public static final Pose2d Point2 = new Pose2d(14.314, 4.15, Rotation2d.fromDegrees(-180));
         }
-        
     }
 
     public enum DriveMode {
@@ -73,41 +89,19 @@ public final class Constants {
         SYSID,
         OTHER
     }
-    public class Pigeon {
+
+    public static class Pigeon {
         public static final int CANID = 0;
     }
 
-    public class Limelight {
+    public static class Limelight {
         public static final String LIMELIGHT_NAME_Shooter = "limelight-shooter";
         public static final String LIMELIGHT_NAME_Intaker = "limelight-intaker";
-        public static final Boolean UsingMetaTag2 = true; // 是否使用 MetaTag2（如果你们的 pipeline 配置了这个功能的话）
-        public static final int climbPipelineIndex = 8;
+        public static final Boolean UsingMetaTag2 = true;
         public static final int locatePipelineIndex = 0;
-
-        // 误差死区 / 对齐判定
-        public static final double AutoClimbToleranceTX = 1.5;   // deg
-        public static final double AutoClimbToleranceTZ = 0.10;  // m
-        public static final double AutoClimbToleranceRY = 2.0;   // deg
-
-        // P 控制系数
-        public static final double AutoClimbKpTX = 0.020;   // deg -> rad/s
-        public static final double AutoClimbKpTZ = 0.90;    // m -> m/s
-        public static final double AutoClimbKpRY = 0.015;   // deg -> rad/s
-
-        // 最小输出（防止快到目标时推不动）
-        public static final double AutoClimbMinVX = 0.18;      // m/s
-        public static final double AutoClimbMinOmega = 0.10;   // rad/s
-
-        // 最大输出（防止冲太猛）
-        public static final double AutoClimbMaxVX = 1.20;      // m/s
-        public static final double AutoClimbMaxOmega = 0.60;   // rad/s
-
-        // 远距离 / 大角度时额外限速，可后续微调
-        public static final double AutoClimbFastTurnThresholdTX = 15.0; // deg
-        public static final double AutoClimbFastTurnOmega = 0.45;       // rad/s
     }
 
-    public class Field {
+    public static class Field {
         public static final double RedHubPositionX = 11.914;
         public static final double RedHubPositionY = 4.034;
         public static final double BlueHubPositionX = 4.625;
@@ -117,56 +111,55 @@ public final class Constants {
         public static final double RedPassingBallPosX = 13.355;
         public static final double BluePassingBallPosX = 3.184;
     }
-    
 
-    public class Intaker {
+    public static class Intaker {
+        // 进球机构 CAN ID 同样是占位值，真实 ID 确认后集中在这里修改。
+        public static final int leftIntakeRollerID = 47;
+        public static final int rightIntakeRollerID = 46;
+        public static final int leftIntakeRotaterID = 48;
+        public static final int rightIntakeRotaterID = 49;
 
-    public static final double intakeRotaterUpLimit = 0.0;  // rotator上限角度
-    public static final double intakeRotaterDownLimit = -7.6;  // rotator下限角度
-    public static final double intakeRotaterVelocity = 5; // rotater的速度（如果你用速度控制的话）
-    public static final double IntakeRotaterGravityFF = 0.0; // 重力前馈增益（需要实测调整）
+        public static final double intakeRollerVoltage = 6.0;
+        public static final double outtakeRollerVoltage = -5.0;
+        public static final double holdRollerVoltage = 1.0;
 
-    public static final Slot0Configs intakeGetterSlot0Configs = new Slot0Configs()
-        .withKP(0.00).withKI(0.00).withKD(0.00)
-        .withKV(0.00).withKA(0.00).withKS(0.00);
-    // getter 如果你只用固定速度开关，也可以先不启闭环；若用闭环速度，这里 kP/kV/KS 等需要实测调参(这句fromAI)
+        public static final double intakeRotaterStowPosition = 0.0;
+        public static final double intakeRotaterGroundPosition = -7.6;
+        public static final double intakeRotaterHandoffPosition = -2.5;
+        public static final double intakeRotaterSafePosition = 0.0;
+        public static final double intakeRotaterManualVoltage = 2.0;
 
-    public static final Slot0Configs intakeRotaterSlot0Configs = new Slot0Configs()
-        .withKP(0.00).withKI(0.00).withKD(0.00)
-        .withKV(0.00).withKA(0.00).withKS(0.00);
-    //如果 rotater 受重力影响明显，可能需要用 withKG/withGravityType/withGravityArmPositionOffset（看机构形式）(这句fromAI)
+        public static final double intakeRotaterUpLimit = 0.0;
+        public static final double intakeRotaterDownLimit = -7.6;
+        public static final double intakeRotaterVelocity = 5;
+        public static final double IntakeRotaterGravityFF = 0.0;
 
-    public static final double IntakeGetterSpeedforAuto = 0.5;
-    // 单位RPS
-    public static final double positionToleranceRotations = 0.00;
-    //rotater容差
+        public static final Slot0Configs intakeGetterSlot0Configs = new Slot0Configs()
+            .withKP(0.00).withKI(0.00).withKD(0.00)
+            .withKV(0.00).withKA(0.00).withKS(0.00);
 
-    }   
-    public static class Climber {
+        public static final Slot0Configs intakeRotaterSlot0Configs = new Slot0Configs()
+            .withKP(0.00).withKI(0.00).withKD(0.00)
+            .withKV(0.00).withKA(0.00).withKS(0.00);
 
-    public static final int motorID = 49;
-
-    public static final boolean inverted = false;
-
-    public static double climbUpTicks = 94; // TODO: 实测后调整
-    public static double climbDownTicks = 0; // TODO: 实测后调整
-    public static double climbDownAutoTicks = 0; // TODO: 实测后调整，自动爬时可能不需要完全降到底
-    public static final double climbVelocity = -200;
-    public static final double holdToleranceRot = 0.5; 
-    public static final double deltaDownTicks = 1;
-
-    public static final Slot0Configs slot0Configs = new Slot0Configs();
-
-    static {
-        // TODO: PID/F 值你们实测后填
-        slot0Configs.kP = 0.2;
-        slot0Configs.kI = 0.0;
-        slot0Configs.kD = 0.0;
-
-        // TODO: 如果要前馈（速度闭环一般建议有 kV）
-        slot0Configs.kS = 0.0;
-        slot0Configs.kV = 0.1;
-        slot0Configs.kA = 0.0;
+        public static final double IntakeGetterSpeedforAuto = 0.5;
+        public static final double positionToleranceRotations = 0.00;
     }
-}
+
+    public static class Conveyor {
+        public static final int mainConveyorID = 50;
+        public static final double feedVoltage = 6.0;
+        public static final double reverseVoltage = -5.0;
+        public static final double holdVoltage = 0.8;
+    }
+
+    public static class Superstructure {
+        // 状态机时间和门控容差。真车基础动作验证后，需要现场调这些值。
+        public static final double shooterFeedPercent = 1.0;
+        public static final double shooterReversePercent = -0.6;
+        public static final double cleanupSeconds = 0.3;
+        public static final double shootTimeoutSeconds = 1.0;
+        public static final double aimToleranceDegrees = 1.5;
+        public static final double stationarySpeedToleranceMetersPerSecond = 0.5;
+    }
 }

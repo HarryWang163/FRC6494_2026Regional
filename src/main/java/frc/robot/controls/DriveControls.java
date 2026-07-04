@@ -151,9 +151,6 @@ public class DriveControls {
             case AllTelop:
                 autoControlNetworkTable.getEntry("autoRotationRate").setDouble(Double.NaN);
                 break;
-            case Climbing:
-                // alignToClimb();
-                break;
             case CrossingBump:
                 double differenceBump = calculateDifferenceToTwoTarget(drivetrain.getState().Pose.getY(), Constants.AutoPositioning.bumpY[0], Constants.AutoPositioning.bumpY[1]);
                 if (Math.abs(differenceBump) < 0.1) {
@@ -405,16 +402,6 @@ public class DriveControls {
     public Command getAllianceColorCommand() {
         return Commands.runOnce(this::setTeamColors);
     }
-    // public void alignToClimb(){
-    //     LimelightSupplier.setPipeline(Constants.Limelight.climbPipelineIndex);
-    //     if(!drivetrain.isAlignedToAprilTag()){
-    //         drivetrain.driveToAprilTag();
-    //     }
-    //     else{
-    //         LimelightSupplier.setPipeline(Constants.Limelight.locatePipelineIndex);
-    //         drivetrain.stop();
-    //     }
-    // }
     public Command autoAimCommand() {
         return drivetrain.applyRequest(() -> {
         double[] distanceAndRotation = calculateDistanceAndRotationToHub();
