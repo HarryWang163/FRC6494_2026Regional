@@ -23,8 +23,9 @@ public class Superstructure extends SubsystemBase {
     public enum WantedState {
         IDLE,
         INTAKE,
-        PREP_SHOOT,
-        SHOOT,
+        SHOOT_HUB,
+        AIM_HUB,
+        PASS_BALL,
         EJECT,
         MANUAL
     }
@@ -34,11 +35,8 @@ public class Superstructure extends SubsystemBase {
         DISABLED,
         STOWED,
         INTAKING,
-        SPINNING_UP,
-        AIMING,
-        READY_TO_SHOOT,
+        PREP_SHOOT,
         SHOOTING,
-        CLEANUP,
         EJECTING,
         MANUAL_OVERRIDE
     }
@@ -56,6 +54,7 @@ public class Superstructure extends SubsystemBase {
     private double stateStartTimestamp = Timer.getFPGATimestamp();
     private double flywheelSpeedOffsetRps = 0.0;
     private double backboardPositionOffset = 0.0;
+    private boolean shotCompletedThisRequest = false;
 
     public Superstructure(
         ShooterSubsystem shooter,
@@ -85,12 +84,26 @@ public class Superstructure extends SubsystemBase {
         wantedState = WantedState.INTAKE;
     }
 
-    public void requestPrepShoot() {
-        wantedState = WantedState.PREP_SHOOT;
+    public void requestShootHub() {
+        if (wantedState != WantedState.SHOOT_HUB) {
+            shotCompletedThisRequest = false;
+        }
+        wantedState = WantedState.SHOOT_HUB;
+    }
+
+    public void requestAimHub() {
+        wantedState = WantedState.AIM_HUB;
+    }
+
+    public void requestPassBall() {
+        if (wantedState != WantedState.PASS_BALL) {
+            shotCompletedThisRequest = false;
+        }
+        wantedState = WantedState.PASS_BALL;
     }
 
     public void requestShoot() {
-        wantedState = WantedState.SHOOT;
+        requestShootHub();
     }
 
     public void requestEject() {
@@ -109,12 +122,20 @@ public class Superstructure extends SubsystemBase {
         return Commands.runOnce(this::requestIntake, this);
     }
 
-    public Command requestPrepShootCommand() {
-        return Commands.runOnce(this::requestPrepShoot, this);
+    public Command requestShootHubCommand() {
+        return Commands.runOnce(this::requestShootHub, this);
+    }
+
+    public Command requestAimHubCommand() {
+        return Commands.runOnce(this::requestAimHub, this);
+    }
+
+    public Command requestPassBallCommand() {
+        return Commands.runOnce(this::requestPassBall, this);
     }
 
     public Command requestShootCommand() {
-        return Commands.runOnce(this::requestShoot, this);
+        return requestShootHubCommand();
     }
 
     public Command requestEjectCommand() {
@@ -131,6 +152,10 @@ public class Superstructure extends SubsystemBase {
 
     public SystemState getSystemState() {
         return systemState;
+    }
+
+    public boolean isShootCycleComplete() {
+        return shotCompletedThisRequest;
     }
 
     /* ====================== */
@@ -188,8 +213,9 @@ public class Superstructure extends SubsystemBase {
         switch (wantedState) {
             case IDLE -> handleIdle();
             case INTAKE -> handleIntake();
-            case PREP_SHOOT -> handlePrepShoot(false);
-            case SHOOT -> handlePrepShoot(true);
+            case SHOOT_HUB -> handleShootHub();
+            case AIM_HUB -> handleAimHub();
+            case PASS_BALL -> handlePassBall();
             case EJECT -> handleEject();
             case MANUAL -> handleManual();
         }
@@ -204,6 +230,7 @@ public class Superstructure extends SubsystemBase {
         shooter.stopFlywheel();
         shooter.stopShooterConveyor();
         shooter.holdBackboardAt(0.0);
+        setSystemState(SystemState.STOWED);
     }
 
     private void handleIntake() {
@@ -218,24 +245,39 @@ public class Superstructure extends SubsystemBase {
         setSystemState(SystemState.INTAKING);
     }
 
-    private void handlePrepShoot(boolean feedWhenReady) {
-        if (systemState != SystemState.SPINNING_UP
-            && systemState != SystemState.AIMING
-            && systemState != SystemState.READY_TO_SHOOT
-            && systemState != SystemState.SHOOTING
-            && systemState != SystemState.CLEANUP) {
-            setSystemState(SystemState.SPINNING_UP);
-        }
+    private void handleAimHub() {
+        intakeRoller.stop();
+        conveyor.stop();
+        shooter.stopFlywheel();
+        shooter.stopShooterConveyor();
+        shooter.holdBackboardAt(0.0);
+        setSystemState(SystemState.STOWED);
+    }
 
-        intakeRotater.lowerForMatch();
+    private void handleShootHub() {
+        double targetRps = limelight.getShooterSetpointByDistance() + flywheelSpeedOffsetRps;
+        double backboardPosition = Constants.Superstructure.backboardShootPosition + backboardPositionOffset;
+        handlePreparedFeed(targetRps, backboardPosition);
+    }
+
+    private void handlePassBall() {
+        double targetRps = Constants.Superstructure.passBallFlywheelRps + flywheelSpeedOffsetRps;
+        double backboardPosition = Constants.Superstructure.passBallBackboardPosition + backboardPositionOffset;
+        handlePreparedFeed(targetRps, backboardPosition);
+    }
+
+    private void handlePreparedFeed(double targetRps, double backboardPosition) {
+        if (systemState != SystemState.PREP_SHOOT
+            && systemState != SystemState.SHOOTING) {
+            setSystemState(SystemState.PREP_SHOOT);
+        }
         intakeRoller.stop();
         conveyor.stop();
         shooter.stopShooterConveyor();
         // 距离到射速的映射由 LimelightSubsystem 提供；操作员 offset 用于现场微调，
         // 但不会绕过 Superstructure 状态机。
-        double targetRps = limelight.getShooterSetpointByDistance() + flywheelSpeedOffsetRps;
         shooter.setFlywheelVelocity(targetRps);
-        shooter.holdBackboardAt(Constants.Superstructure.backboardShootPosition + backboardPositionOffset);
+        shooter.holdBackboardAt(backboardPosition);
 
         if (systemState == SystemState.SHOOTING) {
             // 只有 canShoot() 通过后才会进入本状态；喂球期间不再复查门控，
@@ -245,17 +287,8 @@ public class Superstructure extends SubsystemBase {
             shooter.runShooterConveyor(Constants.Superstructure.shooterFeedPercent);
 
             if (timeInState() > Constants.Superstructure.shootTimeoutSeconds) {
-                setSystemState(SystemState.CLEANUP);
-            }
-            return;
-        }
-
-        if (systemState == SystemState.CLEANUP) {
-            intakeRotater.lowerForMatch();
-            conveyor.stop();
-            shooter.stopShooterConveyor();
-            if (timeInState() > Constants.Superstructure.cleanupSeconds) {
-                setSystemState(SystemState.STOWED);
+                shotCompletedThisRequest = true;
+                setSystemState(SystemState.PREP_SHOOT);
             }
             return;
         }
@@ -266,14 +299,6 @@ public class Superstructure extends SubsystemBase {
 
         // 门控条件实时刷新：条件回落时状态同步回退，仪表盘能看到卡在哪一关。
         if (canShoot()) {
-            setSystemState(SystemState.READY_TO_SHOOT);
-        } else if (shooter.atSpeed()) {
-            setSystemState(SystemState.AIMING);
-        } else {
-            setSystemState(SystemState.SPINNING_UP);
-        }
-
-        if (feedWhenReady && systemState == SystemState.READY_TO_SHOOT) {
             setSystemState(SystemState.SHOOTING);
         }
     }

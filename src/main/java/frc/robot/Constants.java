@@ -10,15 +10,6 @@ public final class Constants {
 
     public static final boolean LEDUsing = false;
 
-    public enum RobotStatus {
-        Stopped,
-        AllTelop,
-        PassingBall,
-        AutoAimming,
-        CrossingBump,
-        CrossingTrench
-    }
-
     public static class Shooter {
         // 机构 CAN ID 目前是占位值；季后赛最终接线确认后，只需要改这里。
         public static final int leftFlywheelID = 41;
@@ -166,10 +157,11 @@ public final class Constants {
         // 状态机时间和门控容差。真车基础动作验证后，需要现场调这些值。
         public static final double shooterFeedPercent = 1.0;
         public static final double shooterReversePercent = -0.6;
-        public static final double cleanupSeconds = 0.3;
         public static final double shootTimeoutSeconds = 1.0;
         public static final double aimToleranceDegrees = 1.5;
         public static final double stationarySpeedToleranceMetersPerSecond = 0.5;
+        public static final double passBallFlywheelRps = Shooter.defaultFlywheelTargetRps;
+        public static final double passBallBackboardPosition = 175.0;
 
         // 射击时背板的目标位置（外接编码器计数）。
         public static final double backboardShootPosition = 175.0;

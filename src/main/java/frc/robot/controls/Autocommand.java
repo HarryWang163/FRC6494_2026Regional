@@ -5,6 +5,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants;
 import frc.robot.subsystems.IntakeRotaterSubsystem;
 import frc.robot.subsystems.Superstructure;
 
@@ -28,10 +29,9 @@ public class Autocommand extends SequentialCommandGroup {
         NamedCommands.registerCommand("stop_intake", idle(superstructure));
         NamedCommands.registerCommand("intaker_down", lowerIntaker(intakeRotater));
         NamedCommands.registerCommand("intaker_up", idle(superstructure));
-        NamedCommands.registerCommand("shoot", shoot(superstructure));
+        NamedCommands.registerCommand("shoot_hub", shootHub(superstructure));
         NamedCommands.registerCommand("Shake", shake(driveControls));
         NamedCommands.registerCommand("AutoAim", autoAim(driveControls));
-        NamedCommands.registerCommand("AutoShoot", operatorControls.autoShootToHubCommand());
         NamedCommands.registerCommand("reset_backboard0", operatorControls.resetBackboard0Command());
     }
 
@@ -56,12 +56,10 @@ public class Autocommand extends SequentialCommandGroup {
     }
 
     // 自动射击和手动射击使用同一套 gated shooting 流程。
-    public static Command shoot(Superstructure superstructure) {
+    public static Command shootHub(Superstructure superstructure) {
         return Commands.sequence(
-            superstructure.requestPrepShootCommand(),
-            Commands.waitUntil(superstructure::canShoot).withTimeout(1.5),
-            superstructure.requestShootCommand(),
-            Commands.waitSeconds(1.2),
+            superstructure.requestShootHubCommand(),
+            Commands.waitSeconds(Constants.Superstructure.shootTimeoutSeconds),
             superstructure.requestIdleCommand()
         );
     }

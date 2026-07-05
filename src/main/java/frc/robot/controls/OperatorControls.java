@@ -2,6 +2,7 @@ package frc.robot.controls;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants;
 import frc.robot.subsystems.IntakeRotaterSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.Superstructure;
@@ -29,12 +30,16 @@ public class OperatorControls {
         return superstructure.requestIntakeCommand();
     }
 
-    public Command requestPrepShootCommand() {
-        return superstructure.requestPrepShootCommand();
+    public Command requestShootHubCommand() {
+        return superstructure.requestShootHubCommand();
     }
 
-    public Command requestShootCommand() {
-        return superstructure.requestShootCommand();
+    public Command requestAimHubCommand() {
+        return superstructure.requestAimHubCommand();
+    }
+
+    public Command requestPassBallCommand() {
+        return superstructure.requestPassBallCommand();
     }
 
     public Command requestEjectCommand() {
@@ -73,10 +78,8 @@ public class OperatorControls {
     // 最后回到空闲状态。真正的“是否能射”判断仍然放在 Superstructure。
     public Command autoShootToHubCommand() {
         return Commands.sequence(
-            superstructure.requestPrepShootCommand(),
-            Commands.waitUntil(superstructure::canShoot).withTimeout(1.5),
-            superstructure.requestShootCommand(),
-            Commands.waitSeconds(1.2),
+            superstructure.requestShootHubCommand(),
+            Commands.waitSeconds(Constants.Superstructure.shootTimeoutSeconds),
             superstructure.requestIdleCommand()
         );
     }

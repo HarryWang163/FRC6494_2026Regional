@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.RobotStatus;
 import frc.robot.controls.Autocommand;
 import frc.robot.controls.DriveControls;
 import frc.robot.controls.OperatorControls;
@@ -67,13 +66,11 @@ public class RobotContainer {
   // LED 子系统仍然只负责灯带显示，不参与机构状态判断。
   private final LEDSubsystem leds = new LEDSubsystem(0, 72, 0); // 总长度 = 72 + 72
 
-  private final RobotStatusManager robotStatusManager = new RobotStatusManager();
-
   /* ====================== */
   /*     控制封装/调参        */
   /* ====================== */
 
-  public final DriveControls driveControls = new DriveControls(drivetrain, controllerlower, robotStatusManager);
+  public final DriveControls driveControls = new DriveControls(drivetrain, controllerlower, superstructure);
 
   // 操作员意图层替代旧的射击/进球分离控制类，让复杂动作判断集中留在 Superstructure。
   private final OperatorControls operatorControls = new OperatorControls(superstructure, shooterSubsystem);
@@ -151,26 +148,19 @@ public class RobotContainer {
     }));
 
     // 预留的左摇杆自动瞄准切换，当前保持注释，避免改变驾驶员已习惯的按键。
-    // controllerlower.leftStick().onTrue(robotStatusManager.setStatusCommand(RobotStatus.AutoAimming));
-    // controllerlower.leftStick().onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
+    // controllerlower.leftStick().onTrue(operatorControls.requestAimHubCommand());
+    // controllerlower.leftStick().onFalse(operatorControls.requestIdleCommand());
 
     // 上操作员右保险：按住进入自动瞄准模式，松开回到全手动模式。
     Trigger autoAim = controllerupper.rightBumper(); // 可按需要再并入驾驶员左摇杆。
-    autoAim.onTrue(robotStatusManager.setStatusCommand(RobotStatus.AutoAimming));
-    autoAim.onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
+    autoAim.onTrue(operatorControls.requestAimHubCommand());
+    autoAim.onFalse(operatorControls.requestIdleCommand());
 
     // 上操作员左保险：按住进入传球模式，松开回到全手动模式。
     Trigger autoAim2 = controllerupper.leftBumper(); // 可按需要再并入驾驶员左摇杆。
-    autoAim2.onTrue(robotStatusManager.setStatusCommand(RobotStatus.PassingBall));
-    autoAim2.onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
+    autoAim2.onTrue(operatorControls.requestPassBallCommand());
+    autoAim2.onFalse(operatorControls.requestIdleCommand());
 
-    controllerlower.leftTrigger()
-        .onTrue(robotStatusManager.setStatusCommand(RobotStatus.CrossingTrench))
-        .onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
-
-    controllerlower.rightTrigger()
-        .onTrue(robotStatusManager.setStatusCommand(RobotStatus.CrossingBump))
-        .onFalse(robotStatusManager.setStatusCommand(RobotStatus.AllTelop));
   }
 
   private void configueShooter() {
@@ -180,10 +170,7 @@ public class RobotContainer {
     // 用 teleop 门控避免自动赛阶段误触直接取消整个 PathPlanner 自动。
     Trigger teleopOnly = RobotModeTriggers.teleop();
     controllerupper.rightTrigger().and(teleopOnly)
-        .onTrue(operatorControls.requestShootCommand())
-        .onFalse(operatorControls.requestIdleCommand());
-    controllerupper.y().and(teleopOnly)
-        .onTrue(operatorControls.requestPrepShootCommand())
+        .onTrue(operatorControls.requestShootHubCommand())
         .onFalse(operatorControls.requestIdleCommand());
     controllerupper.b().and(teleopOnly)
         .onTrue(operatorControls.requestEjectCommand())

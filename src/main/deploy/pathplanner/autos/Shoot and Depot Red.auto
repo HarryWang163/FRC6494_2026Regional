@@ -26,7 +26,7 @@
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "shoot_hub"
           }
         },
         {
@@ -99,7 +99,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "AutoShoot"
+                  "name": "shoot_hub"
                 }
               },
               {
@@ -124,7 +124,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "AutoShoot"
+                  "name": "shoot_hub"
                 }
               },
               {
