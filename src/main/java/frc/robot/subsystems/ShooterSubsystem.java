@@ -4,7 +4,6 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -39,8 +38,8 @@ public class ShooterSubsystem extends SubsystemBase {
     public final Encoder backboardEncoder;
     public final ProfiledPIDController backboardPID;
 
-    private final VoltageOut flywheelVoltageRequest = new VoltageOut(0);
-    private final VoltageOut conveyorVoltageRequest = new VoltageOut(0);
+    private final VelocityVoltage flywheelVelocityRequest = new VelocityVoltage(0);
+    private final VelocityVoltage conveyorVelocityRequest = new VelocityVoltage(0);
     private final VelocityVoltage backboardVelocityRequest = new VelocityVoltage(0);
 
     private final Follower flywheelFollower;
@@ -49,7 +48,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private final NetworkTable shooterNetworkTable;
 
     private double targetFlywheelRps = 0.0;
-    private double shooterConveyorPercent = 0.0;
+    private double shooterConveyorTargetRps = 0.0;
 
     public ShooterSubsystem() {
         leftFlywheel = new TalonFX(Constants.Shooter.leftFlywheelID);
@@ -108,11 +107,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setFlywheelVelocity(double targetRps) {
         // 右飞轮是 follower，因此对外只暴露一个飞轮目标速度。
-        // 实际控制仍是左飞轮电压开环，右飞轮反向跟随左飞轮。
+        // 左飞轮使用 VelocityVoltage 速度闭环，右飞轮反向跟随左飞轮。
+        setFlywheelSpeedByRPS(targetRps);
+    }
+
+    public void setFlywheelSpeedByRPS(double targetRps) {
         targetFlywheelRps = Math.abs(targetRps);
-        double requestedVoltage = targetFlywheelRps * Constants.Shooter.flywheelVoltsPerRps;
-        requestedVoltage = MathUtil.clamp(requestedVoltage, -12.0, 12.0);
-        leftFlywheel.setControl(flywheelVoltageRequest.withOutput(requestedVoltage));
+        leftFlywheel.setControl(flywheelVelocityRequest.withVelocity(targetFlywheelRps));
         setRightFollowLeft();
     }
 
@@ -122,14 +123,8 @@ public class ShooterSubsystem extends SubsystemBase {
         setFlywheelVelocity(targetRps);
     }
 
-    public void setFlywheelVoltage(double volts) {
-        targetFlywheelRps = 0.0;
-        leftFlywheel.setControl(flywheelVoltageRequest.withOutput(MathUtil.clamp(volts, -12.0, 12.0)));
-        setRightFollowLeft();
-    }
-
     public void stopFlywheel() {
-        setFlywheelVoltage(Constants.Shooter.flywheelIdleVoltage);
+        setFlywheelSpeedByRPS(0.0);
     }
 
     public boolean atSpeed() {
@@ -165,14 +160,14 @@ public class ShooterSubsystem extends SubsystemBase {
     /*    shooter conveyor     */
     /* ====================== */
 
-    public void runShooterConveyor(double percent) {
-        shooterConveyorPercent = MathUtil.clamp(percent, -1.0, 1.0);
-        leftConveyor.setControl(conveyorVoltageRequest.withOutput(shooterConveyorPercent * 12.0));
+    public void runShooterConveyorByRPS(double targetRps) {
+        shooterConveyorTargetRps = targetRps;
+        leftConveyor.setControl(conveyorVelocityRequest.withVelocity(targetRps));
         setRightFollowLeft();
     }
 
     public void stopShooterConveyor() {
-        runShooterConveyor(0.0);
+        runShooterConveyorByRPS(0.0);
     }
 
     public double getConveyorStatorCurrent() {
@@ -273,7 +268,7 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterNetworkTable.getEntry("flywheelSpeedDifference").setDouble(getFlywheelVelocityDifference());
         shooterNetworkTable.getEntry("flywheelTargetSpeed").setDouble(targetFlywheelRps);
         shooterNetworkTable.getEntry("flywheelAtSpeed").setBoolean(atSpeed());
-        shooterNetworkTable.getEntry("shooterConveyorPercent").setDouble(shooterConveyorPercent);
+        shooterNetworkTable.getEntry("shooterConveyorTargetRps").setDouble(shooterConveyorTargetRps);
         shooterNetworkTable.getEntry("conveyorSpeed").setDouble(leftConveyor.getVelocity().getValueAsDouble());
         shooterNetworkTable.getEntry("backboardCurrentRate").setDouble(getBackboardPosition());
         shooterNetworkTable.getEntry("backboardTargetRate").setDouble(backboardPID.getSetpoint().position);

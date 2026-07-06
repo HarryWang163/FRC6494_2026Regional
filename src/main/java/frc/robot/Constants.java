@@ -18,10 +18,6 @@ public final class Constants {
         public static final int rightConveyorID = 45;
         public static final int backboardMotorID = 44;
 
-        public static final double flywheelVoltsPerRps = 0.12;
-        public static final double flywheelIdleVoltage = 0.0;
-        public static final double shooterConveyorVoltage = 6.0;
-        public static final double shooterConveyorReverseVoltage = -4.0;
         public static final double flywheelSpeedToleranceRps = 5.0;
         public static final double defaultFlywheelTargetRps = 64.0;
 
@@ -121,8 +117,8 @@ public final class Constants {
         public static final int leftIntakeRotaterID = 48;
         public static final int rightIntakeRotaterID = 49;
 
-        public static final double intakeRollerVoltage = 6.0;
-        public static final double outtakeRollerVoltage = -5.0;
+        public static final double intakeRollerIntakeSpeedRps = 30.0;
+        public static final double intakeRollerOuttakeSpeedRps = -30.0;
 
         public static final double intakeRotaterLoweredPosition = -7.6;
         public static final double intakeRotaterShootAssistUpPosition = -2.5;
@@ -134,9 +130,10 @@ public final class Constants {
         public static final double intakeRotaterUpLimit = 0.0;
         public static final double intakeRotaterDownLimit = -7.6;
 
-        public static final Slot0Configs intakeGetterSlot0Configs = new Slot0Configs()
+        public static final Slot0Configs intakeRollerSlot0Configs = new Slot0Configs()
             .withKP(0.00).withKI(0.00).withKD(0.00)
             .withKV(0.00).withKA(0.00).withKS(0.00);
+        public static final Slot0Configs intakeGetterSlot0Configs = intakeRollerSlot0Configs;
 
         public static final Slot0Configs intakeRotaterSlot0Configs = new Slot0Configs()
             .withKP(0.00).withKI(0.00).withKD(0.00)
@@ -149,14 +146,18 @@ public final class Constants {
 
     public static class Conveyor {
         public static final int mainConveyorID = 50;
-        public static final double feedVoltage = 6.0;
-        public static final double reverseVoltage = -5.0;
+        public static final double feedSpeedRps = 30.0;
+        public static final double reverseSpeedRps = -30.0;
+
+        public static final Slot0Configs mainConveyorSlot0Configs = new Slot0Configs()
+            .withKP(0.00).withKI(0.00).withKD(0.00)
+            .withKV(0.00).withKA(0.00).withKS(0.00);
     }
 
     public static class Superstructure {
         // 状态机时间和门控容差。真车基础动作验证后，需要现场调这些值。
-        public static final double shooterFeedPercent = 1.0;
-        public static final double shooterReversePercent = -0.6;
+        public static final double shooterFeedSpeedRps = Shooter.conveyorSpeed;
+        public static final double shooterReverseSpeedRps = -Shooter.conveyorSpeed * 0.6;
         public static final double shootTimeoutSeconds = 1.0;
         public static final double aimToleranceDegrees = 1.5;
         public static final double stationarySpeedToleranceMetersPerSecond = 0.5;

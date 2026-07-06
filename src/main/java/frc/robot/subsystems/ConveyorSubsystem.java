@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.networktables.NetworkTable;
@@ -13,27 +13,31 @@ import frc.robot.Constants;
  */
 public class ConveyorSubsystem extends SubsystemBase {
     public final TalonFX mainConveyor;
-    private final VoltageOut voltageRequest = new VoltageOut(0);
+    private final VelocityVoltage velocityRequest = new VelocityVoltage(0);
     private final NetworkTable table = NetworkTableInstance.getDefault().getTable("Conveyor");
+    private double targetSpeedRps = 0.0;
 
     public ConveyorSubsystem() {
         mainConveyor = new TalonFX(Constants.Conveyor.mainConveyorID);
+        mainConveyor.getConfigurator().apply(Constants.Conveyor.mainConveyorSlot0Configs);
     }
     public void feedToShooter() {
-        setVoltage(Constants.Conveyor.feedVoltage);
+        setSpeedByRPS(Constants.Conveyor.feedSpeedRps);
     }
     public void reverse() {
-        setVoltage(Constants.Conveyor.reverseVoltage);
+        setSpeedByRPS(Constants.Conveyor.reverseSpeedRps);
     }
     public void stop() {
-        setVoltage(0.0);
+        setSpeedByRPS(0.0);
     }
-    public void setVoltage(double volts) {
-        mainConveyor.setControl(voltageRequest.withOutput(volts));
+    public void setSpeedByRPS(double targetSpeedRps) {
+        this.targetSpeedRps = targetSpeedRps;
+        mainConveyor.setControl(velocityRequest.withVelocity(targetSpeedRps));
     }
 
     @Override
     public void periodic() {
         table.getEntry("velocity").setDouble(mainConveyor.getVelocity().getValueAsDouble());
+        table.getEntry("targetSpeedRps").setDouble(targetSpeedRps);
     }
 }

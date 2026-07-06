@@ -282,7 +282,7 @@ public class Superstructure extends SubsystemBase {
             // 避免球接触飞轮导致的掉速中断喂球。
             intakeRotater.shootAssist();
             conveyor.feedToShooter();
-            shooter.runShooterConveyor(Constants.Superstructure.shooterFeedPercent);
+            shooter.runShooterConveyorByRPS(Constants.Superstructure.shooterFeedSpeedRps);
 
             if (timeInState() > Constants.Superstructure.shootTimeoutSeconds) {
                 shotCompletedThisRequest = true;
@@ -306,7 +306,7 @@ public class Superstructure extends SubsystemBase {
         setSystemState(SystemState.EJECTING);
         intakeRoller.outtake();
         conveyor.reverse();
-        shooter.runShooterConveyor(Constants.Superstructure.shooterReversePercent);
+        shooter.runShooterConveyorByRPS(Constants.Superstructure.shooterReverseSpeedRps);
         shooter.stopFlywheel();
         shooter.holdBackboardAt(0.0);
     }

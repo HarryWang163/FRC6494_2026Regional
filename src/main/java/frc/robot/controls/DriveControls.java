@@ -36,23 +36,23 @@ public class DriveControls {
     private final double maxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
     private final double maxAngularRate = RotationsPerSecond.of(0.75).in(edu.wpi.first.units.Units.RadiansPerSecond);
 
-    // 榛樿閫熷害姣斾緥锛堝钩鏃跺紑杞︼級
+    // 默认速度比例，普通驾驶使用。
     private double normalDriveScale = 0.3;
     private double normalTurnScale  = 0.7;
 
-    // 鍔犻€熸ā寮忔瘮渚嬶紙鎸変綇 RB锛?
+    // 加速模式比例，按住 RB 时使用。
     private double boostDriveScale = 1.0;
     private double boostTurnScale  = 1.0;
-    //autoaim妯″紡
+    // 自动瞄准时降低平移速度。
     private double slowDriveScale =0.1;
 
     private boolean boostEnabled = false;
 
-    private final SlewRateLimiter vxLimiter = new SlewRateLimiter(5.0);   // m/s^2 绛夋晥锛堣皟锛?
+    private final SlewRateLimiter vxLimiter = new SlewRateLimiter(5.0);   // m/s^2 等效加速度限制
     private final SlewRateLimiter vyLimiter = new SlewRateLimiter(5.0);
-    private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(9.0); // rad/s^2 绛夋晥锛堣皟锛?
+    private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(9.0); // rad/s^2 等效角加速度限制
 
-    // ====== 绫绘垚鍛樺彉閲忛噷鏂板锛氳褰曚笂涓€娆¤緭鍑?======
+    // 记录上一周期输出，用于只限制加速、不限制减速。
     private double lastVx = 0.0;
     private double lastVy = 0.0;
     private double lastOmega = 0.0;
@@ -64,7 +64,7 @@ public class DriveControls {
         boostEnabled = enabled;
     }
 
-    // 鏂板锛氬綋鍓嶆槸鍚︿娇鐢ㄥ満鍦板潗鏍囩郴锛堥粯璁?true锛?
+    // 当前是否使用场地坐标系，默认启用。
     private boolean fieldCentricEnabled = true;
 
     private final SwerveRequest.FieldCentric fieldCentric =
@@ -101,7 +101,7 @@ public class DriveControls {
         return fieldCentricEnabled;
     }
 
-    /** 搴曣洏鐨勯粯璁ら┚椹跺懡浠わ紙teleop 鏈熼棿鎸佺画鎵ц锛?*/
+    /** 底盘默认驾驶命令，在 teleop 期间持续执行。 */
     public Command defaultDriveCommand() {
         return drivetrain.applyRequest(() -> {
         WantedState wantedState = superstructure.getWantedState();
@@ -168,27 +168,24 @@ public class DriveControls {
         }
         }, () -> fieldCentricEnabled ? DriveMode.FIELD_CENTRIC : DriveMode.ROBOT_CENTRIC);
     }
-    /**
-     * 
-         * 杈撳嚭绉诲姩鍒拌窛绂讳袱涓洰鏍囦箣闂磋緝杩戠殑閭ｄ釜鐐圭殑浣嶇Щ
-         * @return 浣嶇Щ 鏈夋璐?
-         */
+    // 返回当前位置到两个目标点中更近目标的位移。
+    // 返回到更近目标的带符号位移。
     public double calculateDifferenceToTwoTarget(double current, double target1, double target2){
           double x1 = target1 - current;
           double x2 = target2 - current;
           return Math.abs(x1) < Math.abs(x2) ? x1 : x2;
     }
     public double[] calculateDistanceAndRotationToHub() {
-        Pose2d currentPose = drivetrain.getState().Pose; // 鑾峰彇鏈哄櫒浜哄綋鍓嶇殑浣嶇疆鍜岃搴?
+        Pose2d currentPose = drivetrain.getState().Pose; // 当前机器人位姿
         double targetX = isRedAlliance ? Constants.Field.RedHubPositionX : Constants.Field.BlueHubPositionX;
         double targetY = isRedAlliance ? Constants.Field.RedHubPositionY : Constants.Field.BlueHubPositionY;
 
-        // 璁＄畻鐩爣瑙掑害锛堢浉瀵逛簬鍦哄湴鍧愭爣绯伙級
+        // 计算目标角度，相对于场地坐标系。
         double deltaX = targetX - currentPose.getX();
         double deltaY = targetY - currentPose.getY();
-        double targetAngle = Math.toDegrees(Math.atan2(deltaY, deltaX)); // 杞崲涓哄害
+        double targetAngle = Math.toDegrees(Math.atan2(deltaY, deltaX)); // 转换为角度
 
-        // 褰撳墠鏈哄櫒浜鸿搴?
+        // 当前机器人朝向。
         double currentAngle = currentPose.getRotation().getDegrees();
         double angleDifference = targetAngle - currentAngle;
         // Normalize angle difference to the range [-180, 180]
@@ -198,26 +195,26 @@ public class DriveControls {
             angleDifference += 360;
         }
 
-        // 璁＄畻璺濈
+        // 计算距离。
         double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                // 璁＄畻璺濈鍜屾棆杞搴?
+        // 返回距离和旋转角度误差。
         double[] distanceAndRotation = new double[]{distance, angleDifference};
 
-        // 杩斿洖璺濈鍜岃搴﹀樊
+        // 距离单位为米，角度单位为度。
         return distanceAndRotation;
     }
     public double[] calculateDistanceAndRotationToPassBall() {
-        Pose2d currentPose = drivetrain.getState().Pose; // 鑾峰彇鏈哄櫒浜哄綋鍓嶇殑浣嶇疆鍜岃搴?
-        double targetX = isRedAlliance ? Constants.Field.RedPassingBallPosX : Constants.Field.BluePassingBallPosX;  // 鐩爣 X 鍧愭爣
-        double targetY1 = Constants.Field.PassingBallPosY1;  // 鐩爣 Y 鍧愭爣
-        double targetY2 = Constants.Field.PassingBallPosY2;  // 鐩爣 Y 鍧愭爣
+        Pose2d currentPose = drivetrain.getState().Pose; // 当前机器人位姿
+        double targetX = isRedAlliance ? Constants.Field.RedPassingBallPosX : Constants.Field.BluePassingBallPosX;  // 传球目标 X 坐标
+        double targetY1 = Constants.Field.PassingBallPosY1;  // 传球目标 Y 坐标
+        double targetY2 = Constants.Field.PassingBallPosY2;  // 传球目标 Y 坐标
        
-        // 璁＄畻鐩爣瑙掑害锛堢浉瀵逛簬鍦哄湴鍧愭爣绯伙級
+        // 计算目标角度，相对于场地坐标系。
         double deltaX = targetX - currentPose.getX();
         double deltaY = calculateDifferenceToTwoTarget(currentPose.getY(), targetY1, targetY2);
-        double targetAngle = Math.toDegrees(Math.atan2(deltaY, deltaX)); // 杞崲涓哄害
+        double targetAngle = Math.toDegrees(Math.atan2(deltaY, deltaX)); // 转换为角度
 
-        // 褰撳墠鏈哄櫒浜鸿搴?
+        // 当前机器人朝向。
         double currentAngle = currentPose.getRotation().getDegrees();
         double angleDifference = targetAngle - currentAngle;
         // Normalize angle difference to the range [-180, 180]
@@ -227,12 +224,12 @@ public class DriveControls {
             angleDifference += 360;
         }
 
-        // 璁＄畻璺濈
+        // 计算距离。
         double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                // 璁＄畻璺濈鍜屾棆杞搴?
+        // 返回距离和旋转角度误差。
         double[] distanceAndRotation = new double[]{distance, angleDifference};
 
-        // 杩斿洖璺濈鍜岃搴﹀樊
+        // 距离单位为米，角度单位为度。
         return distanceAndRotation;
     }
 
@@ -260,26 +257,26 @@ public class DriveControls {
             } else {
                 vomega = error * Constants.AutoPositioning.TurningkP;
             }
-            // 闄愬埗鏈€澶ц閫熷害
+            // 限制最大角速度。
             vomega = Math.max(-maxAngularRate, Math.min(maxAngularRate, vomega));
         return vomega;
     }
 
-        /**
-     * 鍙檺鍒垛€滃姞閫熲€濓紙骞呭€煎彉澶э級锛屼笉闄愬埗鈥滃噺閫熲€濓紙骞呭€煎彉灏忥級
-     * 杩欐牱鏉炬潌/鍒硅溅浼氭洿鍙婃椂锛屽悓鏃?boost 浠嶇劧鑳芥姂鍒剁數娴佸啿鍑?
+    /**
+     * 只限制加速，也就是输出幅值变大时；不限制减速。
+     * 这样松杆或刹车能更及时，同时 boost 仍能抑制电流冲击。
      */
     private double limitAccelOnly(double target, double last, SlewRateLimiter limiter) {
-        // 濡傛灉姝ｅ湪鍑忛€燂紙骞呭€煎彉灏忥級锛岀洿鎺ユ斁琛屽埌鐩爣鍊?
+        // 如果正在减速，直接放行到目标值。
         if (Math.abs(target) < Math.abs(last)) {
-        limiter.reset(target);  // 鍚屾 limiter 鍐呴儴鐘舵€侊紝闃叉涓嬩竴娆＄獊鍙?
-        return target;
+            limiter.reset(target);  // 同步 limiter 内部状态，防止下一次突跳。
+            return target;
         }
-        // 鍚﹀垯鏄姞閫燂紝浣跨敤 limiter
+        // 否则是加速，使用 limiter。
         return limiter.calculate(target);
     }
 
-        /** 绱ф€ュ仠姝細娓呴浂闄愰€熷櫒锛岃閫熷害杈撳嚭绔嬪埢褰掗浂 */
+    /** 紧急停止：清零限速器，让速度输出立刻归零。 */
     public void emergencyStop() {
         vxLimiter.reset(0.0);
         vyLimiter.reset(0.0);
@@ -317,13 +314,13 @@ public class DriveControls {
         return maxAngularRate;
     }
     public void setTeamColors() {
-        Optional<Alliance> ally = DriverStation.getAlliance(); // 鑾峰彇闃熶紞棰滆壊
+        Optional<Alliance> ally = DriverStation.getAlliance(); // 获取联盟颜色
         if (ally.isPresent()) {
-            // 鏍规嵁闃熶紞棰滆壊璁剧疆甯冨皵鍊?
+            // 根据联盟颜色更新自动瞄准目标。
             if (ally.get() == Alliance.Red) {
-                isRedAlliance = true; // 绾㈤槦
+                isRedAlliance = true; // 红队
             } else if (ally.get() == Alliance.Blue) {
-                isRedAlliance = false; // 钃濋槦
+                isRedAlliance = false; // 蓝队
             }
         } else {
             isRedAlliance = true;
@@ -369,20 +366,20 @@ public class DriveControls {
 
             switch (phase) {
                 case 0:
-                    vx = amplitude;   // 鍓?
+                    vx = amplitude;   // 前
                     vy = 0.0;
                     break;
                 case 1:
                     vx = 0.0;
-                    vy = amplitude;   // 鍙?
+                    vy = amplitude;   // 左
                     break;
                 case 2:
-                    vx = -amplitude;  // 鍚?
+                    vx = -amplitude;  // 后
                     vy = 0.0;
                     break;
                 case 3:
                     vx = 0.0;
-                    vy = -amplitude;  // 宸?
+                    vy = -amplitude;  // 右
                     break;
             }
 
@@ -404,11 +401,11 @@ public class DriveControls {
 
     public void pushDistanceData(){
         double[] distanceAndRotation = calculateDistanceAndRotationToHub();
-        // 灏嗚窛绂诲€煎啓鍏?NetworkTable
+        // 将距离数据写入 NetworkTable。
         autoControlNetworkTable.getEntry("distanceToHub").setDouble(distanceAndRotation[0]);
         autoControlNetworkTable.getEntry("angleDifferenceToHub").setDouble(distanceAndRotation[1]);
-        // 鑷姩闃舵榛樿椹鹃┒鍛戒护涓嶈繍琛岋紝杩欓噷鍚屾牱淇濇寔鐩爣鏈濆悜鏈€鏂帮紝
-        // 璁╄嚜鍔ㄧ▼搴忛噷鐨勫皠鍑婚棬鎺?isAimed() 鏈夋晥銆?
+        // 自动阶段默认驾驶命令不运行，这里同样保持目标朝向最新，
+        // 让自动程序里的射击门控 isAimed() 有效。
         drivetrain.setTargetHeading(
             drivetrain.getRotation().plus(Rotation2d.fromDegrees(distanceAndRotation[1])));
     }
