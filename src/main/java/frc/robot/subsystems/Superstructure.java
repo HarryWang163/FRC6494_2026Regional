@@ -237,8 +237,6 @@ public class Superstructure extends SubsystemBase {
         shooter.stopFlywheel();
         shooter.stopShooterConveyor();
         shooter.holdBackboardAt(0.0);
-        intakeRotater.lowerForMatch();
-
         // Intaker 比赛开始后保持下放，收球何时结束由操作员松开按键决定。
         intakeRoller.intake();
         conveyor.feedToShooter();
@@ -306,7 +304,6 @@ public class Superstructure extends SubsystemBase {
     private void handleEject() {
         // Eject 反转整条球路，飞轮保持停止。
         setSystemState(SystemState.EJECTING);
-        intakeRotater.lowerForMatch();
         intakeRoller.outtake();
         conveyor.reverse();
         shooter.runShooterConveyor(Constants.Superstructure.shooterReversePercent);

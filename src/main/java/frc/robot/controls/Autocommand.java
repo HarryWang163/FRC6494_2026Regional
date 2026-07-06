@@ -46,7 +46,6 @@ public class Autocommand extends SequentialCommandGroup {
             superstructure.requestIdleCommand()
         );
     }
-
     public static Command idle(Superstructure superstructure) {
         return superstructure.requestIdleCommand();
     }
