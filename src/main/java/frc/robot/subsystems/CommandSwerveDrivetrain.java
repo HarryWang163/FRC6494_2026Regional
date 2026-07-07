@@ -81,8 +81,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         LimelightHelpers.SetIMUMode(Constants.Limelight.LIMELIGHT_NAME_Intaker, 0);
         positioningNetworkTable = NetworkTableInstance.getDefault().getTable("Positioning");
         driveNetworkTable = NetworkTableInstance.getDefault().getTable("Drive");
-        ll_shooter_NT = NetworkTableInstance.getDefault().getTable("Positioning/limelight-shooter");
-        ll_intaker_NT = NetworkTableInstance.getDefault().getTable("Positioning/limelight-intaker");
+        ll_shooter_NT = NetworkTableInstance.getDefault().getTable("Positioning/limelight-left");
+        ll_intaker_NT = NetworkTableInstance.getDefault().getTable("Positioning/limelight-front");
 
         configueAutoBuilder();
     }

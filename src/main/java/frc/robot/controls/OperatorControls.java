@@ -50,8 +50,8 @@ public class OperatorControls {
         return superstructure.requestManualCommand();
     }
 
-    public void adjustFlywheelSpeedOffset(double offset) {
-        superstructure.adjustFlywheelSpeedOffset(offset);
+    public void adjustFlywheelVoltageOffset(double offset) {
+        superstructure.adjustFlywheelVoltageOffset(offset);
     }
 
     public void adjustBackboardRateOffset(double offset) {
@@ -72,6 +72,10 @@ public class OperatorControls {
 
     public Command manualLowerIntakeRotaterCommand(IntakeRotaterSubsystem intakeRotater) {
         return Commands.runEnd(intakeRotater::manualLower, intakeRotater::stop, intakeRotater);
+    }
+
+    public Command lowerIntakeRotaterForMatchCommand(IntakeRotaterSubsystem intakeRotater) {
+        return intakeRotater.lowerForMatchCommand();
     }
 
     // PathPlanner 自动射击辅助：先预备到所有射击条件满足，再请求喂球，

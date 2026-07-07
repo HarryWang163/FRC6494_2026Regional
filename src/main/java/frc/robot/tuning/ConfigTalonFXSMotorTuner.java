@@ -1,7 +1,6 @@
 package frc.robot.tuning;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFXS;
 
 import edu.wpi.first.networktables.*;

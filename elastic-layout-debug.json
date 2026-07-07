@@ -101,14 +101,14 @@
             }
           },
           {
-            "title": "Shooter At Speed",
+            "title": "Shooter At Voltage",
             "x": 192.0,
             "y": 128.0,
             "width": 192.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Superstructure/shooterAtSpeed",
+              "topic": "/Superstructure/shooterAtVoltage",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -168,14 +168,14 @@
             }
           },
           {
-            "title": "Flywheel Offset",
+            "title": "Flywheel Voltage Offset",
             "x": 256.0,
             "y": 256.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Superstructure/flywheelSpeedOffsetRps",
+              "topic": "/Superstructure/flywheelVoltageOffset",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
@@ -277,14 +277,14 @@
         "layouts": [],
         "containers": [
           {
-            "title": "Flywheel Speed",
+            "title": "Flywheel Velocity",
             "x": 0.0,
             "y": 0.0,
             "width": 384.0,
             "height": 256.0,
             "type": "Graph",
             "properties": {
-              "topic": "/Shooter/flywheelSpeed",
+              "topic": "/Shooter/flywheelVelocity",
               "period": 0.033,
               "data_type": "double",
               "time_displayed": 5.0,
@@ -293,28 +293,28 @@
             }
           },
           {
-            "title": "Flywheel Target",
+            "title": "Flywheel Target Voltage",
             "x": 384.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Shooter/flywheelTargetSpeed",
+              "topic": "/Shooter/flywheelTargetVoltage",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
             }
           },
           {
-            "title": "Flywheel At Speed",
+            "title": "Flywheel At Voltage",
             "x": 640.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Shooter/flywheelAtSpeed",
+              "topic": "/Shooter/flywheelAtVoltage",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -324,42 +324,42 @@
             }
           },
           {
-            "title": "Flywheel Difference",
+            "title": "Flywheel Velocity Difference",
             "x": 384.0,
             "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Shooter/flywheelSpeedDifference",
+              "topic": "/Shooter/flywheelVelocityDifference",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
             }
           },
           {
-            "title": "Shooter Conveyor Target RPS",
+            "title": "Shooter Conveyor Volts",
             "x": 640.0,
             "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Shooter/shooterConveyorTargetRps",
+              "topic": "/Shooter/shooterConveyorOutputVolts",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
             }
           },
           {
-            "title": "Shooter Conveyor Speed",
+            "title": "Shooter Conveyor Velocity",
             "x": 0.0,
             "y": 256.0,
             "width": 384.0,
             "height": 256.0,
             "type": "Graph",
             "properties": {
-              "topic": "/Shooter/conveyorSpeed",
+              "topic": "/Shooter/conveyorVelocity",
               "period": 0.033,
               "data_type": "double",
               "time_displayed": 5.0,
@@ -459,28 +459,28 @@
             }
           },
           {
-            "title": "Intake Target",
+            "title": "Intake Output Volts",
             "x": 256.0,
             "y": 512.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/IntakeRotater/targetPosition",
+              "topic": "/IntakeRotater/outputVoltage",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
             }
           },
           {
-            "title": "Intake At Goal",
+            "title": "Intake Running",
             "x": 512.0,
             "y": 512.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/IntakeRotater/atGoal",
+              "topic": "/IntakeRotater/isRunning",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -546,17 +546,65 @@
             }
           },
           {
-            "title": "Intake Roller Target RPS",
+            "title": "Intake Roller Volts",
             "x": 0.0,
             "y": 768.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/IntakeRoller/targetSpeedRps",
+              "topic": "/IntakeRoller/targetOutputVolts",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
+            }
+          },
+          {
+            "title": "Intake Roller Left Speed",
+            "x": 256.0,
+            "y": 768.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRoller/leftVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Intake Roller Right Speed",
+            "x": 640.0,
+            "y": 768.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRoller/rightVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Intake Rotater Speed",
+            "x": 1024.0,
+            "y": 768.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRotater/leftVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
             }
           },
           {
@@ -576,14 +624,28 @@
             }
           },
           {
-            "title": "Main Conveyor Target RPS",
+            "title": "Main Conveyor Volts",
             "x": 1280.0,
             "y": 512.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Conveyor/targetSpeedRps",
+              "topic": "/Conveyor/targetOutputVolts",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Flywheel Output Volts",
+            "x": 640.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/flywheelOutputVolts",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
@@ -626,7 +688,7 @@
             "height": 256.0,
             "type": "Camera Stream",
             "properties": {
-              "topic": "/CameraPublisher/limelight-shooter",
+              "topic": "/CameraPublisher/limelight-left",
               "period": 0.06,
               "rotation_turns": 0
             }
@@ -639,7 +701,7 @@
             "height": 256.0,
             "type": "Camera Stream",
             "properties": {
-              "topic": "/CameraPublisher/limelight-intaker",
+              "topic": "/CameraPublisher/limelight-front",
               "period": 0.06,
               "rotation_turns": 0
             }
@@ -1010,98 +1072,14 @@
             }
           },
           {
-            "title": "Flywheel Run RPS",
+            "title": "Flywheel Run Volts",
             "x": 256.0,
             "y": 192.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Tuning/flywheel/flywheelRunningSpeedRPS",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "Flywheel kP",
-            "x": 512.0,
-            "y": 192.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/flywheel/flywheelkP",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "Flywheel kV",
-            "x": 640.0,
-            "y": 192.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/flywheel/flywheelkV",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "Flywheel kI",
-            "x": 768.0,
-            "y": 192.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/flywheel/flywheelkI",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "Flywheel kD",
-            "x": 896.0,
-            "y": 192.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/flywheel/flywheelkD",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "Flywheel kA",
-            "x": 1024.0,
-            "y": 192.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/flywheel/flywheelkA",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "Flywheel kS",
-            "x": 1152.0,
-            "y": 192.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/flywheel/flywheelkS",
+              "topic": "/Tuning/flywheel/flywheelRunningVolts",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
@@ -1134,98 +1112,14 @@
             }
           },
           {
-            "title": "Shooter Conv Run RPS",
+            "title": "Shooter Conv Run Volts",
             "x": 256.0,
             "y": 384.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Tuning/conveyor/conveyorRunningSpeedRPS",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "Shooter Conv kP",
-            "x": 512.0,
-            "y": 384.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/conveyor/conveyorkP",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "Shooter Conv kV",
-            "x": 640.0,
-            "y": 384.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/conveyor/conveyorkV",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "Shooter Conv kI",
-            "x": 768.0,
-            "y": 384.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/conveyor/conveyorkI",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "Shooter Conv kD",
-            "x": 896.0,
-            "y": 384.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/conveyor/conveyorkD",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "Shooter Conv kA",
-            "x": 1024.0,
-            "y": 384.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/conveyor/conveyorkA",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "Shooter Conv kS",
-            "x": 1152.0,
-            "y": 384.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/conveyor/conveyorkS",
+              "topic": "/Tuning/conveyor/conveyorRunningVolts",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
@@ -1353,6 +1247,1111 @@
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
+            }
+          },
+          {
+            "title": "Main Conv Enable",
+            "x": 0.0,
+            "y": 768.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/mainconveyor/mainconveyorEnable",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Main Conv Run",
+            "x": 128.0,
+            "y": 768.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/mainconveyor/mainconveyorEnableRunning",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Main Conv Run Volts",
+            "x": 256.0,
+            "y": 768.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/mainconveyor/mainconveyorRunningVolts",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Intake Roller Enable",
+            "x": 0.0,
+            "y": 960.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/intakerroller/intakerrollerEnable",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Intake Roller Run",
+            "x": 128.0,
+            "y": 960.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/intakerroller/intakerrollerEnableRunning",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Intake Roller Run Volts",
+            "x": 256.0,
+            "y": 960.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/intakerroller/intakerrollerRunningVolts",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Intake Roller Left Speed",
+            "x": 512.0,
+            "y": 960.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRoller/leftVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Intake Roller Right Speed",
+            "x": 896.0,
+            "y": 960.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRoller/rightVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Intake Roller Speed Diff",
+            "x": 1280.0,
+            "y": 960.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRoller/velocityDifference",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Intake Rotater Enable",
+            "x": 0.0,
+            "y": 1152.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/intakerrotater/intakerrotaterEnable",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Intake Rotater Run",
+            "x": 128.0,
+            "y": 1152.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/intakerrotater/intakerrotaterEnableRunning",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Intake Rotater Run Volts",
+            "x": 256.0,
+            "y": 1152.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/intakerrotater/intakerrotaterRunningVolts",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Intake Rotater Left Speed",
+            "x": 512.0,
+            "y": 1152.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRotater/leftVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Intake Rotater Right Speed",
+            "x": 896.0,
+            "y": 1152.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRotater/rightVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Intake Rotater Speed Diff",
+            "x": 1280.0,
+            "y": 1152.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRotater/velocityDifference",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Intaker",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Roller Enable",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/intakerroller/intakerrollerEnable",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Roller Run",
+            "x": 128.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/intakerroller/intakerrollerEnableRunning",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Roller Run Volts",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/intakerroller/intakerrollerRunningVolts",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Roller Output Volts",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/IntakeRoller/targetOutputVolts",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Roller Left Speed",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/IntakeRoller/leftVelocity",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Roller Right Speed",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/IntakeRoller/rightVelocity",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Roller Speed Diff",
+            "x": 1280.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/IntakeRoller/velocityDifference",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Roller Left Speed Trend",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 512.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRoller/leftVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Roller Right Speed Trend",
+            "x": 512.0,
+            "y": 128.0,
+            "width": 512.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRoller/rightVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Roller Speed Diff Trend",
+            "x": 1024.0,
+            "y": 128.0,
+            "width": 512.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRoller/velocityDifference",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Rotater Enable",
+            "x": 0.0,
+            "y": 448.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/intakerrotater/intakerrotaterEnable",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Rotater Run",
+            "x": 128.0,
+            "y": 448.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/intakerrotater/intakerrotaterEnableRunning",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Rotater Run Volts",
+            "x": 256.0,
+            "y": 448.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/intakerrotater/intakerrotaterRunningVolts",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Rotater Output Volts",
+            "x": 512.0,
+            "y": 448.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/IntakeRotater/outputVoltage",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Rotater Position",
+            "x": 768.0,
+            "y": 448.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/IntakeRotater/position",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Rotater Running",
+            "x": 1024.0,
+            "y": 448.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/IntakeRotater/isRunning",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Rotater Speed Diff",
+            "x": 1280.0,
+            "y": 448.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/IntakeRotater/velocityDifference",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Rotater Left Speed Trend",
+            "x": 0.0,
+            "y": 576.0,
+            "width": 512.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRotater/leftVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Rotater Right Speed Trend",
+            "x": 512.0,
+            "y": 576.0,
+            "width": 512.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRotater/rightVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Rotater Speed Diff Trend",
+            "x": 1024.0,
+            "y": 576.0,
+            "width": 512.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRotater/velocityDifference",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Rotater Position Trend",
+            "x": 0.0,
+            "y": 832.0,
+            "width": 512.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/IntakeRotater/position",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Backboard Debug",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Position",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 512.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/backboardCurrentRate",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 6.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Setpoint Position",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 512.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/backboardSetpointPosition",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 6.0,
+              "color": 4294198070,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Goal Position",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/backboardGoalPosition",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "At Target",
+            "x": 1280.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Shooter/isBackboardAtTarget",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Position Offset",
+            "x": 1024.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Superstructure/backboardPositionOffset",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Can Shoot",
+            "x": 1280.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Superstructure/canShoot",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Goal Error",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 512.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/backboardGoalError",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 6.0,
+              "color": 4281966278,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "PID Output",
+            "x": 512.0,
+            "y": 256.0,
+            "width": 512.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/backboardPIDOutput",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 6.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Setpoint Velocity",
+            "x": 1024.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/backboardSetpointVelocity",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Setpoint Error",
+            "x": 1280.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/backboardSetpointError",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Raw PID Output",
+            "x": 1024.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/backboardRawPIDOutput",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Clamped PID Output",
+            "x": 1280.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/backboardClampedPIDOutput",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Output Saturated",
+            "x": 0.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Shooter/backboardOutputSaturated",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4294198070,
+              "false_color": 4283215696,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Minimum Output",
+            "x": 256.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Shooter/backboardMinimumOutputActive",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4294198070,
+              "false_color": 4283215696,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Final Output Volts",
+            "x": 512.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/backboardOutputVolts",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Max Output Volts",
+            "x": 768.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/backboardMaxOutputVolts",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Motor Voltage",
+            "x": 1024.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/backboardMotorVoltage",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Motor Current",
+            "x": 1280.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/backboardMotorStatorCurrent",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Motor Position",
+            "x": 0.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/backboardMotorPosition",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Motor Velocity",
+            "x": 256.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/backboardMotorVelocity",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Tolerance",
+            "x": 512.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/backboardPositionTolerance",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Shoot Position",
+            "x": 768.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/backboardShootPosition",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Pass Position",
+            "x": 1024.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/backboardPassPosition",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "System State",
+            "x": 1280.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Superstructure/systemState",
+              "period": 0.06,
+              "data_type": "string",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Backboard Enable",
+            "x": 0.0,
+            "y": 768.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/backboard/backboardEnable",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Backboard Run",
+            "x": 128.0,
+            "y": 768.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/backboard/backboardEnableRunning",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Backboard Run RPS",
+            "x": 256.0,
+            "y": 768.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/backboard/backboardRunningSpeedRPS",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Talon kP",
+            "x": 512.0,
+            "y": 768.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/backboard/backboardkP",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Talon kI",
+            "x": 640.0,
+            "y": 768.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/backboard/backboardkI",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Talon kD",
+            "x": 768.0,
+            "y": 768.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/backboard/backboardkD",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Talon kV",
+            "x": 896.0,
+            "y": 768.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/backboard/backboardkV",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Talon kS",
+            "x": 1024.0,
+            "y": 768.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/backboard/backboardkS",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Talon kA",
+            "x": 1152.0,
+            "y": 768.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/backboard/backboardkA",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Min Output Volts",
+            "x": 1280.0,
+            "y": 768.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/backboardMinOutputVolts",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Position Enable",
+            "x": 0.0,
+            "y": 896.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/backboard/backboardPositionEnable",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Target Position",
+            "x": 256.0,
+            "y": 896.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/backboard/backboardTargetPosition",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Position Active",
+            "x": 512.0,
+            "y": 896.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Tuning/backboard/backboardPositionEnableActive",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Commanded Target",
+            "x": 768.0,
+            "y": 896.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/backboard/backboardCommandedTargetPosition",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Clamped Target",
+            "x": 1024.0,
+            "y": 896.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/backboard/backboardClampedTargetPosition",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
             }
           }
         ]

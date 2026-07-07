@@ -768,14 +768,14 @@
             }
           },
           {
-            "title": "flywheelRunningSpeedRPS",
+            "title": "flywheelRunningVolts",
             "x": 640.0,
             "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Tuning/flywheel/flywheelRunningSpeedRPS",
+              "topic": "/Tuning/flywheel/flywheelRunningVolts",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
@@ -845,27 +845,27 @@
         "layouts": [],
         "containers": [
           {
-            "title": "limelight-intaker",
+            "title": "limelight-front",
             "x": 0.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
             "type": "Camera Stream",
             "properties": {
-              "topic": "/CameraPublisher/limelight-intaker",
+              "topic": "/CameraPublisher/limelight-front",
               "period": 0.06,
               "rotation_turns": 0
             }
           },
           {
-            "title": "limelight-shooter",
+            "title": "limelight-left",
             "x": 768.0,
             "y": 512.0,
             "width": 640.0,
             "height": 384.0,
             "type": "Camera Stream",
             "properties": {
-              "topic": "/CameraPublisher/limelight-shooter",
+              "topic": "/CameraPublisher/limelight-left",
               "period": 0.06,
               "rotation_turns": 0
             }
@@ -909,7 +909,7 @@
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Positioning/limelight-intaker/available",
+              "topic": "/Positioning/limelight-front/available",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -926,7 +926,7 @@
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Positioning/limelight-shooter/available",
+              "topic": "/Positioning/limelight-left/available",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -1034,7 +1034,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Positioning/limelight-intaker/Distance",
+              "topic": "/Positioning/limelight-front/Distance",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
@@ -1064,7 +1064,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Positioning/limelight-shooter/Distance",
+              "topic": "/Positioning/limelight-left/Distance",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
@@ -1138,7 +1138,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Positioning/limelight-intaker/X",
+              "topic": "/Positioning/limelight-front/X",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
@@ -1152,7 +1152,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Positioning/limelight-intaker/Y",
+              "topic": "/Positioning/limelight-front/Y",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
@@ -1166,7 +1166,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Positioning/limelight-shooter/X",
+              "topic": "/Positioning/limelight-left/X",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
@@ -1180,7 +1180,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Positioning/limelight-shooter/Y",
+              "topic": "/Positioning/limelight-left/Y",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
@@ -1195,14 +1195,14 @@
         "layouts": [],
         "containers": [
           {
-            "title": "limelight-shooter",
+            "title": "limelight-left",
             "x": 1152.0,
             "y": 0.0,
             "width": 384.0,
             "height": 256.0,
             "type": "Camera Stream",
             "properties": {
-              "topic": "/CameraPublisher/limelight-shooter",
+              "topic": "/CameraPublisher/limelight-left",
               "period": 0.06,
               "rotation_turns": 0
             }
@@ -1224,14 +1224,14 @@
             }
           },
           {
-            "title": "conveyorSpeed",
+            "title": "conveyorVelocity",
             "x": 384.0,
             "y": 256.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Shooter/conveyorSpeed",
+              "topic": "/Shooter/conveyorVelocity",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
@@ -1271,14 +1271,14 @@
             }
           },
           {
-            "title": "flywheelSpeed",
+            "title": "flywheelVelocity",
             "x": 640.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
             "type": "Graph",
             "properties": {
-              "topic": "/Shooter/flywheelSpeed",
+              "topic": "/Shooter/flywheelVelocity",
               "period": 0.033,
               "data_type": "double",
               "time_displayed": 5.0,
@@ -1322,14 +1322,14 @@
             }
           },
           {
-            "title": "conveyorSpeed",
+            "title": "conveyorVelocity",
             "x": 384.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
             "type": "Graph",
             "properties": {
-              "topic": "/Shooter/conveyorSpeed",
+              "topic": "/Shooter/conveyorVelocity",
               "period": 0.033,
               "data_type": "double",
               "time_displayed": 5.0,
@@ -1338,14 +1338,14 @@
             }
           },
           {
-            "title": "flywheelSpeed",
+            "title": "flywheelVelocity",
             "x": 640.0,
             "y": 256.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Shooter/flywheelSpeed",
+              "topic": "/Shooter/flywheelVelocity",
               "period": 0.033,
               "data_type": "double",
               "show_submit_button": true
@@ -1380,14 +1380,14 @@
             }
           },
           {
-            "title": "flywheelTargetSpeed",
+            "title": "flywheelTargetVoltage",
             "x": 768.0,
             "y": 256.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/ShooterControl/flywheelTargetSpeed",
+              "topic": "/Shooter/flywheelTargetVoltage",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
@@ -1424,14 +1424,14 @@
             }
           },
           {
-            "title": "flywheelTargetSpeed",
+            "title": "flywheelTargetVoltage",
             "x": 640.0,
             "y": 384.0,
             "width": 256.0,
             "height": 256.0,
             "type": "Graph",
             "properties": {
-              "topic": "/ShooterControl/flywheelTargetSpeed",
+              "topic": "/Shooter/flywheelTargetVoltage",
               "period": 0.033,
               "data_type": "double",
               "time_displayed": 5.0,

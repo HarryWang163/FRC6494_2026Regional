@@ -3,7 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -15,6 +15,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,8 +24,8 @@ import frc.robot.Constants;
 /**
  * Shooter 总成的硬件封装。
  *
- * 飞轮和 shooter 内部 conveyor 都使用电压开环输出，
- * 右侧电机通过反向 follower 跟随左侧电机。
+ * 飞轮和 shooter 内部 conveyor 使用 VoltageOut 开环电压输出；
+ * shooter 内部 conveyor 仍由右侧电机反向 follower 跟随左侧电机。
  * 背板控制沿用旧代码中的电机、编码器和 PID 调参流程。
  * 何时 spin up、何时喂球由 Superstructure 决定，本类不做比赛动作判断。
  */
@@ -38,17 +39,24 @@ public class ShooterSubsystem extends SubsystemBase {
     public final Encoder backboardEncoder;
     public final ProfiledPIDController backboardPID;
 
-    private final VelocityVoltage flywheelVelocityRequest = new VelocityVoltage(0);
-    private final VelocityVoltage conveyorVelocityRequest = new VelocityVoltage(0);
-    private final VelocityVoltage backboardVelocityRequest = new VelocityVoltage(0);
+    private final VoltageOut leftFlywheelVoltageRequest = new VoltageOut(0);
+    private final VoltageOut rightFlywheelVoltageRequest = new VoltageOut(0);
+    private final VoltageOut conveyorVoltageRequest = new VoltageOut(0);
+    private final VoltageOut backboardVoltageRequest = new VoltageOut(0);
 
-    private final Follower flywheelFollower;
     private final Follower conveyorFollower;
 
     private final NetworkTable shooterNetworkTable;
+    private final NetworkTable backboardTuningTable;
 
-    private double targetFlywheelRps = 0.0;
-    private double shooterConveyorTargetRps = 0.0;
+    private double flywheelOutputVolts = 0.0;
+    private double flywheelVoltageStartTimestamp = 0.0;
+    private double shooterConveyorOutputVolts = 0.0;
+    private double backboardOutputVolts = 0.0;
+    private double backboardRawPidOutputVolts = 0.0;
+    private double backboardClampedPidOutputVolts = 0.0;
+    private boolean backboardOutputSaturated = false;
+    private boolean backboardMinimumOutputActive = false;
 
     public ShooterSubsystem() {
         leftFlywheel = new TalonFX(Constants.Shooter.leftFlywheelID);
@@ -66,9 +74,8 @@ public class ShooterSubsystem extends SubsystemBase {
         leftFlywheel.getConfigurator().apply(motorOutputConfigs);
         leftConveyor.getConfigurator().apply(motorOutputConfigs);
 
-        flywheelFollower = new Follower(leftFlywheel.getDeviceID(), MotorAlignmentValue.Opposed).withUpdateFreqHz(50);
         conveyorFollower = new Follower(leftConveyor.getDeviceID(), MotorAlignmentValue.Opposed).withUpdateFreqHz(50);
-        setRightFollowLeft();
+        setRightConveyorFollowLeft();
 
         backboardMotor = new TalonFXS(Constants.Shooter.backboardMotorID);
         backboardMotor.getConfigurator().apply(Constants.Shooter.backboardSlot0Configs);
@@ -87,15 +94,17 @@ public class ShooterSubsystem extends SubsystemBase {
         backboardPID.setTolerance(10.0);
 
         shooterNetworkTable = NetworkTableInstance.getDefault().getTable("Shooter");
+        backboardTuningTable = NetworkTableInstance.getDefault().getTable("Tuning/backboard");
+        backboardTuningTable.getEntry("backboardPositionEnable").setDefaultBoolean(false);
+        backboardTuningTable.getEntry("backboardTargetPosition").setDefaultDouble(0.0);
     }
 
     /* ====================== */
     /*         飞轮            */
     /* ====================== */
 
-    public void setRightFollowLeft() {
+    public void setRightConveyorFollowLeft() {
         // 成对机构机械方向相反，因此右侧电机以反向 follower 跟随左侧电机。
-        rightFlywheel.setControl(flywheelFollower);
         rightConveyor.setControl(conveyorFollower);
     }
 
@@ -105,37 +114,32 @@ public class ShooterSubsystem extends SubsystemBase {
         rightFlywheel.getConfigurator().apply(configs);
     }
 
-    public void setFlywheelVelocity(double targetRps) {
-        // 右飞轮是 follower，因此对外只暴露一个飞轮目标速度。
-        // 左飞轮使用 VelocityVoltage 速度闭环，右飞轮反向跟随左飞轮。
-        setFlywheelSpeedByRPS(targetRps);
+    public void setFlywheelVoltage(double outputVolts) {
+        double clampedOutputVolts = MathUtil.clamp(outputVolts, -12.0, 12.0);
+        if (Math.abs(clampedOutputVolts - flywheelOutputVolts) > 1e-6) {
+            flywheelVoltageStartTimestamp = Timer.getFPGATimestamp();
+        }
+        flywheelOutputVolts = clampedOutputVolts;
+        leftFlywheel.setControl(leftFlywheelVoltageRequest.withOutput(flywheelOutputVolts));
+        rightFlywheel.setControl(rightFlywheelVoltageRequest.withOutput(-flywheelOutputVolts));
     }
 
-    public void setFlywheelSpeedByRPS(double targetRps) {
-        targetFlywheelRps = Math.abs(targetRps);
-        leftFlywheel.setControl(flywheelVelocityRequest.withVelocity(targetFlywheelRps));
-        setRightFollowLeft();
-    }
-
-    public void setFlywheelVelocityByDistance(double distance) {
-        // 查 Constants 里的射表，两端自动取边界值。
-        double targetRps = Constants.Shooter.flywheelRpsByDistance.get(distance);
-        setFlywheelVelocity(targetRps);
+    public void setFlywheelVoltageByDistance(double distance) {
+        double targetVolts = Constants.Shooter.flywheelVoltageByDistance.get(distance);
+        setFlywheelVoltage(targetVolts);
     }
 
     public void stopFlywheel() {
-        setFlywheelSpeedByRPS(0.0);
+        setFlywheelVoltage(0.0);
     }
 
-    public boolean atSpeed() {
-        // 虽然飞轮控制是电压开环，但仍读取 TalonFX 速度作为喂球门控。
-        if (targetFlywheelRps <= 1.0) {
+    public boolean atVoltage() {
+        if (Math.abs(flywheelOutputVolts) < Constants.Shooter.flywheelReadyVoltageThreshold) {
             return false;
         }
-        return Math.abs(Math.abs(getLeftFlywheelVelocity()) - targetFlywheelRps) <= Constants.Shooter.flywheelSpeedToleranceRps
-            && Math.abs(Math.abs(getRightFlywheelVelocity()) - targetFlywheelRps) <= Constants.Shooter.flywheelSpeedToleranceRps;
+        return Timer.getFPGATimestamp() - flywheelVoltageStartTimestamp
+            >= Constants.Shooter.flywheelReadyDelaySeconds;
     }
-
     public double getLeftFlywheelVelocity() {
         return leftFlywheel.getVelocity().getValueAsDouble();
     }
@@ -152,22 +156,22 @@ public class ShooterSubsystem extends SubsystemBase {
         return Math.abs(getLeftFlywheelVelocity()) - Math.abs(getRightFlywheelVelocity());
     }
 
-    public double getTargetFlywheelRps() {
-        return targetFlywheelRps;
+    public double getTargetFlywheelVoltage() {
+        return flywheelOutputVolts;
     }
 
     /* ====================== */
     /*    shooter conveyor     */
     /* ====================== */
 
-    public void runShooterConveyorByRPS(double targetRps) {
-        shooterConveyorTargetRps = targetRps;
-        leftConveyor.setControl(conveyorVelocityRequest.withVelocity(targetRps));
-        setRightFollowLeft();
+    public void runShooterConveyorVoltage(double outputVolts) {
+        shooterConveyorOutputVolts = MathUtil.clamp(outputVolts, -12.0, 12.0);
+        leftConveyor.setControl(conveyorVoltageRequest.withOutput(shooterConveyorOutputVolts));
+        setRightConveyorFollowLeft();
     }
 
     public void stopShooterConveyor() {
-        runShooterConveyorByRPS(0.0);
+        runShooterConveyorVoltage(0.0);
     }
 
     public double getConveyorStatorCurrent() {
@@ -178,13 +182,13 @@ public class ShooterSubsystem extends SubsystemBase {
     /*         背板            */
     /* ====================== */
 
-    public void setBackboardSpeedByRPS(double speed) {
-        if (speed > 0 && speed < 10) {
-            speed = 10;
-        } else if (speed < 0 && speed > -10) {
-            speed = -10;
-        }
-        backboardMotor.setControl(backboardVelocityRequest.withVelocity(speed));
+    public void setBackboardVoltage(double outputVolts) {
+        backboardOutputVolts = MathUtil.clamp(
+            outputVolts,
+            -Constants.Shooter.backboardSpeedMax,
+            Constants.Shooter.backboardSpeedMax
+        );
+        backboardMotor.setControl(backboardVoltageRequest.withOutput(backboardOutputVolts));
     }
 
     public void setBackboardPosition(double targetPosition) {
@@ -199,29 +203,47 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void outputBackboard() {
         // 背板仍使用旧外部编码器和 ProfiledPID；Superstructure 只选择目标位置。
-        double pidOutput = backboardPID.calculate(getBackboardPosition());
-        pidOutput = MathUtil.clamp(pidOutput, -Constants.Shooter.backboardSpeedMax, Constants.Shooter.backboardSpeedMax);
+        double rawPidOutput = backboardPID.calculate(getBackboardPosition());
+        double pidOutput = MathUtil.clamp(
+            rawPidOutput,
+            -Constants.Shooter.backboardSpeedMax,
+            Constants.Shooter.backboardSpeedMax
+        );
+        backboardRawPidOutputVolts = rawPidOutput;
+        backboardClampedPidOutputVolts = pidOutput;
+        backboardOutputSaturated = Math.abs(rawPidOutput - pidOutput) > 1e-9;
 
-        if (Math.abs(pidOutput) < 0.8) {
-            pidOutput = 0.0;
+        if (pidOutput != 0.0 && Math.abs(pidOutput) < Constants.Shooter.backboardSpeedMin) {
+            pidOutput = Math.copySign(Constants.Shooter.backboardSpeedMin, pidOutput);
+            backboardMinimumOutputActive = true;
+        } else {
+            backboardMinimumOutputActive = false;
         }
 
         shooterNetworkTable.getEntry("backboardPIDOutput").setDouble(pidOutput);
-        setBackboardSpeedByRPS(pidOutput);
+        setBackboardVoltage(pidOutput);
     }
 
     public void holdBackboardAt(double targetPosition) {
         // 上层只给目标位置；到位后停止输出，未到位时继续闭环。
         setBackboardPosition(targetPosition);
         if (isBackboardAtTarget()) {
-            backboardMotor.set(0.0);
+            backboardRawPidOutputVolts = 0.0;
+            backboardClampedPidOutputVolts = 0.0;
+            backboardOutputSaturated = false;
+            backboardMinimumOutputActive = false;
+            setBackboardVoltage(0.0);
         } else {
             outputBackboard();
         }
     }
 
     public void stopBackboard() {
-        backboardMotor.set(0.0);
+        backboardRawPidOutputVolts = 0.0;
+        backboardClampedPidOutputVolts = 0.0;
+        backboardOutputSaturated = false;
+        backboardMinimumOutputActive = false;
+        setBackboardVoltage(0.0);
     }
 
     public double getBackboardPosition() {
@@ -259,20 +281,62 @@ public class ShooterSubsystem extends SubsystemBase {
         stopBackboard();
     }
 
+    public void debugBackboardTargetPeriodic() {
+        boolean positionEnable = backboardTuningTable.getEntry("backboardPositionEnable").getBoolean(false);
+        double requestedTarget = backboardTuningTable.getEntry("backboardTargetPosition").getDouble(0.0);
+        double clampedTarget = MathUtil.clamp(
+            requestedTarget,
+            Constants.Shooter.backboardDownLimit,
+            Constants.Shooter.backboardUpLimit
+        );
+
+        backboardTuningTable.getEntry("backboardPositionEnableActive").setBoolean(positionEnable);
+        backboardTuningTable.getEntry("backboardCommandedTargetPosition").setDouble(requestedTarget);
+        backboardTuningTable.getEntry("backboardClampedTargetPosition").setDouble(clampedTarget);
+
+        if (positionEnable) {
+            holdBackboardAt(clampedTarget);
+        }
+    }
+
     @Override
     public void periodic() {
         backboardPID.calculate(getBackboardPosition());
-        shooterNetworkTable.getEntry("flywheelSpeed").setDouble(getAverageFlywheelVelocity());
-        shooterNetworkTable.getEntry("leftFlywheelSpeed").setDouble(getLeftFlywheelVelocity());
-        shooterNetworkTable.getEntry("rightFlywheelSpeed").setDouble(getRightFlywheelVelocity());
-        shooterNetworkTable.getEntry("flywheelSpeedDifference").setDouble(getFlywheelVelocityDifference());
-        shooterNetworkTable.getEntry("flywheelTargetSpeed").setDouble(targetFlywheelRps);
-        shooterNetworkTable.getEntry("flywheelAtSpeed").setBoolean(atSpeed());
-        shooterNetworkTable.getEntry("shooterConveyorTargetRps").setDouble(shooterConveyorTargetRps);
-        shooterNetworkTable.getEntry("conveyorSpeed").setDouble(leftConveyor.getVelocity().getValueAsDouble());
-        shooterNetworkTable.getEntry("backboardCurrentRate").setDouble(getBackboardPosition());
-        shooterNetworkTable.getEntry("backboardTargetRate").setDouble(backboardPID.getSetpoint().position);
+        double backboardPosition = getBackboardPosition();
+        double backboardGoalPosition = backboardPID.getGoal().position;
+        double backboardSetpointPosition = backboardPID.getSetpoint().position;
+        shooterNetworkTable.getEntry("flywheelVelocity").setDouble(getAverageFlywheelVelocity());
+        shooterNetworkTable.getEntry("leftFlywheelVelocity").setDouble(getLeftFlywheelVelocity());
+        shooterNetworkTable.getEntry("rightFlywheelVelocity").setDouble(getRightFlywheelVelocity());
+        shooterNetworkTable.getEntry("flywheelVelocityDifference").setDouble(getFlywheelVelocityDifference());
+        shooterNetworkTable.getEntry("flywheelTargetVoltage").setDouble(getTargetFlywheelVoltage());
+        shooterNetworkTable.getEntry("flywheelOutputVolts").setDouble(flywheelOutputVolts);
+        shooterNetworkTable.getEntry("flywheelAtVoltage").setBoolean(atVoltage());
+        shooterNetworkTable.getEntry("shooterConveyorOutputVolts").setDouble(shooterConveyorOutputVolts);
+        shooterNetworkTable.getEntry("conveyorVelocity").setDouble(leftConveyor.getVelocity().getValueAsDouble());
+        shooterNetworkTable.getEntry("backboardCurrentRate").setDouble(backboardPosition);
+        shooterNetworkTable.getEntry("backboardTargetRate").setDouble(backboardSetpointPosition);
+        shooterNetworkTable.getEntry("backboardOutputVolts").setDouble(backboardOutputVolts);
         shooterNetworkTable.getEntry("isBackboardAtTarget").setBoolean(isBackboardAtTarget());
+        shooterNetworkTable.getEntry("backboardGoalPosition").setDouble(backboardGoalPosition);
+        shooterNetworkTable.getEntry("backboardSetpointPosition").setDouble(backboardSetpointPosition);
+        shooterNetworkTable.getEntry("backboardSetpointVelocity").setDouble(backboardPID.getSetpoint().velocity);
+        shooterNetworkTable.getEntry("backboardGoalError").setDouble(backboardGoalPosition - backboardPosition);
+        shooterNetworkTable.getEntry("backboardSetpointError").setDouble(backboardSetpointPosition - backboardPosition);
+        shooterNetworkTable.getEntry("backboardRawPIDOutput").setDouble(backboardRawPidOutputVolts);
+        shooterNetworkTable.getEntry("backboardClampedPIDOutput").setDouble(backboardClampedPidOutputVolts);
+        shooterNetworkTable.getEntry("backboardOutputSaturated").setBoolean(backboardOutputSaturated);
+        shooterNetworkTable.getEntry("backboardMinimumOutputActive").setBoolean(backboardMinimumOutputActive);
+        shooterNetworkTable.getEntry("backboardMaxOutputVolts").setDouble(Constants.Shooter.backboardSpeedMax);
+        shooterNetworkTable.getEntry("backboardMinOutputVolts").setDouble(Constants.Shooter.backboardSpeedMin);
+        shooterNetworkTable.getEntry("backboardPositionTolerance").setDouble(10.0);
+        shooterNetworkTable.getEntry("backboardShootPosition").setDouble(Constants.Superstructure.backboardShootPosition);
+        shooterNetworkTable.getEntry("backboardPassPosition").setDouble(Constants.Superstructure.passBallBackboardPosition);
+        shooterNetworkTable.getEntry("backboardMotorPosition").setDouble(backboardMotor.getPosition().getValueAsDouble());
+        shooterNetworkTable.getEntry("backboardMotorVelocity").setDouble(backboardMotor.getVelocity().getValueAsDouble());
+        shooterNetworkTable.getEntry("backboardMotorVoltage").setDouble(backboardMotor.getMotorVoltage().getValueAsDouble());
+        shooterNetworkTable.getEntry("backboardMotorStatorCurrent").setDouble(backboardMotor.getStatorCurrent().getValueAsDouble());
         shooterNetworkTable.getEntry("statorCurrent").setDouble(getConveyorStatorCurrent());
     }
 }
+

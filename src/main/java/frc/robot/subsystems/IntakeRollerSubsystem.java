@@ -1,10 +1,11 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,13 +18,13 @@ import frc.robot.Constants;
  * 本类只负责成对 TalonFX 输出和 follower 关系。
  */
 public class IntakeRollerSubsystem extends SubsystemBase {
-    private final TalonFX leftIntakeRoller;
+    public final TalonFX leftIntakeRoller;
     private final TalonFX rightIntakeRoller;
 
-    private final VelocityVoltage velocityRequest = new VelocityVoltage(0);
+    private final VoltageOut voltageRequest = new VoltageOut(0);
     private final Follower rightFollower;
     private final NetworkTable table = NetworkTableInstance.getDefault().getTable("IntakeRoller");
-    private double targetSpeedRps = 0.0;
+    private double targetOutputVolts = 0.0;
 
     public IntakeRollerSubsystem() {
         leftIntakeRoller = new TalonFX(Constants.Intaker.leftIntakeRollerID);
@@ -35,20 +36,20 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     }
 
     public void intake() {
-        setSpeedByRPS(Constants.Intaker.intakeRollerIntakeSpeedRps);
+        setVoltage(Constants.Intaker.intakeRollerIntakeVoltage);
     }
 
     public void outtake() {
-        setSpeedByRPS(Constants.Intaker.intakeRollerOuttakeSpeedRps);
+        setVoltage(Constants.Intaker.intakeRollerOuttakeVoltage);
     }
 
     public void stop() {
-        setSpeedByRPS(0.0);
+        setVoltage(0.0);
     }
 
-    public void setSpeedByRPS(double targetSpeedRps) {
-        this.targetSpeedRps = targetSpeedRps;
-        leftIntakeRoller.setControl(velocityRequest.withVelocity(targetSpeedRps));
+    public void setVoltage(double outputVolts) {
+        targetOutputVolts = MathUtil.clamp(outputVolts, -12.0, 12.0);
+        leftIntakeRoller.setControl(voltageRequest.withOutput(targetOutputVolts));
         followLeft();
     }
 
@@ -67,6 +68,6 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         table.getEntry("leftVelocity").setDouble(leftIntakeRoller.getVelocity().getValueAsDouble());
         table.getEntry("rightVelocity").setDouble(rightIntakeRoller.getVelocity().getValueAsDouble());
         table.getEntry("velocityDifference").setDouble(getVelocityDifference());
-        table.getEntry("targetSpeedRps").setDouble(targetSpeedRps);
+        table.getEntry("targetOutputVolts").setDouble(targetOutputVolts);
     }
 }

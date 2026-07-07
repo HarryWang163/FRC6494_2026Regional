@@ -47,8 +47,8 @@ public class LimelightSubsystem extends SubsystemBase {
         return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName).pose;
     }
 
-    public double getShooterSetpointByDistance() {
+    public double getShooterVoltageByDistance() {
         // 查 Constants 里的插值射表；真车试射后往表里加实测点即可。
-        return Constants.Shooter.flywheelRpsByDistance.get(getDistanceToTarget());
+        return Constants.Shooter.flywheelVoltageByDistance.get(getDistanceToTarget());
     }
 }

@@ -52,7 +52,7 @@ public class Superstructure extends SubsystemBase {
     private WantedState wantedState = WantedState.IDLE;
     private SystemState systemState = SystemState.STOWED;
     private double stateStartTimestamp = Timer.getFPGATimestamp();
-    private double flywheelSpeedOffsetRps = 0.0;
+    private double flywheelVoltageOffset = 0.0;
     private double backboardPositionOffset = 0.0;
     private boolean shotCompletedThisRequest = false;
 
@@ -164,7 +164,7 @@ public class Superstructure extends SubsystemBase {
 
     public boolean canShoot() {
         boolean stationaryGate = !Constants.Superstructure.stationaryGateEnabled || isDriveStationary();
-        return shooter.atSpeed()
+        return shooter.atVoltage()
             && drive.isAimed()
             && stationaryGate;
     }
@@ -179,8 +179,8 @@ public class Superstructure extends SubsystemBase {
     /*      现场微调 offset     */
     /* ====================== */
 
-    public void adjustFlywheelSpeedOffset(double offsetRps) {
-        flywheelSpeedOffsetRps += offsetRps;
+    public void adjustFlywheelVoltageOffset(double offsetVolts) {
+        flywheelVoltageOffset += offsetVolts;
     }
 
     public void adjustBackboardPositionOffset(double offset) {
@@ -188,7 +188,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void resetOffsets() {
-        flywheelSpeedOffsetRps = 0.0;
+        flywheelVoltageOffset = 0.0;
         backboardPositionOffset = 0.0;
     }
 
@@ -227,6 +227,7 @@ public class Superstructure extends SubsystemBase {
         // 安全默认状态：球路不动，intaker 不主动动作，背板保持受控。
         conveyor.stop();
         intakeRoller.stop();
+        intakeRotater.stop();
         shooter.stopFlywheel();
         shooter.stopShooterConveyor();
         shooter.holdBackboardAt(0.0);
@@ -253,18 +254,18 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void handleShootHub() {
-        double targetRps = limelight.getShooterSetpointByDistance() + flywheelSpeedOffsetRps;
+        double targetVolts = limelight.getShooterVoltageByDistance() + flywheelVoltageOffset;
         double backboardPosition = Constants.Superstructure.backboardShootPosition + backboardPositionOffset;
-        handlePreparedFeed(targetRps, backboardPosition);
+        handlePreparedFeed(targetVolts, backboardPosition);
     }
 
     private void handlePassBall() {
-        double targetRps = Constants.Superstructure.passBallFlywheelRps + flywheelSpeedOffsetRps;
+        double targetVolts = Constants.Superstructure.passBallFlywheelVoltage + flywheelVoltageOffset;
         double backboardPosition = Constants.Superstructure.passBallBackboardPosition + backboardPositionOffset;
-        handlePreparedFeed(targetRps, backboardPosition);
+        handlePreparedFeed(targetVolts, backboardPosition);
     }
 
-    private void handlePreparedFeed(double targetRps, double backboardPosition) {
+    private void handlePreparedFeed(double targetVolts, double backboardPosition) {
         if (systemState != SystemState.PREP_SHOOT
             && systemState != SystemState.SHOOTING) {
             setSystemState(SystemState.PREP_SHOOT);
@@ -274,7 +275,7 @@ public class Superstructure extends SubsystemBase {
         shooter.stopShooterConveyor();
         // 距离到射速的映射由 LimelightSubsystem 提供；操作员 offset 用于现场微调，
         // 但不会绕过 Superstructure 状态机。
-        shooter.setFlywheelVelocity(targetRps);
+        shooter.setFlywheelVoltage(targetVolts);
         shooter.holdBackboardAt(backboardPosition);
 
         if (systemState == SystemState.SHOOTING) {
@@ -282,7 +283,7 @@ public class Superstructure extends SubsystemBase {
             // 避免球接触飞轮导致的掉速中断喂球。
             intakeRotater.shootAssist();
             conveyor.feedToShooter();
-            shooter.runShooterConveyorByRPS(Constants.Superstructure.shooterFeedSpeedRps);
+            shooter.runShooterConveyorVoltage(Constants.Superstructure.shooterFeedVoltage);
 
             if (timeInState() > Constants.Superstructure.shootTimeoutSeconds) {
                 shotCompletedThisRequest = true;
@@ -306,7 +307,7 @@ public class Superstructure extends SubsystemBase {
         setSystemState(SystemState.EJECTING);
         intakeRoller.outtake();
         conveyor.reverse();
-        shooter.runShooterConveyorByRPS(Constants.Superstructure.shooterReverseSpeedRps);
+        shooter.runShooterConveyorVoltage(Constants.Superstructure.shooterReverseVoltage);
         shooter.stopFlywheel();
         shooter.holdBackboardAt(0.0);
     }
@@ -345,11 +346,11 @@ public class Superstructure extends SubsystemBase {
         table.getEntry("systemState").setString(systemState.name());
         table.getEntry("timeInState").setDouble(timeInState());
         table.getEntry("canShoot").setBoolean(canShoot());
-        table.getEntry("shooterAtSpeed").setBoolean(shooter.atSpeed());
+        table.getEntry("shooterAtVoltage").setBoolean(shooter.atVoltage());
         table.getEntry("driveAimed").setBoolean(drive.isAimed());
         table.getEntry("driveHeadingError").setDouble(drive.getHeadingError());
         table.getEntry("driveStationary").setBoolean(isDriveStationary());
-        table.getEntry("flywheelSpeedOffsetRps").setDouble(flywheelSpeedOffsetRps);
+        table.getEntry("flywheelVoltageOffset").setDouble(flywheelVoltageOffset);
         table.getEntry("backboardPositionOffset").setDouble(backboardPositionOffset);
     }
 }

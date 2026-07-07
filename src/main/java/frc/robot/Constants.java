@@ -12,27 +12,28 @@ public final class Constants {
 
     public static class Shooter {
         // 机构 CAN ID 目前是占位值；季后赛最终接线确认后，只需要改这里。
-        public static final int leftFlywheelID = 41;
-        public static final int rightFlywheelID = 42;
-        public static final int leftConveyorID = 43;
-        public static final int rightConveyorID = 45;
+        public static final int leftFlywheelID = 38;
+        public static final int rightFlywheelID = 39;
+        public static final int leftConveyorID = 40;
+        public static final int rightConveyorID = 37;
         public static final int backboardMotorID = 44;
 
-        public static final double flywheelSpeedToleranceRps = 5.0;
-        public static final double defaultFlywheelTargetRps = 64.0;
+        public static final double defaultFlywheelVoltage = 3.34;
+        public static final double flywheelReadyVoltageThreshold = 1.0;
+        public static final double flywheelReadyDelaySeconds = 0.5;
 
-        // 距离(米) -> 飞轮转速(RPS) 射表。当前为占位点；
+        // 距离(米) -> 飞轮电压(V) 射表。当前为占位点；
         // 真车试射后按实测数据加点即可，查表自动线性插值并在两端取边界值。
-        public static final InterpolatingDoubleTreeMap flywheelRpsByDistance = new InterpolatingDoubleTreeMap();
+        public static final InterpolatingDoubleTreeMap flywheelVoltageByDistance = new InterpolatingDoubleTreeMap();
         static {
-            flywheelRpsByDistance.put(1.2, 58.8);
-            flywheelRpsByDistance.put(2.5, 64.0);
-            flywheelRpsByDistance.put(3.5, 68.0);
-            flywheelRpsByDistance.put(5.0, 74.0);
+            flywheelVoltageByDistance.put(1.2, 5.82);
+            flywheelVoltageByDistance.put(2.5, 6.34);
+            flywheelVoltageByDistance.put(3.5, 6.73);
+            flywheelVoltageByDistance.put(5.0, 7.33);
         }
 
-        public static final double conveyorSpeed = 150;
-        public static final double conveyorSpeedForAuto = 10;
+        public static final double shooterConveyorFeedVoltage = 3.0;
+        public static final double shooterConveyorReverseVoltage = -2.0;
 
         public static final Slot0Configs flyWheelSlot0Configs = new Slot0Configs()
             .withKP(0.0).withKI(0).withKD(0)
@@ -47,13 +48,14 @@ public final class Constants {
             .withKV(0.03).withKA(0.0).withKS(0.010);
 
         public static class backboardPositionPID {
-            public static final double kP = 0.3;
+            public static final double kP = 0.007;
             public static final double kI = 0.0;
             public static final double kD = 0.0;
         }
 
-        public static final double backboardSpeedMax = 60;
-        public static final double backboardUpLimit = 3000.0;
+        public static final double backboardSpeedMax = 5.0;
+        public static final double backboardSpeedMin = 0.4;
+        public static final double backboardUpLimit = 2200.0;
         public static final double backboardDownLimit = 0.0;
     }
 
@@ -93,8 +95,8 @@ public final class Constants {
     }
 
     public static class Limelight {
-        public static final String LIMELIGHT_NAME_Shooter = "limelight-shooter";
-        public static final String LIMELIGHT_NAME_Intaker = "limelight-intaker";
+        public static final String LIMELIGHT_NAME_Shooter = "limelight-left";
+        public static final String LIMELIGHT_NAME_Intaker = "limelight-front";
         public static final Boolean UsingMetaTag2 = true;
         public static final int locatePipelineIndex = 0;
     }
@@ -112,23 +114,19 @@ public final class Constants {
 
     public static class Intaker {
         // 进球机构 CAN ID 同样是占位值，真实 ID 确认后集中在这里修改。
-        public static final int leftIntakeRollerID = 47;
-        public static final int rightIntakeRollerID = 46;
+        public static final int leftIntakeRollerID = 20;
+        public static final int rightIntakeRollerID = 47;
         public static final int leftIntakeRotaterID = 48;
-        public static final int rightIntakeRotaterID = 49;
+        public static final int rightIntakeRotaterID = 43;
 
-        public static final double intakeRollerIntakeSpeedRps = 30.0;
-        public static final double intakeRollerOuttakeSpeedRps = -30.0;
+        public static final double intakeRollerIntakeVoltage = -6.0;
+        public static final double intakeRollerOuttakeVoltage = 3.0;
 
-        public static final double intakeRotaterLoweredPosition = -7.6;
-        public static final double intakeRotaterShootAssistUpPosition = -2.5;
-        public static final double intakeRotaterManualRaiseVoltage = 2.0;
-        public static final double intakeRotaterManualLowerVoltage = -2.0;
+        public static final double intakeRotaterRaiseVoltage = 0.8;
+        public static final double intakeRotaterLowerVoltage = 0.05;
+
         public static final double intakeRotaterShootAssistPeriodSeconds = 0.4;
         public static final double intakeRotaterShootAssistUpDutyCycle = 0.5;
-
-        public static final double intakeRotaterUpLimit = 0.0;
-        public static final double intakeRotaterDownLimit = -7.6;
 
         public static final Slot0Configs intakeRollerSlot0Configs = new Slot0Configs()
             .withKP(0.00).withKI(0.00).withKD(0.00)
@@ -141,13 +139,12 @@ public final class Constants {
 
         public static final double IntakeGetterSpeedforAuto = 0.5;
         // 这里给出可用的占位值，真车调好位置闭环后再收紧。
-        public static final double positionToleranceRotations = 0.3;
     }
 
     public static class Conveyor {
-        public static final int mainConveyorID = 50;
-        public static final double feedSpeedRps = 30.0;
-        public static final double reverseSpeedRps = -30.0;
+        public static final int mainConveyorID = 42;
+        public static final double feedVoltage = 2.5;
+        public static final double reverseVoltage = -2.0;
 
         public static final Slot0Configs mainConveyorSlot0Configs = new Slot0Configs()
             .withKP(0.00).withKI(0.00).withKD(0.00)
@@ -156,12 +153,12 @@ public final class Constants {
 
     public static class Superstructure {
         // 状态机时间和门控容差。真车基础动作验证后，需要现场调这些值。
-        public static final double shooterFeedSpeedRps = Shooter.conveyorSpeed;
-        public static final double shooterReverseSpeedRps = -Shooter.conveyorSpeed * 0.6;
+        public static final double shooterFeedVoltage = Shooter.shooterConveyorFeedVoltage;
+        public static final double shooterReverseVoltage = Shooter.shooterConveyorReverseVoltage;
         public static final double shootTimeoutSeconds = 1.0;
         public static final double aimToleranceDegrees = 1.5;
         public static final double stationarySpeedToleranceMetersPerSecond = 0.5;
-        public static final double passBallFlywheelRps = Shooter.defaultFlywheelTargetRps;
+        public static final double passBallFlywheelVoltage = Shooter.defaultFlywheelVoltage;
         public static final double passBallBackboardPosition = 175.0;
 
         // 射击时背板的目标位置（外接编码器计数）。

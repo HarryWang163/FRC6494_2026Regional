@@ -1,11 +1,12 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.MathUtil;
 import frc.robot.Constants;
 
 /**
@@ -13,31 +14,31 @@ import frc.robot.Constants;
  */
 public class ConveyorSubsystem extends SubsystemBase {
     public final TalonFX mainConveyor;
-    private final VelocityVoltage velocityRequest = new VelocityVoltage(0);
+    private final VoltageOut voltageRequest = new VoltageOut(0);
     private final NetworkTable table = NetworkTableInstance.getDefault().getTable("Conveyor");
-    private double targetSpeedRps = 0.0;
+    private double targetOutputVolts = 0.0;
 
     public ConveyorSubsystem() {
         mainConveyor = new TalonFX(Constants.Conveyor.mainConveyorID);
         mainConveyor.getConfigurator().apply(Constants.Conveyor.mainConveyorSlot0Configs);
     }
     public void feedToShooter() {
-        setSpeedByRPS(Constants.Conveyor.feedSpeedRps);
+        setVoltage(Constants.Conveyor.feedVoltage);
     }
     public void reverse() {
-        setSpeedByRPS(Constants.Conveyor.reverseSpeedRps);
+        setVoltage(Constants.Conveyor.reverseVoltage);
     }
     public void stop() {
-        setSpeedByRPS(0.0);
+        setVoltage(0.0);
     }
-    public void setSpeedByRPS(double targetSpeedRps) {
-        this.targetSpeedRps = targetSpeedRps;
-        mainConveyor.setControl(velocityRequest.withVelocity(targetSpeedRps));
+    public void setVoltage(double outputVolts) {
+        targetOutputVolts = MathUtil.clamp(outputVolts, -12.0, 12.0);
+        mainConveyor.setControl(voltageRequest.withOutput(targetOutputVolts));
     }
 
     @Override
     public void periodic() {
         table.getEntry("velocity").setDouble(mainConveyor.getVelocity().getValueAsDouble());
-        table.getEntry("targetSpeedRps").setDouble(targetSpeedRps);
+        table.getEntry("targetOutputVolts").setDouble(targetOutputVolts);
     }
 }

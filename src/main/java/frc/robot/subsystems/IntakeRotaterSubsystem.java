@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -18,19 +17,17 @@ import frc.robot.Constants;
 /**
  * Intaker rotation control for the 2026 fuel path.
  *
- * The normal match posture is lowered. During shooting, the arm alternates
- * between lowered and an upward assist position to help fuel enter the chamber.
+ * The rotater uses timed voltage actions only. Position is published for
+ * telemetry, but it is not used for closed-loop control.
  */
 public class IntakeRotaterSubsystem extends SubsystemBase {
-    private final TalonFX leftIntakeRotater;
+    public final TalonFX leftIntakeRotater;
     private final TalonFX rightIntakeRotater;
 
-    private final PositionVoltage positionRequest = new PositionVoltage(0);
     private final VoltageOut voltageRequest = new VoltageOut(0);
     private final Follower rightFollower;
     private final NetworkTable table = NetworkTableInstance.getDefault().getTable("IntakeRotater");
 
-    private double targetPosition = Constants.Intaker.intakeRotaterLoweredPosition;
     private double outputVoltage = 0.0;
 
     public IntakeRotaterSubsystem() {
@@ -46,51 +43,70 @@ public class IntakeRotaterSubsystem extends SubsystemBase {
     }
 
     public void lowerForMatch() {
-        setPosition(Constants.Intaker.intakeRotaterLoweredPosition);
+        setVoltage(0.05);
     }
 
     public Command lowerForMatchCommand() {
-        return Commands.runOnce(this::lowerForMatch, this);
+        return Commands.sequence(
+            Commands.runOnce(() -> setVoltage(-1.5), this),
+            Commands.waitSeconds(0.7),
+            Commands.runOnce(() -> setVoltage(0.05), this),
+            Commands.waitSeconds(0.7),
+            Commands.runOnce(this::stop, this)
+        );
+    }
+
+    public void raiseForMatch() {
+        setVoltage(0.8);
+    }
+
+    public Command raiseForMatchCommand() {
+        return Commands.sequence(
+            Commands.runOnce(this::raiseForMatch, this),
+            Commands.waitSeconds(0.5),
+            Commands.runOnce(this::stop, this)
+        );
     }
 
     public void shootAssist() {
         double period = Constants.Intaker.intakeRotaterShootAssistPeriodSeconds;
         double phase = (Timer.getFPGATimestamp() % period) / period;
-        double target = phase < Constants.Intaker.intakeRotaterShootAssistUpDutyCycle
-            ? Constants.Intaker.intakeRotaterShootAssistUpPosition
-            : Constants.Intaker.intakeRotaterLoweredPosition;
-        setPosition(target);
+        double volts = phase < Constants.Intaker.intakeRotaterShootAssistUpDutyCycle
+            ? Constants.Intaker.intakeRotaterRaiseVoltage
+            : Constants.Intaker.intakeRotaterLowerVoltage;
+        setVoltage(volts);
     }
 
     public void manualRaise() {
-        setVoltage(Constants.Intaker.intakeRotaterManualRaiseVoltage);
+        setVoltage(Constants.Intaker.intakeRotaterRaiseVoltage);
     }
 
     public void manualLower() {
-        setVoltage(Constants.Intaker.intakeRotaterManualLowerVoltage);
+        setVoltage(Constants.Intaker.intakeRotaterLowerVoltage);
     }
 
     public void stop() {
         setVoltage(0.0);
     }
 
-    public boolean atGoal() {
-        return Math.abs(getPosition() - targetPosition) <= Constants.Intaker.positionToleranceRotations;
+    public boolean isRunning() {
+        return Math.abs(outputVoltage) > 1e-6;
     }
 
     public double getPosition() {
         return leftIntakeRotater.getPosition().getValueAsDouble();
     }
 
-    private void setPosition(double rotations) {
-        targetPosition = MathUtil.clamp(
-            rotations,
-            Constants.Intaker.intakeRotaterDownLimit,
-            Constants.Intaker.intakeRotaterUpLimit
-        );
-        outputVoltage = 0.0;
-        leftIntakeRotater.setControl(positionRequest.withPosition(targetPosition));
-        followLeft();
+    public double getLeftVelocity() {
+        return leftIntakeRotater.getVelocity().getValueAsDouble();
+    }
+
+    public double getRightVelocity() {
+        return rightIntakeRotater.getVelocity().getValueAsDouble();
+    }
+
+    private double getVelocityDifference() {
+        return Math.abs(getLeftVelocity()) - Math.abs(getRightVelocity());
     }
 
     private void setVoltage(double volts) {
@@ -106,8 +122,10 @@ public class IntakeRotaterSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         table.getEntry("position").setDouble(getPosition());
-        table.getEntry("targetPosition").setDouble(targetPosition);
-        table.getEntry("atGoal").setBoolean(atGoal());
+        table.getEntry("isRunning").setBoolean(isRunning());
         table.getEntry("outputVoltage").setDouble(outputVoltage);
+        table.getEntry("leftVelocity").setDouble(getLeftVelocity());
+        table.getEntry("rightVelocity").setDouble(getRightVelocity());
+        table.getEntry("velocityDifference").setDouble(getVelocityDifference());
     }
 }

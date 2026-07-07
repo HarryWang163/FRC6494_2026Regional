@@ -82,6 +82,12 @@ public class RobotContainer {
       new ConfigTalonFXMotorTuner(shooterSubsystem.leftConveyor, "conveyor", Constants.Shooter.conveyorSlot0Configs);
   private ConfigTalonFXSMotorTuner configBackboardTuner =
       new ConfigTalonFXSMotorTuner(shooterSubsystem.backboardMotor, "backboard", Constants.Shooter.backboardSlot0Configs);
+  private ConfigTalonFXMotorTuner configMainConveyorTuner =
+      new ConfigTalonFXMotorTuner(conveyorSubsystem.mainConveyor, "mainconveyor", Constants.Conveyor.mainConveyorSlot0Configs);
+  private ConfigTalonFXMotorTuner configIntakerRollerTuner =
+      new ConfigTalonFXMotorTuner(intakeRollerSubsystem.leftIntakeRoller, "intakerroller", Constants.Intaker.intakeRollerSlot0Configs);
+  private ConfigTalonFXMotorTuner configIntakerRotaterTuner =
+      new ConfigTalonFXMotorTuner(intakeRotaterSubsystem.leftIntakeRotater, "intakerrotater", Constants.Intaker.intakeRotaterSlot0Configs);
 
   private final SendableChooser<Command> autoChooser;
   private final Trigger enableTrigger = new Trigger(DriverStation::isEnabled);
@@ -175,8 +181,8 @@ public class RobotContainer {
     controllerupper.b().and(teleopOnly)
         .onTrue(operatorControls.requestEjectCommand())
         .onFalse(operatorControls.requestIdleCommand());
-    controllerupper.povLeft().onTrue(Commands.runOnce(() -> operatorControls.adjustFlywheelSpeedOffset(-1)));
-    controllerupper.povRight().onTrue(Commands.runOnce(() -> operatorControls.adjustFlywheelSpeedOffset(1)));
+    controllerupper.povLeft().onTrue(Commands.runOnce(() -> operatorControls.adjustFlywheelVoltageOffset(-0.1)));
+    controllerupper.povRight().onTrue(Commands.runOnce(() -> operatorControls.adjustFlywheelVoltageOffset(0.1)));
     controllerupper.povUp().onTrue(Commands.runOnce(() -> operatorControls.adjustBackboardRateOffset(100)));
     controllerupper.povDown().onTrue(Commands.runOnce(() -> operatorControls.adjustBackboardRateOffset(-100)));
     controllerupper.back().onTrue(Commands.runOnce(() -> operatorControls.resetOffsets()));
@@ -196,7 +202,11 @@ public class RobotContainer {
     configFlywheelTuner.periodic(() -> shooterSubsystem.applyLeftConfigurationToRight());
     configConveyorTuner.periodic(null);
     configBackboardTuner.periodic();
-    shooterSubsystem.setRightFollowLeft();
+    shooterSubsystem.debugBackboardTargetPeriodic();
+    configMainConveyorTuner.periodic(null);
+    configIntakerRollerTuner.periodic(null);
+    configIntakerRotaterTuner.periodic(null);
+    shooterSubsystem.setRightConveyorFollowLeft();
   }
 
   public void dashboardPeriodic() {
@@ -221,5 +231,12 @@ public class RobotContainer {
         .onTrue(operatorControls.requestManualCommand())
         .whileTrue(operatorControls.manualLowerIntakeRotaterCommand(intakeRotaterSubsystem))
         .onFalse(operatorControls.requestIdleCommand());
+
+    controllerupper.y().and(teleopOnly)
+        .onTrue(Commands.sequence(
+            operatorControls.requestManualCommand(),
+            operatorControls.lowerIntakeRotaterForMatchCommand(intakeRotaterSubsystem),
+            operatorControls.requestIdleCommand()
+        ));
   }
 }

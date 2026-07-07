@@ -2,8 +2,9 @@ package frc.robot.tuning;
 import java.util.function.Function;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.networktables.*;
 
 public class ConfigTalonFXMotorTuner {
@@ -22,10 +23,10 @@ public class ConfigTalonFXMotorTuner {
   private final DoubleSubscriber KsSub;
 
   private final BooleanSubscriber enableRuningSub;
-  private final DoubleSubscriber runningSpeedRPS;
+  private final DoubleSubscriber runningVolts;
   private double lastKp = 0, lastKi = 0, lastKd = 0, lastKv = 0, lastKa = 0, lastKs = 0;
   
-  private final VelocityDutyCycle velocityRequest = new VelocityDutyCycle(0);
+  private final VoltageOut voltageRequest = new VoltageOut(0);
   public ConfigTalonFXMotorTuner(TalonFX motor_, String motorName_, Slot0Configs motorSlot0Configs_) {
     this.motor = motor_;
     this.motorName = motorName_;
@@ -42,7 +43,7 @@ public class ConfigTalonFXMotorTuner {
     table.getDoubleTopic(motorName+"kS").publish().set(motorSlot0Configs.kS);
 
     table.getBooleanTopic(motorName+"EnableRunning").publish().set(false);;
-    table.getDoubleTopic(motorName+"RunningSpeedRPS").publish().set(0);;
+    table.getDoubleTopic(motorName+"RunningVolts").publish().set(0);;
     
     this.enableSub = table.getBooleanTopic(motorName+"Enable").subscribe(false);
     this.KpSub = table.getDoubleTopic(motorName+"kP").subscribe(motorSlot0Configs.kP);
@@ -52,7 +53,7 @@ public class ConfigTalonFXMotorTuner {
     this.KaSub = table.getDoubleTopic(motorName+"kA").subscribe(motorSlot0Configs.kA);
     this.KsSub = table.getDoubleTopic(motorName+"kS").subscribe(motorSlot0Configs.kS);
     this.enableRuningSub = table.getBooleanTopic(motorName+"EnableRunning").subscribe(false);
-    this.runningSpeedRPS = table.getDoubleTopic(motorName+"RunningSpeedRPS").subscribe(0);
+    this.runningVolts = table.getDoubleTopic(motorName+"RunningVolts").subscribe(0);
   }
 
   public void periodic(Runnable func) {
@@ -80,11 +81,11 @@ public class ConfigTalonFXMotorTuner {
     }
     
     if (enableRuningSub.get()) {;
-      double speed = runningSpeedRPS.get();
-      motor.setControl(velocityRequest.withVelocity(speed));
-    // System.out.println("running motor with speed: "+speed+" on motor: "+motorName);
+      double volts = MathUtil.clamp(runningVolts.get(), -12.0, 12.0);
+      motor.setControl(voltageRequest.withOutput(volts));
+    // System.out.println("running motor with volts: "+volts+" on motor: "+motorName);
     }else{
-      motor.setControl(velocityRequest.withVelocity(0));
+      motor.setControl(voltageRequest.withOutput(0));
     }
   }
 

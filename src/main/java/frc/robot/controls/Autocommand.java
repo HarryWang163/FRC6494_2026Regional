@@ -28,7 +28,7 @@ public class Autocommand extends SequentialCommandGroup {
         NamedCommands.registerCommand("start_intake_timelimit", timedIntake(superstructure));
         NamedCommands.registerCommand("stop_intake", idle(superstructure));
         NamedCommands.registerCommand("intaker_down", lowerIntaker(intakeRotater));
-        NamedCommands.registerCommand("intaker_up", idle(superstructure));
+        NamedCommands.registerCommand("intaker_up", raiseIntaker(intakeRotater));
         NamedCommands.registerCommand("shoot_hub", shootHub(superstructure));
         NamedCommands.registerCommand("Shake", shake(driveControls));
         NamedCommands.registerCommand("AutoAim", autoAim(driveControls));
@@ -52,6 +52,10 @@ public class Autocommand extends SequentialCommandGroup {
 
     public static Command lowerIntaker(IntakeRotaterSubsystem intakeRotater) {
         return intakeRotater.lowerForMatchCommand();
+    }
+
+    public static Command raiseIntaker(IntakeRotaterSubsystem intakeRotater) {
+        return intakeRotater.raiseForMatchCommand();
     }
 
     // 自动射击和手动射击使用同一套 gated shooting 流程。
