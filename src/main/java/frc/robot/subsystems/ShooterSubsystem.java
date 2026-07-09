@@ -54,6 +54,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private double shooterConveyorOutputVolts = 0.0;
     private double backboardOutputVolts = 0.0;
     private double backboardRawPidOutputVolts = 0.0;
+    private double backboardGravityFeedforwardVolts = 0.0;
     private double backboardClampedPidOutputVolts = 0.0;
     private boolean backboardOutputSaturated = false;
     private boolean backboardMinimumOutputActive = false;
@@ -203,7 +204,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void outputBackboard() {
         // 背板仍使用旧外部编码器和 ProfiledPID；Superstructure 只选择目标位置。
-        double rawPidOutput = backboardPID.calculate(getBackboardPosition());
+        double backboardPosition = getBackboardPosition();
+        double rawPidOutput = backboardPID.calculate(backboardPosition);
         double pidOutput = MathUtil.clamp(
             rawPidOutput,
             -Constants.Shooter.backboardSpeedMax,
@@ -220,26 +222,50 @@ public class ShooterSubsystem extends SubsystemBase {
             backboardMinimumOutputActive = false;
         }
 
-        shooterNetworkTable.getEntry("backboardPIDOutput").setDouble(pidOutput);
-        setBackboardVoltage(pidOutput);
+        double gravityOutput = calculateBackboardGravityFeedforward(backboardPosition);
+        double outputVolts = MathUtil.clamp(
+            pidOutput + gravityOutput,
+            -Constants.Shooter.backboardSpeedMax,
+            Constants.Shooter.backboardSpeedMax
+        );
+        backboardGravityFeedforwardVolts = gravityOutput;
+        backboardOutputSaturated = backboardOutputSaturated
+            || Math.abs((pidOutput + gravityOutput) - outputVolts) > 1e-9;
+
+        shooterNetworkTable.getEntry("backboardPIDOutput").setDouble(outputVolts);
+        setBackboardVoltage(outputVolts);
+    }
+
+    private double calculateBackboardGravityFeedforward(double backboardPosition) {
+        double clampedPosition = MathUtil.clamp(
+            backboardPosition,
+            Constants.Shooter.backboardGravityFeedforwardMinPosition,
+            Constants.Shooter.backboardGravityFeedforwardMaxPosition
+        );
+        double positionRange = Constants.Shooter.backboardGravityFeedforwardMaxPosition
+            - Constants.Shooter.backboardGravityFeedforwardMinPosition;
+        if (positionRange <= 0.0) {
+            return 0.0;
+        }
+
+        double positionRatio = (clampedPosition - Constants.Shooter.backboardGravityFeedforwardMinPosition)
+            / positionRange;
+        double feedforwardVolts = Constants.Shooter.backboardGravityFeedforwardMinVolts
+            + positionRatio
+                * (Constants.Shooter.backboardGravityFeedforwardMaxVolts
+                    - Constants.Shooter.backboardGravityFeedforwardMinVolts);
+        return Constants.Shooter.backboardGravityFeedforwardDirection * feedforwardVolts;
     }
 
     public void holdBackboardAt(double targetPosition) {
-        // 上层只给目标位置；到位后停止输出，未到位时继续闭环。
+        // 上层只给目标位置；到位后仍继续输出重力补偿。
         setBackboardPosition(targetPosition);
-        if (isBackboardAtTarget()) {
-            backboardRawPidOutputVolts = 0.0;
-            backboardClampedPidOutputVolts = 0.0;
-            backboardOutputSaturated = false;
-            backboardMinimumOutputActive = false;
-            setBackboardVoltage(0.0);
-        } else {
-            outputBackboard();
-        }
+        outputBackboard();
     }
 
     public void stopBackboard() {
         backboardRawPidOutputVolts = 0.0;
+        backboardGravityFeedforwardVolts = 0.0;
         backboardClampedPidOutputVolts = 0.0;
         backboardOutputSaturated = false;
         backboardMinimumOutputActive = false;
@@ -252,6 +278,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public boolean isBackboardAtTarget() {
         return backboardPID.atGoal();
+    }
+
+    public boolean isBackboardPositionTuningActive() {
+        return backboardTuningTable.getEntry("backboardPositionEnable").getBoolean(false);
     }
 
     public void resetbackboardencoder() {
@@ -301,7 +331,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        backboardPID.calculate(getBackboardPosition());
         double backboardPosition = getBackboardPosition();
         double backboardGoalPosition = backboardPID.getGoal().position;
         double backboardSetpointPosition = backboardPID.getSetpoint().position;
@@ -324,11 +353,14 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterNetworkTable.getEntry("backboardGoalError").setDouble(backboardGoalPosition - backboardPosition);
         shooterNetworkTable.getEntry("backboardSetpointError").setDouble(backboardSetpointPosition - backboardPosition);
         shooterNetworkTable.getEntry("backboardRawPIDOutput").setDouble(backboardRawPidOutputVolts);
+        shooterNetworkTable.getEntry("backboardGravityFeedforward").setDouble(backboardGravityFeedforwardVolts);
         shooterNetworkTable.getEntry("backboardClampedPIDOutput").setDouble(backboardClampedPidOutputVolts);
         shooterNetworkTable.getEntry("backboardOutputSaturated").setBoolean(backboardOutputSaturated);
         shooterNetworkTable.getEntry("backboardMinimumOutputActive").setBoolean(backboardMinimumOutputActive);
         shooterNetworkTable.getEntry("backboardMaxOutputVolts").setDouble(Constants.Shooter.backboardSpeedMax);
         shooterNetworkTable.getEntry("backboardMinOutputVolts").setDouble(Constants.Shooter.backboardSpeedMin);
+        shooterNetworkTable.getEntry("backboardGravityFeedforwardMinVolts").setDouble(Constants.Shooter.backboardGravityFeedforwardMinVolts);
+        shooterNetworkTable.getEntry("backboardGravityFeedforwardMaxVolts").setDouble(Constants.Shooter.backboardGravityFeedforwardMaxVolts);
         shooterNetworkTable.getEntry("backboardPositionTolerance").setDouble(10.0);
         shooterNetworkTable.getEntry("backboardShootPosition").setDouble(Constants.Superstructure.backboardShootPosition);
         shooterNetworkTable.getEntry("backboardPassPosition").setDouble(Constants.Superstructure.passBallBackboardPosition);

@@ -230,14 +230,14 @@ public class Superstructure extends SubsystemBase {
         intakeRotater.stop();
         shooter.stopFlywheel();
         shooter.stopShooterConveyor();
-        shooter.holdBackboardAt(0.0);
+        holdBackboardStowedUnlessTuning();
         setSystemState(SystemState.STOWED);
     }
 
     private void handleIntake() {
         shooter.stopFlywheel();
         shooter.stopShooterConveyor();
-        shooter.holdBackboardAt(0.0);
+        holdBackboardStowedUnlessTuning();
         // Intaker 比赛开始后保持下放，收球何时结束由操作员松开按键决定。
         intakeRoller.intake();
         conveyor.feedToShooter();
@@ -249,7 +249,7 @@ public class Superstructure extends SubsystemBase {
         conveyor.stop();
         shooter.stopFlywheel();
         shooter.stopShooterConveyor();
-        shooter.holdBackboardAt(0.0);
+        holdBackboardStowedUnlessTuning();
         setSystemState(SystemState.STOWED);
     }
 
@@ -309,7 +309,13 @@ public class Superstructure extends SubsystemBase {
         conveyor.reverse();
         shooter.runShooterConveyorVoltage(Constants.Superstructure.shooterReverseVoltage);
         shooter.stopFlywheel();
-        shooter.holdBackboardAt(0.0);
+        holdBackboardStowedUnlessTuning();
+    }
+
+    private void holdBackboardStowedUnlessTuning() {
+        if (!shooter.isBackboardPositionTuningActive()) {
+            shooter.holdBackboardAt(0.0);
+        }
     }
 
     private void handleManual() {

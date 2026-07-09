@@ -53,8 +53,13 @@ public final class Constants {
             public static final double kD = 0.0;
         }
 
-        public static final double backboardSpeedMax = 5.0;
-        public static final double backboardSpeedMin = 0.4;
+        public static final double backboardSpeedMax = 3.0;
+        public static final double backboardSpeedMin = 0;
+        public static final double backboardGravityFeedforwardMinVolts = 0.1;
+        public static final double backboardGravityFeedforwardMaxVolts = 0.3;
+        public static final double backboardGravityFeedforwardMinPosition = 0.0;
+        public static final double backboardGravityFeedforwardMaxPosition = 2200.0;
+        public static final double backboardGravityFeedforwardDirection = 1.0;
         public static final double backboardUpLimit = 2200.0;
         public static final double backboardDownLimit = 0.0;
     }
