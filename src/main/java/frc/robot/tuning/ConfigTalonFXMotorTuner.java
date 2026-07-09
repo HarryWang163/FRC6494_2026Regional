@@ -1,6 +1,4 @@
 package frc.robot.tuning;
-import java.util.function.Function;
-
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -25,6 +23,7 @@ public class ConfigTalonFXMotorTuner {
   private final BooleanSubscriber enableRuningSub;
   private final DoubleSubscriber runningVolts;
   private double lastKp = 0, lastKi = 0, lastKd = 0, lastKv = 0, lastKa = 0, lastKs = 0;
+  private boolean wasRunning = false;
   
   private final VoltageOut voltageRequest = new VoltageOut(0);
   public ConfigTalonFXMotorTuner(TalonFX motor_, String motorName_, Slot0Configs motorSlot0Configs_) {
@@ -83,9 +82,11 @@ public class ConfigTalonFXMotorTuner {
     if (enableRuningSub.get()) {;
       double volts = MathUtil.clamp(runningVolts.get(), -12.0, 12.0);
       motor.setControl(voltageRequest.withOutput(volts));
+      wasRunning = true;
     // System.out.println("running motor with volts: "+volts+" on motor: "+motorName);
-    }else{
+    }else if (wasRunning){
       motor.setControl(voltageRequest.withOutput(0));
+      wasRunning = false;
     }
   }
 

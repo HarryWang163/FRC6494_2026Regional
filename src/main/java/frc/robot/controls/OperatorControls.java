@@ -54,6 +54,10 @@ public class OperatorControls {
         superstructure.adjustFlywheelVoltageOffset(offset);
     }
 
+    public void adjustFlywheelVelocityOffset(double offset) {
+        superstructure.adjustFlywheelVelocityOffset(offset);
+    }
+
     public void adjustBackboardRateOffset(double offset) {
         superstructure.adjustBackboardPositionOffset(offset);
     }

@@ -244,7 +244,11 @@ public class DriveControls {
 
         // If angle difference is within threshold, don't rotate
         if (Math.abs(calDifference) > 1.0) {
-            return calDifference  * Constants.AutoPositioning.autoRotationkP;
+            double rotationRate = calDifference * Constants.AutoPositioning.autoRotationkP;
+            if (Math.abs(rotationRate) < 0.24) {
+                return Math.copySign(0.24, rotationRate);
+            }
+            return rotationRate;
         } else {
             return 0;
         }

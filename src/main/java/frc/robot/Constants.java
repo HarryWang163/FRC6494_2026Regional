@@ -18,30 +18,52 @@ public final class Constants {
         public static final int rightConveyorID = 37;
         public static final int backboardMotorID = 44;
 
+        public static final double flywheelNominalKv = 0.12;
         public static final double defaultFlywheelVoltage = 3.34;
-        public static final double flywheelReadyVoltageThreshold = 1.0;
+        public static final double defaultFlywheelVelocity = defaultFlywheelVoltage / flywheelNominalKv;
+        public static final double flywheelMaxVelocity = 120.0;
+        public static final double flywheelReadyVelocityThreshold = 5.0;
+        public static final double flywheelReadyVelocityTolerance = 2.0;
         public static final double flywheelReadyDelaySeconds = 0.5;
 
         // 距离(米) -> 飞轮电压(V) 射表。当前为占位点；
         // 真车试射后按实测数据加点即可，查表自动线性插值并在两端取边界值。
         public static final InterpolatingDoubleTreeMap flywheelVoltageByDistance = new InterpolatingDoubleTreeMap();
         static {
-            flywheelVoltageByDistance.put(1.2, 5.82);
-            flywheelVoltageByDistance.put(2.5, 6.34);
-            flywheelVoltageByDistance.put(3.5, 6.73);
-            flywheelVoltageByDistance.put(5.0, 7.33);
+            flywheelVoltageByDistance.put(1.2, 2.0);
+            flywheelVoltageByDistance.put(2.5, 2.1);
+            flywheelVoltageByDistance.put(3.5, 2.2);
+            flywheelVoltageByDistance.put(5.0, 2.3);
+        }
+
+        public static final InterpolatingDoubleTreeMap flywheelVelocityByDistance = new InterpolatingDoubleTreeMap();
+        static {
+            flywheelVelocityByDistance.put(1.2, 2.0 / flywheelNominalKv);
+            flywheelVelocityByDistance.put(2.5, 2.1 / flywheelNominalKv);
+            flywheelVelocityByDistance.put(3.5, 2.2 / flywheelNominalKv);
+            flywheelVelocityByDistance.put(5.0, 2.3 / flywheelNominalKv);
         }
 
         public static final double shooterConveyorFeedVoltage = 3.0;
         public static final double shooterConveyorReverseVoltage = -2.0;
+        public static final double shooterConveyorNominalKv = 0.125;
+        public static final double shooterConveyorMaxVelocity = 12.0 / shooterConveyorNominalKv;
+        public static final double shooterConveyorFeedVelocity =
+            shooterConveyorFeedVoltage / shooterConveyorNominalKv;
+        public static final double shooterConveyorReverseVelocity =
+            shooterConveyorReverseVoltage / shooterConveyorNominalKv;
 
         public static final Slot0Configs flyWheelSlot0Configs = new Slot0Configs()
-            .withKP(0.0).withKI(0).withKD(0)
-            .withKV(0.099).withKA(0.0).withKS(0.0);
+            .withKP(0.21)
+            .withKI(0)
+            .withKD(0.004)
+            .withKS(0.25)
+            .withKA(0.0)
+            .withKV(flywheelNominalKv);
 
         public static final Slot0Configs conveyorSlot0Configs = new Slot0Configs()
-            .withKP(0.0).withKI(0).withKD(0)
-            .withKV(0.16).withKA(0.15).withKS(0);
+            .withKP(0.19).withKI(0).withKD(0.001)
+            .withKV(shooterConveyorNominalKv).withKA(0.0).withKS(0.07);
 
         public static final Slot0Configs backboardSlot0Configs = new Slot0Configs()
             .withKP(0.01).withKI(0).withKD(0)
@@ -65,7 +87,7 @@ public final class Constants {
     }
 
     public static class AutoPositioning {
-        public static final double autoRotationkP = 0.08;
+        public static final double autoRotationkP = 0.07;
         public static final double autoRotationForBumpTargetDegrees = 45;
         public static final double autoRotationForTrenchTargetDegrees = 0;
         public static final boolean teleopOffsetEnabled = true;
@@ -130,9 +152,6 @@ public final class Constants {
         public static final double intakeRotaterRaiseVoltage = 0.8;
         public static final double intakeRotaterLowerVoltage = 0.05;
 
-        public static final double intakeRotaterShootAssistPeriodSeconds = 0.4;
-        public static final double intakeRotaterShootAssistUpDutyCycle = 0.5;
-
         public static final Slot0Configs intakeRollerSlot0Configs = new Slot0Configs()
             .withKP(0.00).withKI(0.00).withKD(0.00)
             .withKV(0.00).withKA(0.00).withKS(0.00);
@@ -160,14 +179,18 @@ public final class Constants {
         // 状态机时间和门控容差。真车基础动作验证后，需要现场调这些值。
         public static final double shooterFeedVoltage = Shooter.shooterConveyorFeedVoltage;
         public static final double shooterReverseVoltage = Shooter.shooterConveyorReverseVoltage;
+        public static final double shooterFeedVelocity = Shooter.shooterConveyorFeedVelocity;
+        public static final double shooterReverseVelocity = Shooter.shooterConveyorReverseVelocity;
         public static final double shootTimeoutSeconds = 1.0;
         public static final double aimToleranceDegrees = 1.5;
         public static final double stationarySpeedToleranceMetersPerSecond = 0.5;
         public static final double passBallFlywheelVoltage = Shooter.defaultFlywheelVoltage;
+        public static final double passBallFlywheelVelocity = Shooter.defaultFlywheelVelocity;
         public static final double passBallBackboardPosition = 175.0;
 
         // 射击时背板的目标位置（外接编码器计数）。
         public static final double backboardShootPosition = 175.0;
+        public static final double backboardReadyPositionTolerance = 100.0;
         // 射击门控是否要求底盘接近静止。
         public static final boolean stationaryGateEnabled = true;
     }

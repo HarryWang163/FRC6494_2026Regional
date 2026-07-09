@@ -51,4 +51,8 @@ public class LimelightSubsystem extends SubsystemBase {
         // 查 Constants 里的插值射表；真车试射后往表里加实测点即可。
         return Constants.Shooter.flywheelVoltageByDistance.get(getDistanceToTarget());
     }
+
+    public double getShooterVelocityByDistance() {
+        return Constants.Shooter.flywheelVelocityByDistance.get(getDistanceToTarget());
+    }
 }

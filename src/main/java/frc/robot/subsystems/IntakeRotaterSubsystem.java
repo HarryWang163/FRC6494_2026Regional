@@ -69,12 +69,20 @@ public class IntakeRotaterSubsystem extends SubsystemBase {
     }
 
     public void shootAssist() {
-        double period = Constants.Intaker.intakeRotaterShootAssistPeriodSeconds;
-        double phase = (Timer.getFPGATimestamp() % period) / period;
-        double volts = phase < Constants.Intaker.intakeRotaterShootAssistUpDutyCycle
-            ? Constants.Intaker.intakeRotaterRaiseVoltage
-            : Constants.Intaker.intakeRotaterLowerVoltage;
-        setVoltage(volts);
+        double cycleTime = Timer.getFPGATimestamp() % 1.7;
+
+        if (cycleTime < 0.7) {
+            setVoltage(1);
+        } else if (cycleTime < 0.9) {
+            setVoltage(0.0);
+        } else {
+            setVoltage(0.03);
+        }
+    }
+
+    public void postShootIdleAssist(double elapsedSeconds) {
+        double cycleTime = elapsedSeconds % 0.2;
+        setVoltage(cycleTime < 0.1 ? 0.03 : 0.0);
     }
 
     public void manualRaise() {

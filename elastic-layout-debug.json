@@ -1821,28 +1821,41 @@
             }
           },
           {
-            "title": "Goal Position",
+            "title": "Position Enable",
             "x": 1024.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/backboard/backboardPositionEnable",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Target Position",
+            "x": 1280.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Shooter/backboardGoalPosition",
+              "topic": "/Tuning/backboard/backboardTargetPosition",
               "period": 0.06,
               "data_type": "double",
-              "show_submit_button": false
+              "show_submit_button": true
             }
           },
           {
-            "title": "At Target",
-            "x": 1280.0,
-            "y": 0.0,
+            "title": "Position Active",
+            "x": 1024.0,
+            "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Shooter/isBackboardAtTarget",
+              "topic": "/Tuning/backboard/backboardPositionEnableActive",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -1852,34 +1865,17 @@
             }
           },
           {
-            "title": "Position Offset",
-            "x": 1024.0,
+            "title": "Clamped Target",
+            "x": 1280.0,
             "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Superstructure/backboardPositionOffset",
+              "topic": "/Tuning/backboard/backboardClampedTargetPosition",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
-            }
-          },
-          {
-            "title": "Can Shoot",
-            "x": 1280.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Superstructure/canShoot",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
             }
           },
           {
@@ -2281,43 +2277,50 @@
               "data_type": "double",
               "show_submit_button": false
             }
-          },
+          }
+        ]
+      }
+    },
+    {
+      "name": "Flywheel Velocity Tuning",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
           {
-            "title": "Position Enable",
+            "title": "Apply Gains",
             "x": 0.0,
-            "y": 896.0,
-            "width": 256.0,
+            "y": 0.0,
+            "width": 128.0,
             "height": 128.0,
             "type": "Toggle Switch",
             "properties": {
-              "topic": "/Tuning/backboard/backboardPositionEnable",
+              "topic": "/Tuning/flywheel/flywheelEnable",
               "period": 0.06,
               "data_type": "boolean"
             }
           },
           {
-            "title": "Target Position",
-            "x": 256.0,
-            "y": 896.0,
-            "width": 256.0,
+            "title": "Velocity Test",
+            "x": 128.0,
+            "y": 0.0,
+            "width": 128.0,
             "height": 128.0,
-            "type": "Text Display",
+            "type": "Toggle Switch",
             "properties": {
-              "topic": "/Tuning/backboard/backboardTargetPosition",
+              "topic": "/Tuning/flywheel/flywheelVelocityEnable",
               "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
+              "data_type": "boolean"
             }
           },
           {
-            "title": "Position Active",
-            "x": 512.0,
-            "y": 896.0,
-            "width": 256.0,
+            "title": "Test Active",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 192.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Tuning/backboard/backboardPositionEnableActive",
+              "topic": "/Tuning/flywheel/flywheelVelocityEnableActive",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -2327,14 +2330,76 @@
             }
           },
           {
-            "title": "Commanded Target",
-            "x": 768.0,
-            "y": 896.0,
+            "title": "At Velocity",
+            "x": 448.0,
+            "y": 0.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Shooter/flywheelAtVelocity",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Opposed Follower",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Shooter/flywheelFollowerOpposed",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Target Velocity",
+            "x": 0.0,
+            "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Tuning/backboard/backboardCommandedTargetPosition",
+              "topic": "/Tuning/flywheel/flywheelTargetVelocity",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Tolerance",
+            "x": 256.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/flywheel/flywheelVelocityTolerance",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Commanded Target",
+            "x": 512.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/flywheel/flywheelCommandedTargetVelocity",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
@@ -2342,16 +2407,755 @@
           },
           {
             "title": "Clamped Target",
-            "x": 1024.0,
-            "y": 896.0,
+            "x": 768.0,
+            "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Tuning/backboard/backboardClampedTargetPosition",
+              "topic": "/Tuning/flywheel/flywheelClampedTargetVelocity",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
+            }
+          },
+          {
+            "title": "Active Tolerance",
+            "x": 1024.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/flywheel/flywheelVelocityToleranceActive",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "kP",
+            "x": 0.0,
+            "y": 320.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/flywheel/flywheelkP",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kI",
+            "x": 128.0,
+            "y": 320.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/flywheel/flywheelkI",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kD",
+            "x": 256.0,
+            "y": 320.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/flywheel/flywheelkD",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kV",
+            "x": 384.0,
+            "y": 320.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/flywheel/flywheelkV",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kA",
+            "x": 512.0,
+            "y": 320.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/flywheel/flywheelkA",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kS",
+            "x": 640.0,
+            "y": 320.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/flywheel/flywheelkS",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Target Velocity Now",
+            "x": 768.0,
+            "y": 320.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/flywheelTargetVelocity",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Velocity Error",
+            "x": 1024.0,
+            "y": 320.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/flywheelVelocityError",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Average Velocity",
+            "x": 0.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/flywheelVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Target Velocity",
+            "x": 384.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/flywheelTargetVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4283443184,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Velocity Error",
+            "x": 768.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/flywheelVelocityError",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4294198070,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Output Volts",
+            "x": 1152.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/flywheelOutputVolts",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4289374890,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Left Velocity",
+            "x": 0.0,
+            "y": 768.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/leftFlywheelVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Right Velocity",
+            "x": 384.0,
+            "y": 768.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/rightFlywheelVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4283443184,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Velocity Difference",
+            "x": 768.0,
+            "y": 768.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/flywheelVelocityDifference",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4294198070,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Left Current",
+            "x": 1152.0,
+            "y": 768.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/leftFlywheelStatorCurrent",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4289374890,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Right Current",
+            "x": 1152.0,
+            "y": 1024.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/rightFlywheelStatorCurrent",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Target Volts Estimate",
+            "x": 0.0,
+            "y": 1024.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/flywheelTargetVoltage",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Left Output Volts",
+            "x": 256.0,
+            "y": 1024.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/leftFlywheelOutputVolts",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Right Output Volts",
+            "x": 512.0,
+            "y": 1024.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/rightFlywheelOutputVolts",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Left Output Volts Graph",
+            "x": 0.0,
+            "y": 1152.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/leftFlywheelOutputVolts",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4283443184,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Right Output Volts Graph",
+            "x": 384.0,
+            "y": 1152.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/rightFlywheelOutputVolts",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4289374890,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Velocity Offset",
+            "x": 768.0,
+            "y": 1024.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Superstructure/flywheelVelocityOffset",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Can Shoot",
+            "x": 1024.0,
+            "y": 1024.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Superstructure/canShoot",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Shooter Ready",
+            "x": 1216.0,
+            "y": 1024.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Superstructure/shooterAtVelocity",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Shooter Conveyor Velocity Tuning",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Apply Gains",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/conveyor/conveyorEnable",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Velocity Test",
+            "x": 128.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Tuning/conveyor/conveyorVelocityEnable",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Test Active",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Tuning/conveyor/conveyorVelocityEnableActive",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Subsystem Active",
+            "x": 448.0,
+            "y": 0.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Shooter/conveyorVelocityTuningActive",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Superstructure Holdoff",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Superstructure/shooterConveyorTuningControlActive",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Target Velocity",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/conveyor/conveyorTargetVelocity",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Commanded Target",
+            "x": 256.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/conveyor/conveyorCommandedTargetVelocity",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Clamped Target",
+            "x": 512.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/conveyor/conveyorClampedTargetVelocity",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Target Velocity Now",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/conveyorTargetVelocity",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Velocity Error",
+            "x": 1024.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/conveyorVelocityError",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "kP",
+            "x": 0.0,
+            "y": 320.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/conveyor/conveyorkP",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kI",
+            "x": 128.0,
+            "y": 320.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/conveyor/conveyorkI",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kD",
+            "x": 256.0,
+            "y": 320.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/conveyor/conveyorkD",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kV",
+            "x": 384.0,
+            "y": 320.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/conveyor/conveyorkV",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kA",
+            "x": 512.0,
+            "y": 320.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/conveyor/conveyorkA",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kS",
+            "x": 640.0,
+            "y": 320.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/conveyor/conveyorkS",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Output Volts",
+            "x": 768.0,
+            "y": 320.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/shooterConveyorOutputVolts",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Stator Current",
+            "x": 1024.0,
+            "y": 320.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Shooter/statorCurrent",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Velocity",
+            "x": 0.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/conveyorVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Target Velocity",
+            "x": 384.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/conveyorTargetVelocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4283443184,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Velocity Error",
+            "x": 768.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/conveyorVelocityError",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4294198070,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Output Volts",
+            "x": 1152.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/shooterConveyorOutputVolts",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4289374890,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Stator Current",
+            "x": 0.0,
+            "y": 768.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/Shooter/statorCurrent",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 8.0,
+              "color": 4278238420,
+              "line_width": 2.0
             }
           }
         ]
