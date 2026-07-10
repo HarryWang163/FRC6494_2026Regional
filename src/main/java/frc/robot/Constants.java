@@ -27,22 +27,9 @@ public final class Constants {
         public static final double flywheelReadyDelaySeconds = 0.5;
 
         // Distance (meters) -> flywheel velocity (rotations per second).
-        public static final InterpolatingDoubleTreeMap flywheelVelocityByDistance = new InterpolatingDoubleTreeMap();
-        static {
-            flywheelVelocityByDistance.put(1.2, 2.0 / flywheelNominalKv);
-            flywheelVelocityByDistance.put(2.5, 2.1 / flywheelNominalKv);
-            flywheelVelocityByDistance.put(3.5, 2.2 / flywheelNominalKv);
-            flywheelVelocityByDistance.put(5.0, 2.3 / flywheelNominalKv);
-        }
 
-        public static final double shooterConveyorFeedVoltage = 3.0;
-        public static final double shooterConveyorReverseVoltage = -2.0;
-        public static final double shooterConveyorNominalKv = 0.125;
-        public static final double shooterConveyorMaxVelocity = 12.0 / shooterConveyorNominalKv;
-        public static final double shooterConveyorFeedVelocity =
-            shooterConveyorFeedVoltage / shooterConveyorNominalKv;
-        public static final double shooterConveyorReverseVelocity =
-            shooterConveyorReverseVoltage / shooterConveyorNominalKv;
+        public static final double shooterConveyorFeedVelocity = 40;
+        public static final double shooterConveyorReverseVelocity = -10;
 
         public static final Slot0Configs flyWheelSlot0Configs = new Slot0Configs()
             .withKP(0.21)
@@ -54,7 +41,7 @@ public final class Constants {
 
         public static final Slot0Configs conveyorSlot0Configs = new Slot0Configs()
             .withKP(0.19).withKI(0).withKD(0.001)
-            .withKV(shooterConveyorNominalKv).withKA(0.0).withKS(0.07);
+            .withKV(0.125).withKA(0.0).withKS(0.07);
 
         public static final Slot0Configs backboardSlot0Configs = new Slot0Configs()
             .withKP(0.01).withKI(0).withKD(0)
@@ -168,8 +155,7 @@ public final class Constants {
 
     public static class Superstructure {
         // State-machine timing and gate tolerances; tune on the real robot.
-        public static final double shooterFeedVoltage = Shooter.shooterConveyorFeedVoltage;
-        public static final double shooterReverseVoltage = Shooter.shooterConveyorReverseVoltage;
+
         public static final double shooterFeedVelocity = Shooter.shooterConveyorFeedVelocity;
         public static final double shooterReverseVelocity = Shooter.shooterConveyorReverseVelocity;
         public static final double shootTimeoutSeconds = 1.0;

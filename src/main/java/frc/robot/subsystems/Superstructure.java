@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -284,8 +285,13 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void handleShootHub() {
-        double targetVelocity = limelight.getShooterVelocityByDistance() + flywheelVelocityOffset;
-        double backboardPosition = Constants.Superstructure.backboardShootPosition + backboardPositionOffset;
+        double x = NetworkTableInstance.getDefault().getTable("AutoControl").getEntry("distanceToHub").getDouble(0.0);
+        x = MathUtil.clamp(x, 1.2, 4.5);
+        double rawtargetVelocity = -0.9702766369910669*x*x*x*x*x*x+16.17984114722666*x*x*x*x*x-107.89020547785285*x*x*x*x+365.6895126610877*x*x*x-659.1553030522557*x*x+598.8266122952737*x-188.96203796840197;
+        double targetVelocity = rawtargetVelocity + flywheelVelocityOffset;
+        double rawtargetbackboardPosition = +72.63723930800967*x*x*x*x*x*x-1226.7072434356646*x*x*x*x*x+8380.732539436454*x*x*x*x-29585.06108203164*x*x*x+56753.91414329895*x*x-55469.56099616276*x+21418.08191862802;
+        rawtargetbackboardPosition = MathUtil.clamp(rawtargetbackboardPosition, 0, 2200);
+        double backboardPosition = rawtargetbackboardPosition + backboardPositionOffset;
         handlePreparedFeed(targetVelocity, backboardPosition);
     }
 
@@ -301,8 +307,6 @@ public class Superstructure extends SubsystemBase {
             setSystemState(SystemState.PREP_SHOOT);
         }
         intakeRoller.stop();
-        conveyor.stop();
-        stopShooterConveyorUnlessTuning();
         // 距离到射速的映射由 LimelightSubsystem 提供；操作员 offset 用于现场微调，
         // 但不会绕过 Superstructure 状态机。
         shooter.setFlywheelVelocity(targetVelocity);
@@ -312,6 +316,7 @@ public class Superstructure extends SubsystemBase {
             // 只有 canShoot() 通过后才会进入本状态；喂球期间不再复查门控，
             // 避免球接触飞轮导致的掉速中断喂球。
             intakeRotater.shootAssist();
+            
             conveyor.feedToShooter();
             runShooterConveyorVelocityUnlessTuning(Constants.Superstructure.shooterFeedVelocity);
             return;
@@ -382,6 +387,9 @@ public class Superstructure extends SubsystemBase {
         if (systemState != nextState) {
             systemState = nextState;
             stateStartTimestamp = Timer.getFPGATimestamp();
+            if (nextState == SystemState.SHOOTING) {
+                shooter.setBackboardBrakeMode();
+            }
         }
     }
 

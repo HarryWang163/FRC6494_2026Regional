@@ -9,12 +9,14 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -49,7 +51,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private final NetworkTable shooterNetworkTable;
     private final NetworkTable flywheelTuningTable;
-    private final NetworkTable conveyorTuningTable;
     private final NetworkTable backboardTuningTable;
 
     private double flywheelOutputVolts = 0.0;
@@ -90,6 +91,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         backboardMotor = new TalonFXS(Constants.Shooter.backboardMotorID);
         backboardMotor.getConfigurator().apply(Constants.Shooter.backboardSlot0Configs);
+        setBackboardBrakeMode();
 
         backboardEncoder = new Encoder(0, 1, false, Encoder.EncodingType.k4X);
         backboardEncoder.setSamplesToAverage(5);
@@ -109,9 +111,6 @@ public class ShooterSubsystem extends SubsystemBase {
         flywheelTuningTable.getEntry("flywheelVelocityEnable").setDefaultBoolean(false);
         flywheelTuningTable.getEntry("flywheelTargetVelocity").setDefaultDouble(Constants.Shooter.defaultFlywheelVelocity);
         flywheelTuningTable.getEntry("flywheelVelocityTolerance").setDefaultDouble(Constants.Shooter.flywheelReadyVelocityTolerance);
-        conveyorTuningTable = NetworkTableInstance.getDefault().getTable("Tuning/conveyor");
-        conveyorTuningTable.getEntry("conveyorVelocityEnable").setDefaultBoolean(false);
-        conveyorTuningTable.getEntry("conveyorTargetVelocity").setDefaultDouble(Constants.Shooter.shooterConveyorFeedVelocity);
         backboardTuningTable = NetworkTableInstance.getDefault().getTable("Tuning/backboard");
         backboardTuningTable.getEntry("backboardPositionEnable").setDefaultBoolean(false);
         backboardTuningTable.getEntry("backboardTargetPosition").setDefaultDouble(0.0);
@@ -155,18 +154,14 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean atVelocity() {
-        if (Math.abs(flywheelTargetVelocity) < Constants.Shooter.flywheelReadyVelocityThreshold) {
-            flywheelVelocityReadyStartTimestamp = Timer.getFPGATimestamp();
+        double currentvelocity = getAverageFlywheelVelocity();
+        if(currentvelocity>flywheelTargetVelocity*0.95){
+            return true;
+        } else {
             return false;
-        }
-        if (Math.abs(getFlywheelVelocityError()) > flywheelVelocityTolerance) {
-            flywheelVelocityReadyStartTimestamp = Timer.getFPGATimestamp();
-            return false;
-        }
-        return Timer.getFPGATimestamp() - flywheelVelocityReadyStartTimestamp
-            >= Constants.Shooter.flywheelReadyDelaySeconds;
+        }   
     }
-
+    
     public double getLeftFlywheelVelocity() {
         return leftFlywheel.getVelocity().getValueAsDouble();
     }
@@ -196,11 +191,7 @@ public class ShooterSubsystem extends SubsystemBase {
     /* ====================== */
 
     public void runShooterConveyorVelocity(double targetVelocityRps) {
-        shooterConveyorTargetVelocity = MathUtil.clamp(
-            targetVelocityRps,
-            -Constants.Shooter.shooterConveyorMaxVelocity,
-            Constants.Shooter.shooterConveyorMaxVelocity
-        );
+        shooterConveyorTargetVelocity = targetVelocityRps;
         leftConveyor.setControl(conveyorVelocityRequest.withVelocity(shooterConveyorTargetVelocity));
         setRightConveyorFollowLeft();
     }
@@ -318,6 +309,12 @@ public class ShooterSubsystem extends SubsystemBase {
         setBackboardVoltage(0.0);
     }
 
+    public void setBackboardBrakeMode() {
+        var backboardMotorOutputConfigs = new MotorOutputConfigs();
+        backboardMotorOutputConfigs.NeutralMode = NeutralModeValue.Brake;
+        backboardMotor.getConfigurator().apply(backboardMotorOutputConfigs);
+    }
+
     public double getBackboardPosition() {
         return backboardEncoder.getDistance();
     }
@@ -339,17 +336,17 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean isBackboardPositionTuningActive() {
-        return backboardTuningTable.getEntry("backboardPositionEnable").getBoolean(false);
+        return DriverStation.isTest()
+            && backboardTuningTable.getEntry("backboardPositionEnable").getBoolean(false);
     }
 
     public boolean isFlywheelTuningControlActive() {
-        boolean velocityTunerEnabled = flywheelTuningTable.getEntry("flywheelVelocityEnable").getBoolean(false);
-        return velocityTunerEnabled;
+        return DriverStation.isTest()
+            && flywheelTuningTable.getEntry("flywheelVelocityEnable").getBoolean(false);
     }
 
     public boolean isShooterConveyorTuningControlActive() {
-        boolean velocityTunerEnabled = conveyorTuningTable.getEntry("conveyorVelocityEnable").getBoolean(false);
-        return velocityTunerEnabled;
+        return false;
     }
 
     public void resetbackboardencoder() {
@@ -379,8 +376,9 @@ public class ShooterSubsystem extends SubsystemBase {
         stopBackboard();
     }
 
-    public void debugBackboardTargetPeriodic() {
-        boolean positionEnable = backboardTuningTable.getEntry("backboardPositionEnable").getBoolean(false);
+    public void debugBackboardTargetPeriodic(boolean allowMotorOutput) {
+        boolean positionEnable =
+            allowMotorOutput && backboardTuningTable.getEntry("backboardPositionEnable").getBoolean(false);
         double requestedTarget = backboardTuningTable.getEntry("backboardTargetPosition").getDouble(0.0);
         double clampedTarget = MathUtil.clamp(
             requestedTarget,
@@ -397,8 +395,9 @@ public class ShooterSubsystem extends SubsystemBase {
         }
     }
 
-    public void debugFlywheelVelocityPeriodic() {
-        flywheelVelocityTuningActive = flywheelTuningTable.getEntry("flywheelVelocityEnable").getBoolean(false);
+    public void debugFlywheelVelocityPeriodic(boolean allowMotorOutput) {
+        flywheelVelocityTuningActive =
+            allowMotorOutput && flywheelTuningTable.getEntry("flywheelVelocityEnable").getBoolean(false);
         double requestedTargetVelocity =
             flywheelTuningTable.getEntry("flywheelTargetVelocity").getDouble(Constants.Shooter.defaultFlywheelVelocity);
         flywheelVelocityTolerance = Math.max(
@@ -419,28 +418,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
         if (flywheelVelocityTuningActive) {
             setFlywheelVelocity(clampedTargetVelocity);
-        }
-    }
-
-    public void debugShooterConveyorVelocityPeriodic() {
-        shooterConveyorVelocityTuningActive =
-            conveyorTuningTable.getEntry("conveyorVelocityEnable").getBoolean(false);
-        double requestedTargetVelocity =
-            conveyorTuningTable.getEntry("conveyorTargetVelocity")
-                .getDouble(Constants.Shooter.shooterConveyorFeedVelocity);
-        double clampedTargetVelocity = MathUtil.clamp(
-            requestedTargetVelocity,
-            -Constants.Shooter.shooterConveyorMaxVelocity,
-            Constants.Shooter.shooterConveyorMaxVelocity
-        );
-
-        conveyorTuningTable.getEntry("conveyorVelocityEnableActive")
-            .setBoolean(shooterConveyorVelocityTuningActive);
-        conveyorTuningTable.getEntry("conveyorCommandedTargetVelocity").setDouble(requestedTargetVelocity);
-        conveyorTuningTable.getEntry("conveyorClampedTargetVelocity").setDouble(clampedTargetVelocity);
-
-        if (shooterConveyorVelocityTuningActive) {
-            runShooterConveyorVelocity(clampedTargetVelocity);
         }
     }
 
@@ -499,4 +476,3 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterNetworkTable.getEntry("statorCurrent").setDouble(getConveyorStatorCurrent());
     }
 }
-

@@ -1,6 +1,5 @@
 package frc.robot.tuning;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFXS;
 
 import edu.wpi.first.networktables.*;
@@ -20,11 +19,8 @@ public class ConfigTalonFXSMotorTuner {
   private final DoubleSubscriber KaSub;
   private final DoubleSubscriber KsSub;
 
-  private final BooleanSubscriber enableRuningSub;
-  private final DoubleSubscriber runningSpeedRPS;
   private double lastKp = 0, lastKi = 0, lastKd = 0, lastKv = 0, lastKa = 0, lastKs = 0;
-  
-  private final VelocityDutyCycle velocityRequest = new VelocityDutyCycle(0);
+
   public ConfigTalonFXSMotorTuner(TalonFXS motor_, String motorName_, Slot0Configs motorSlot0Configs_) {
     this.motor = motor_;
     this.motorName = motorName_;
@@ -39,9 +35,6 @@ public class ConfigTalonFXSMotorTuner {
     table.getDoubleTopic(motorName+"kA").publish().set(motorSlot0Configs.kA);
     table.getDoubleTopic(motorName+"kS").publish().set(motorSlot0Configs.kS);
 
-    table.getBooleanTopic(motorName+"EnableRunning").publish().set(false);
-    table.getDoubleTopic(motorName+"RunningSpeedRPS").publish().set(0);
-    
     this.enableSub = table.getBooleanTopic(motorName+"Enable").subscribe(false);
     this.KpSub = table.getDoubleTopic(motorName+"kP").subscribe(motorSlot0Configs.kP);
     this.KiSub = table.getDoubleTopic(motorName+"kI").subscribe(motorSlot0Configs.kI);
@@ -49,8 +42,6 @@ public class ConfigTalonFXSMotorTuner {
     this.KvSub = table.getDoubleTopic(motorName+"kV").subscribe(motorSlot0Configs.kV);
     this.KaSub = table.getDoubleTopic(motorName+"kA").subscribe(motorSlot0Configs.kA);
     this.KsSub = table.getDoubleTopic(motorName+"kS").subscribe(motorSlot0Configs.kS);
-    this.enableRuningSub = table.getBooleanTopic(motorName+"EnableRunning").subscribe(false);
-    this.runningSpeedRPS = table.getDoubleTopic(motorName+"RunningSpeedRPS").subscribe(0);
   }
 
   public void periodic() {
@@ -72,14 +63,6 @@ public class ConfigTalonFXSMotorTuner {
       System.out.println("applyed settings: "+motorName);
 
       lastKp = kp; lastKi = ki; lastKd = kd; lastKv = kv; lastKa = ka; lastKs = ks;
-    }
-    
-    if (enableRuningSub.get()) {;
-      double speed = runningSpeedRPS.get();
-      motor.setControl(velocityRequest.withVelocity(speed));
-    // System.out.println("running motor with speed: "+speed+" on motor: "+motorName);
-    }else{
-      motor.setControl(velocityRequest.withVelocity(0));
     }
   }
 }

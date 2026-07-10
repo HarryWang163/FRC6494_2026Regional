@@ -77,7 +77,7 @@ public class TunerConstants {
     new Pigeon2Configuration()
         .withGyroTrim(
             new GyroTrimConfigs()
-                .withGyroScalarZ(-5.0)
+                .withGyroScalarZ(-6.7)
         )
         .withPigeon2Features(
             new Pigeon2FeaturesConfigs()

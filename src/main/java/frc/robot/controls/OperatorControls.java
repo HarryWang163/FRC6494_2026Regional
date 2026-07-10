@@ -3,6 +3,7 @@ package frc.robot.controls;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
+import frc.robot.subsystems.IntakeRollerSubsystem;
 import frc.robot.subsystems.IntakeRotaterSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.Superstructure;
@@ -72,6 +73,24 @@ public class OperatorControls {
 
     public Command manualRaiseIntakeRotaterCommand(IntakeRotaterSubsystem intakeRotater) {
         return Commands.runEnd(intakeRotater::manualRaise, intakeRotater::stop, intakeRotater);
+    }
+
+    public Command manualRaiseIntakeWithRollerCommand(
+        IntakeRotaterSubsystem intakeRotater,
+        IntakeRollerSubsystem intakeRoller
+    ) {
+        return Commands.runEnd(
+            () -> {
+                intakeRotater.manualRaise();
+                intakeRoller.intake();
+            },
+            () -> {
+                intakeRotater.stop();
+                intakeRoller.stop();
+            },
+            intakeRotater,
+            intakeRoller
+        );
     }
 
     public Command manualLowerIntakeRotaterCommand(IntakeRotaterSubsystem intakeRotater) {

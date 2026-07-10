@@ -36,9 +36,8 @@ public class RobotContainer {
   /*         手柄            */
   /* ====================== */
 
-  // 使用两个 Xbox 手柄：0 号给底盘驾驶，1 号给机构操作员。
-  private final CommandXboxController controllerlower = new CommandXboxController(0);
-  private final CommandXboxController controllerupper = new CommandXboxController(1);
+  // 使用一个 Xbox 手柄：0 号口同时负责底盘驾驶和机构操作。
+  private final CommandXboxController controller = new CommandXboxController(0);
 
   /* ====================== */
   /*         子系统           */
@@ -70,7 +69,7 @@ public class RobotContainer {
   /*     控制封装/调参        */
   /* ====================== */
 
-  public final DriveControls driveControls = new DriveControls(drivetrain, controllerlower, superstructure);
+  public final DriveControls driveControls = new DriveControls(drivetrain, controller, superstructure);
 
   // 操作员意图层替代旧的射击/进球分离控制类，让复杂动作判断集中留在 Superstructure。
   private final OperatorControls operatorControls = new OperatorControls(superstructure, shooterSubsystem);
@@ -78,16 +77,8 @@ public class RobotContainer {
   private final GameData2026 gameData2026 = new GameData2026();
   private ConfigTalonFXMotorTuner configFlywheelTuner =
       new ConfigTalonFXMotorTuner(shooterSubsystem.leftFlywheel, "flywheel", Constants.Shooter.flyWheelSlot0Configs, false);
-  private ConfigTalonFXMotorTuner configConveyorTuner =
-      new ConfigTalonFXMotorTuner(shooterSubsystem.leftConveyor, "conveyor", Constants.Shooter.conveyorSlot0Configs, false);
   private ConfigTalonFXSMotorTuner configBackboardTuner =
       new ConfigTalonFXSMotorTuner(shooterSubsystem.backboardMotor, "backboard", Constants.Shooter.backboardSlot0Configs);
-  private ConfigTalonFXMotorTuner configMainConveyorTuner =
-      new ConfigTalonFXMotorTuner(conveyorSubsystem.mainConveyor, "mainconveyor", Constants.Conveyor.mainConveyorSlot0Configs);
-  private ConfigTalonFXMotorTuner configIntakerRollerTuner =
-      new ConfigTalonFXMotorTuner(intakeRollerSubsystem.leftIntakeRoller, "intakerroller", Constants.Intaker.intakeRollerSlot0Configs);
-  private ConfigTalonFXMotorTuner configIntakerRotaterTuner =
-      new ConfigTalonFXMotorTuner(intakeRotaterSubsystem.leftIntakeRotater, "intakerrotater", Constants.Intaker.intakeRotaterSlot0Configs);
 
   private final SendableChooser<Command> autoChooser;
   private final Trigger enableTrigger = new Trigger(DriverStation::isEnabled);
@@ -128,44 +119,12 @@ public class RobotContainer {
     // 禁用状态下进入空闲命令，防止模块继续响应上一周期的运动请求。
     RobotModeTriggers.disabled().whileTrue(driveControls.idleCommand());
 
-    // 左保险：按住刹车。
-    controllerlower.leftBumper()
-        .onTrue(Commands.runOnce(driveControls::emergencyStop))
-        .whileTrue(driveControls.brakeWhileHeld());
-
-    // 右保险：按住开启加速模式，松开后恢复普通速度。
-    controllerlower.rightBumper()
-        .onTrue(Commands.runOnce(() -> driveControls.setBoostEnabled(true)))
-        .onFalse(Commands.runOnce(() -> driveControls.setBoostEnabled(false)));
-
     // Back 键：重置场地坐标系角度。
-    controllerlower.back().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-
-    // Start 键：强行使用 shooter 侧 Limelight 的 MegaTag2 全场定位。
-    controllerlower.start().whileTrue(drivetrain.run(drivetrain::forceUsingLimelightmt2));
-
-    controllerlower.a().whileTrue(drivetrain.run(() -> {
-      drivetrain.forceUsingLimelightmt2WithllName(Constants.Limelight.LIMELIGHT_NAME_Shooter);
-      System.out.println("Try using shooter for metatag2");
-    }));
-    controllerlower.b().whileTrue(drivetrain.run(() -> {
-      drivetrain.forceUsingLimelightmt2WithllName(Constants.Limelight.LIMELIGHT_NAME_Intaker);
-      System.out.println("Try using intaker for metatag2");
-    }));
+    controller.back().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
     // 预留的左摇杆自动瞄准切换，当前保持注释，避免改变驾驶员已习惯的按键。
-    // controllerlower.leftStick().onTrue(operatorControls.requestAimHubCommand());
-    // controllerlower.leftStick().onFalse(operatorControls.requestIdleCommand());
-
-    // 上操作员右保险：按住进入自动瞄准模式，松开回到全手动模式。
-    Trigger autoAim = controllerupper.rightBumper(); // 可按需要再并入驾驶员左摇杆。
-    autoAim.onTrue(operatorControls.requestAimHubCommand());
-    autoAim.onFalse(operatorControls.requestIdleCommand());
-
-    // 上操作员左保险：按住进入传球模式，松开回到全手动模式。
-    Trigger autoAim2 = controllerupper.leftBumper(); // 可按需要再并入驾驶员左摇杆。
-    autoAim2.onTrue(operatorControls.requestPassBallCommand());
-    autoAim2.onFalse(operatorControls.requestIdleCommand());
+    // controller.leftStick().onTrue(operatorControls.requestAimHubCommand());
+    // controller.leftStick().onFalse(operatorControls.requestIdleCommand());
 
   }
 
@@ -175,18 +134,17 @@ public class RobotContainer {
     // 这些命令 require Superstructure，与自动程序共用需求；
     // 用 teleop 门控避免自动赛阶段误触直接取消整个 PathPlanner 自动。
     Trigger teleopOnly = RobotModeTriggers.teleop();
-    controllerupper.rightTrigger().and(teleopOnly)
+    controller.rightTrigger().and(teleopOnly)
         .onTrue(operatorControls.requestShootHubCommand())
         .onFalse(operatorControls.requestIdleCommand());
-    controllerupper.b().and(teleopOnly)
+    controller.rightBumper().and(teleopOnly)
         .onTrue(operatorControls.requestEjectCommand())
         .onFalse(operatorControls.requestIdleCommand());
-    controllerupper.povLeft().onTrue(Commands.runOnce(() -> operatorControls.adjustFlywheelVelocityOffset(-1.0)));
-    controllerupper.povRight().onTrue(Commands.runOnce(() -> operatorControls.adjustFlywheelVelocityOffset(1.0)));
-    controllerupper.povUp().onTrue(Commands.runOnce(() -> operatorControls.adjustBackboardRateOffset(100)));
-    controllerupper.povDown().onTrue(Commands.runOnce(() -> operatorControls.adjustBackboardRateOffset(-100)));
-    controllerupper.back().onTrue(Commands.runOnce(() -> operatorControls.resetOffsets()));
-    controllerupper.start().onTrue(operatorControls.resetBackboardCommand());
+    controller.povLeft().onTrue(Commands.runOnce(() -> operatorControls.adjustFlywheelVelocityOffset(-1.0)));
+    controller.povRight().onTrue(Commands.runOnce(() -> operatorControls.adjustFlywheelVelocityOffset(1.0)));
+    controller.povUp().onTrue(Commands.runOnce(() -> operatorControls.adjustBackboardRateOffset(100)));
+    controller.povDown().onTrue(Commands.runOnce(() -> operatorControls.adjustBackboardRateOffset(-100)));
+    controller.start().onTrue(operatorControls.resetBackboardCommand());
   }
 
   private void bingdingLED() {
@@ -198,16 +156,13 @@ public class RobotContainer {
   }
 
   public void tunerPeriodic() {
+    boolean allowMotorOutputTuning = DriverStation.isTest();
+
     driveGainsTuner.periodic();
     configFlywheelTuner.periodic(() -> shooterSubsystem.applyLeftConfigurationToRight());
-    shooterSubsystem.debugFlywheelVelocityPeriodic();
-    configConveyorTuner.periodic(null);
-    shooterSubsystem.debugShooterConveyorVelocityPeriodic();
     configBackboardTuner.periodic();
-    shooterSubsystem.debugBackboardTargetPeriodic();
-    configMainConveyorTuner.periodic(null);
-    configIntakerRollerTuner.periodic(null);
-    configIntakerRotaterTuner.periodic(null);
+    shooterSubsystem.debugFlywheelVelocityPeriodic(allowMotorOutputTuning);
+    shooterSubsystem.debugBackboardTargetPeriodic(allowMotorOutputTuning);
     shooterSubsystem.setRightFlywheelFollowLeft();
     shooterSubsystem.setRightConveyorFollowLeft();
   }
@@ -219,27 +174,24 @@ public class RobotContainer {
   private void configueIntaker() {
     // 进球相关按钮也只请求 Superstructure 状态；intaker 开赛后默认保持下放。
     Trigger teleopOnly = RobotModeTriggers.teleop();
-    controllerupper.leftTrigger().and(teleopOnly)
+    controller.leftTrigger().and(teleopOnly)
+        .onTrue(operatorControls.requestPassBallCommand())
+        .onFalse(operatorControls.requestIdleCommand());
+
+    controller.leftBumper().and(teleopOnly)
         .onTrue(operatorControls.requestIntakeCommand())
         .onFalse(operatorControls.requestIdleCommand());
 
-    Trigger manualRaiseIntaker = controllerupper.x().and(teleopOnly);
+    Trigger manualRaiseIntaker = controller.y().and(teleopOnly);
     manualRaiseIntaker
         .onTrue(operatorControls.requestManualCommand())
         .whileTrue(operatorControls.manualRaiseIntakeRotaterCommand(intakeRotaterSubsystem))
         .onFalse(operatorControls.requestIdleCommand());
 
-    Trigger manualLowerIntaker = controllerupper.a().and(teleopOnly);
+    Trigger manualLowerIntaker = controller.a().and(teleopOnly);
     manualLowerIntaker
         .onTrue(operatorControls.requestManualCommand())
         .whileTrue(operatorControls.manualLowerIntakeRotaterCommand(intakeRotaterSubsystem))
         .onFalse(operatorControls.requestIdleCommand());
-
-    controllerupper.y().and(teleopOnly)
-        .onTrue(Commands.sequence(
-            operatorControls.requestManualCommand(),
-            operatorControls.lowerIntakeRotaterForMatchCommand(intakeRotaterSubsystem),
-            operatorControls.requestIdleCommand()
-        ));
   }
 }

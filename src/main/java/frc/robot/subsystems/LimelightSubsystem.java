@@ -46,8 +46,4 @@ public class LimelightSubsystem extends SubsystemBase {
     public Pose2d getEstimatedPose() {
         return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName).pose;
     }
-
-    public double getShooterVelocityByDistance() {
-        return Constants.Shooter.flywheelVelocityByDistance.get(getDistanceToTarget());
-    }
 }

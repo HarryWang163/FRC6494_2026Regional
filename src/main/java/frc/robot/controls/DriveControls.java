@@ -37,8 +37,8 @@ public class DriveControls {
     private final double maxAngularRate = RotationsPerSecond.of(0.75).in(edu.wpi.first.units.Units.RadiansPerSecond);
 
     // 默认速度比例，普通驾驶使用。
-    private double normalDriveScale = 0.3;
-    private double normalTurnScale  = 0.7;
+    private double normalDriveScale = 1.0;
+    private double normalTurnScale  = 1.0;
 
     // 加速模式比例，按住 RB 时使用。
     private double boostDriveScale = 1.0;
@@ -48,7 +48,7 @@ public class DriveControls {
 
     private boolean boostEnabled = false;
 
-    private final SlewRateLimiter vxLimiter = new SlewRateLimiter(5.0);   // m/s^2 等效加速度限制
+    private final SlewRateLimiter vxLimiter = new SlewRateLimiter(3.5);   // m/s^2 等效加速度限制
     private final SlewRateLimiter vyLimiter = new SlewRateLimiter(5.0);
     private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(9.0); // rad/s^2 等效角加速度限制
 
