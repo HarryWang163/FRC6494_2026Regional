@@ -10,6 +10,7 @@ public class ConfigTalonFXMotorTuner {
   private final String motorName;
   private final Slot0Configs motorSlot0Configs;
   private final NetworkTable table;
+  private final boolean voltageRunEnabled;
 
   // ---- Subscribers：读取 Elastic 改过的新值 ----
   private final BooleanSubscriber enableSub;
@@ -27,9 +28,19 @@ public class ConfigTalonFXMotorTuner {
   
   private final VoltageOut voltageRequest = new VoltageOut(0);
   public ConfigTalonFXMotorTuner(TalonFX motor_, String motorName_, Slot0Configs motorSlot0Configs_) {
+    this(motor_, motorName_, motorSlot0Configs_, true);
+  }
+
+  public ConfigTalonFXMotorTuner(
+      TalonFX motor_,
+      String motorName_,
+      Slot0Configs motorSlot0Configs_,
+      boolean voltageRunEnabled_
+  ) {
     this.motor = motor_;
     this.motorName = motorName_;
     this.motorSlot0Configs = motorSlot0Configs_;
+    this.voltageRunEnabled = voltageRunEnabled_;
 
     this.table = NetworkTableInstance.getDefault().getTable("Tuning/" + motorName);
 
@@ -41,8 +52,10 @@ public class ConfigTalonFXMotorTuner {
     table.getDoubleTopic(motorName+"kA").publish().set(motorSlot0Configs.kA);
     table.getDoubleTopic(motorName+"kS").publish().set(motorSlot0Configs.kS);
 
-    table.getBooleanTopic(motorName+"EnableRunning").publish().set(false);;
-    table.getDoubleTopic(motorName+"RunningVolts").publish().set(0);;
+    if (voltageRunEnabled) {
+      table.getBooleanTopic(motorName+"EnableRunning").publish().set(false);;
+      table.getDoubleTopic(motorName+"RunningVolts").publish().set(0);;
+    }
     
     this.enableSub = table.getBooleanTopic(motorName+"Enable").subscribe(false);
     this.KpSub = table.getDoubleTopic(motorName+"kP").subscribe(motorSlot0Configs.kP);
@@ -51,8 +64,12 @@ public class ConfigTalonFXMotorTuner {
     this.KvSub = table.getDoubleTopic(motorName+"kV").subscribe(motorSlot0Configs.kV);
     this.KaSub = table.getDoubleTopic(motorName+"kA").subscribe(motorSlot0Configs.kA);
     this.KsSub = table.getDoubleTopic(motorName+"kS").subscribe(motorSlot0Configs.kS);
-    this.enableRuningSub = table.getBooleanTopic(motorName+"EnableRunning").subscribe(false);
-    this.runningVolts = table.getDoubleTopic(motorName+"RunningVolts").subscribe(0);
+    this.enableRuningSub = voltageRunEnabled
+        ? table.getBooleanTopic(motorName+"EnableRunning").subscribe(false)
+        : null;
+    this.runningVolts = voltageRunEnabled
+        ? table.getDoubleTopic(motorName+"RunningVolts").subscribe(0)
+        : null;
   }
 
   public void periodic(Runnable func) {
@@ -79,7 +96,7 @@ public class ConfigTalonFXMotorTuner {
       }
     }
     
-    if (enableRuningSub.get()) {;
+    if (voltageRunEnabled && enableRuningSub.get()) {;
       double volts = MathUtil.clamp(runningVolts.get(), -12.0, 12.0);
       motor.setControl(voltageRequest.withOutput(volts));
       wasRunning = true;

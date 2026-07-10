@@ -11,7 +11,7 @@ public final class Constants {
     public static final boolean LEDUsing = false;
 
     public static class Shooter {
-        // 机构 CAN ID 目前是占位值；季后赛最终接线确认后，只需要改这里。
+        // Placeholder mechanism CAN IDs; update here after final wiring.
         public static final int leftFlywheelID = 38;
         public static final int rightFlywheelID = 39;
         public static final int leftConveyorID = 40;
@@ -26,16 +26,7 @@ public final class Constants {
         public static final double flywheelReadyVelocityTolerance = 2.0;
         public static final double flywheelReadyDelaySeconds = 0.5;
 
-        // 距离(米) -> 飞轮电压(V) 射表。当前为占位点；
-        // 真车试射后按实测数据加点即可，查表自动线性插值并在两端取边界值。
-        public static final InterpolatingDoubleTreeMap flywheelVoltageByDistance = new InterpolatingDoubleTreeMap();
-        static {
-            flywheelVoltageByDistance.put(1.2, 2.0);
-            flywheelVoltageByDistance.put(2.5, 2.1);
-            flywheelVoltageByDistance.put(3.5, 2.2);
-            flywheelVoltageByDistance.put(5.0, 2.3);
-        }
-
+        // Distance (meters) -> flywheel velocity (rotations per second).
         public static final InterpolatingDoubleTreeMap flywheelVelocityByDistance = new InterpolatingDoubleTreeMap();
         static {
             flywheelVelocityByDistance.put(1.2, 2.0 / flywheelNominalKv);
@@ -140,7 +131,7 @@ public final class Constants {
     }
 
     public static class Intaker {
-        // 进球机构 CAN ID 同样是占位值，真实 ID 确认后集中在这里修改。
+        // Placeholder intake CAN IDs; update here after wiring is confirmed.
         public static final int leftIntakeRollerID = 20;
         public static final int rightIntakeRollerID = 47;
         public static final int leftIntakeRotaterID = 48;
@@ -162,7 +153,7 @@ public final class Constants {
             .withKV(0.00).withKA(0.00).withKS(0.00);
 
         public static final double IntakeGetterSpeedforAuto = 0.5;
-        // 这里给出可用的占位值，真车调好位置闭环后再收紧。
+        // Placeholder values; tighten after the real mechanism is tuned.
     }
 
     public static class Conveyor {
@@ -176,7 +167,7 @@ public final class Constants {
     }
 
     public static class Superstructure {
-        // 状态机时间和门控容差。真车基础动作验证后，需要现场调这些值。
+        // State-machine timing and gate tolerances; tune on the real robot.
         public static final double shooterFeedVoltage = Shooter.shooterConveyorFeedVoltage;
         public static final double shooterReverseVoltage = Shooter.shooterConveyorReverseVoltage;
         public static final double shooterFeedVelocity = Shooter.shooterConveyorFeedVelocity;
@@ -188,10 +179,10 @@ public final class Constants {
         public static final double passBallFlywheelVelocity = Shooter.defaultFlywheelVelocity;
         public static final double passBallBackboardPosition = 175.0;
 
-        // 射击时背板的目标位置（外接编码器计数）。
+        // Shoot backboard target position in external encoder counts.
         public static final double backboardShootPosition = 175.0;
         public static final double backboardReadyPositionTolerance = 100.0;
-        // 射击门控是否要求底盘接近静止。
+        // Whether the shooting gate requires the drivetrain to be nearly still.
         public static final boolean stationaryGateEnabled = true;
     }
 }

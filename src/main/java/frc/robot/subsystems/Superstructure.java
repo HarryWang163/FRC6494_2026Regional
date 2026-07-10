@@ -396,7 +396,6 @@ public class Superstructure extends SubsystemBase {
         table.getEntry("timeInState").setDouble(timeInState());
         table.getEntry("canShoot").setBoolean(canShoot());
         table.getEntry("shooterAtVelocity").setBoolean(shooter.atVelocity());
-        table.getEntry("shooterAtVoltage").setBoolean(shooter.atVoltage());
         table.getEntry("driveAimed").setBoolean(drive.isAimed());
         table.getEntry("driveHeadingError").setDouble(drive.getHeadingError());
         table.getEntry("driveStationary").setBoolean(isDriveStationary());

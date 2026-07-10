@@ -101,23 +101,6 @@
             }
           },
           {
-            "title": "Shooter At Voltage",
-            "x": 192.0,
-            "y": 128.0,
-            "width": 192.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Superstructure/shooterAtVoltage",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
             "title": "Drive Aimed",
             "x": 384.0,
             "y": 128.0,
@@ -290,37 +273,6 @@
               "time_displayed": 5.0,
               "color": 4278238420,
               "line_width": 2.0
-            }
-          },
-          {
-            "title": "Flywheel Target Voltage",
-            "x": 384.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Shooter/flywheelTargetVoltage",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "Flywheel At Voltage",
-            "x": 640.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Shooter/flywheelAtVoltage",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
             }
           },
           {
@@ -1059,33 +1011,6 @@
             }
           },
           {
-            "title": "Flywheel Run",
-            "x": 128.0,
-            "y": 192.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Toggle Switch",
-            "properties": {
-              "topic": "/Tuning/flywheel/flywheelEnableRunning",
-              "period": 0.06,
-              "data_type": "boolean"
-            }
-          },
-          {
-            "title": "Flywheel Run Volts",
-            "x": 256.0,
-            "y": 192.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/flywheel/flywheelRunningVolts",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
             "title": "Shooter Conv Enable",
             "x": 0.0,
             "y": 384.0,
@@ -1096,33 +1021,6 @@
               "topic": "/Tuning/conveyor/conveyorEnable",
               "period": 0.06,
               "data_type": "boolean"
-            }
-          },
-          {
-            "title": "Shooter Conv Run",
-            "x": 128.0,
-            "y": 384.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Toggle Switch",
-            "properties": {
-              "topic": "/Tuning/conveyor/conveyorEnableRunning",
-              "period": 0.06,
-              "data_type": "boolean"
-            }
-          },
-          {
-            "title": "Shooter Conv Run Volts",
-            "x": 256.0,
-            "y": 384.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/conveyor/conveyorRunningVolts",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
             }
           },
           {
@@ -2687,20 +2585,6 @@
               "time_displayed": 8.0,
               "color": 4278238420,
               "line_width": 2.0
-            }
-          },
-          {
-            "title": "Target Volts Estimate",
-            "x": 0.0,
-            "y": 1024.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Shooter/flywheelTargetVoltage",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
             }
           },
           {

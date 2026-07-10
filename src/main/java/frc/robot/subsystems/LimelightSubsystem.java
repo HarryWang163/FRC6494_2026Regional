@@ -6,10 +6,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 /**
- * 对现有 LimelightHelpers 的薄只读封装。
+ * Thin read-only wrapper around the existing LimelightHelpers.
  *
- * 本类不做视觉融合，也不控制任何机构；只给 Superstructure 提供稳定的
- * 目标和距离读取接口。
+ * This subsystem does not fuse vision or command mechanisms; it only gives
+ * Superstructure stable target and distance read APIs.
  */
 public class LimelightSubsystem extends SubsystemBase {
     private final String limelightName;
@@ -35,8 +35,8 @@ public class LimelightSubsystem extends SubsystemBase {
     }
 
     public double getDistanceToTarget() {
-        // DriveControls 已经把基于场地位姿计算的距离发布到 AutoControl；
-        // 这里复用该值，保留旧定位和目标计算逻辑。
+        // DriveControls publishes the field-pose distance under AutoControl.
+        // Reuse that value to preserve the existing target calculation path.
         return NetworkTableInstance.getDefault()
             .getTable("AutoControl")
             .getEntry("distanceToHub")
@@ -45,11 +45,6 @@ public class LimelightSubsystem extends SubsystemBase {
 
     public Pose2d getEstimatedPose() {
         return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName).pose;
-    }
-
-    public double getShooterVoltageByDistance() {
-        // 查 Constants 里的插值射表；真车试射后往表里加实测点即可。
-        return Constants.Shooter.flywheelVoltageByDistance.get(getDistanceToTarget());
     }
 
     public double getShooterVelocityByDistance() {

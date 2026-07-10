@@ -77,9 +77,9 @@ public class RobotContainer {
   private final DriveGainsTuner driveGainsTuner = new DriveGainsTuner(drivetrain);
   private final GameData2026 gameData2026 = new GameData2026();
   private ConfigTalonFXMotorTuner configFlywheelTuner =
-      new ConfigTalonFXMotorTuner(shooterSubsystem.leftFlywheel, "flywheel", Constants.Shooter.flyWheelSlot0Configs);
+      new ConfigTalonFXMotorTuner(shooterSubsystem.leftFlywheel, "flywheel", Constants.Shooter.flyWheelSlot0Configs, false);
   private ConfigTalonFXMotorTuner configConveyorTuner =
-      new ConfigTalonFXMotorTuner(shooterSubsystem.leftConveyor, "conveyor", Constants.Shooter.conveyorSlot0Configs);
+      new ConfigTalonFXMotorTuner(shooterSubsystem.leftConveyor, "conveyor", Constants.Shooter.conveyorSlot0Configs, false);
   private ConfigTalonFXSMotorTuner configBackboardTuner =
       new ConfigTalonFXSMotorTuner(shooterSubsystem.backboardMotor, "backboard", Constants.Shooter.backboardSlot0Configs);
   private ConfigTalonFXMotorTuner configMainConveyorTuner =

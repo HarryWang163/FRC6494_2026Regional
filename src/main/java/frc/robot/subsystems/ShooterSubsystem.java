@@ -136,11 +136,6 @@ public class ShooterSubsystem extends SubsystemBase {
         rightFlywheel.getConfigurator().apply(configs);
     }
 
-    public void setFlywheelVoltage(double outputVolts) {
-        double clampedOutputVolts = MathUtil.clamp(outputVolts, -12.0, 12.0);
-        setFlywheelVelocity(clampedOutputVolts / Constants.Shooter.flywheelNominalKv);
-    }
-
     public void setFlywheelVelocity(double targetVelocityRps) {
         double clampedTargetVelocity = MathUtil.clamp(
             targetVelocityRps,
@@ -153,15 +148,6 @@ public class ShooterSubsystem extends SubsystemBase {
         flywheelTargetVelocity = clampedTargetVelocity;
         leftFlywheel.setControl(leftFlywheelVelocityRequest.withVelocity(flywheelTargetVelocity));
         setRightFlywheelFollowLeft();
-    }
-
-    public void setFlywheelVoltageByDistance(double distance) {
-        setFlywheelVelocityByDistance(distance);
-    }
-
-    public void setFlywheelVelocityByDistance(double distance) {
-        double targetVelocity = Constants.Shooter.flywheelVelocityByDistance.get(distance);
-        setFlywheelVelocity(targetVelocity);
     }
 
     public void stopFlywheel() {
@@ -181,9 +167,6 @@ public class ShooterSubsystem extends SubsystemBase {
             >= Constants.Shooter.flywheelReadyDelaySeconds;
     }
 
-    public boolean atVoltage() {
-        return atVelocity();
-    }
     public double getLeftFlywheelVelocity() {
         return leftFlywheel.getVelocity().getValueAsDouble();
     }
@@ -208,10 +191,6 @@ public class ShooterSubsystem extends SubsystemBase {
         return Math.abs(flywheelTargetVelocity) - getAverageFlywheelVelocity();
     }
 
-    public double getTargetFlywheelVoltage() {
-        return flywheelTargetVelocity * Constants.Shooter.flywheelNominalKv;
-    }
-
     /* ====================== */
     /*    shooter conveyor     */
     /* ====================== */
@@ -224,11 +203,6 @@ public class ShooterSubsystem extends SubsystemBase {
         );
         leftConveyor.setControl(conveyorVelocityRequest.withVelocity(shooterConveyorTargetVelocity));
         setRightConveyorFollowLeft();
-    }
-
-    public void runShooterConveyorVoltage(double outputVolts) {
-        double clampedOutputVolts = MathUtil.clamp(outputVolts, -12.0, 12.0);
-        runShooterConveyorVelocity(clampedOutputVolts / Constants.Shooter.shooterConveyorNominalKv);
     }
 
     public void stopShooterConveyor() {
@@ -369,17 +343,13 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean isFlywheelTuningControlActive() {
-        boolean voltageTunerEnabled = flywheelTuningTable.getEntry("flywheelEnable").getBoolean(false);
-        boolean voltageTunerRunning = flywheelTuningTable.getEntry("flywheelEnableRunning").getBoolean(false);
         boolean velocityTunerEnabled = flywheelTuningTable.getEntry("flywheelVelocityEnable").getBoolean(false);
-        return (voltageTunerEnabled && voltageTunerRunning) || velocityTunerEnabled;
+        return velocityTunerEnabled;
     }
 
     public boolean isShooterConveyorTuningControlActive() {
-        boolean voltageTunerEnabled = conveyorTuningTable.getEntry("conveyorEnable").getBoolean(false);
-        boolean voltageTunerRunning = conveyorTuningTable.getEntry("conveyorEnableRunning").getBoolean(false);
         boolean velocityTunerEnabled = conveyorTuningTable.getEntry("conveyorVelocityEnable").getBoolean(false);
-        return (voltageTunerEnabled && voltageTunerRunning) || velocityTunerEnabled;
+        return velocityTunerEnabled;
     }
 
     public void resetbackboardencoder() {
@@ -490,9 +460,7 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterNetworkTable.getEntry("flywheelAtVelocity").setBoolean(atVelocity());
         shooterNetworkTable.getEntry("flywheelVelocityTuningActive").setBoolean(flywheelVelocityTuningActive);
         shooterNetworkTable.getEntry("flywheelFollowerOpposed").setBoolean(true);
-        shooterNetworkTable.getEntry("flywheelTargetVoltage").setDouble(getTargetFlywheelVoltage());
         shooterNetworkTable.getEntry("flywheelOutputVolts").setDouble(flywheelOutputVolts);
-        shooterNetworkTable.getEntry("flywheelAtVoltage").setBoolean(atVoltage());
         shooterNetworkTable.getEntry("leftFlywheelOutputVolts").setDouble(leftFlywheel.getMotorVoltage().getValueAsDouble());
         shooterNetworkTable.getEntry("rightFlywheelOutputVolts").setDouble(rightFlywheel.getMotorVoltage().getValueAsDouble());
         shooterNetworkTable.getEntry("leftFlywheelStatorCurrent").setDouble(leftFlywheel.getStatorCurrent().getValueAsDouble());
