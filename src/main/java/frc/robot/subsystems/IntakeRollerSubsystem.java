@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -22,6 +23,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     private final TalonFX rightIntakeRoller;
 
     private final VoltageOut voltageRequest = new VoltageOut(0);
+    private final NeutralOut neutralRequest = new NeutralOut();
     private final Follower rightFollower;
     private final NetworkTable table = NetworkTableInstance.getDefault().getTable("IntakeRoller");
     private double targetOutputVolts = 0.0;
@@ -44,7 +46,9 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     }
 
     public void stop() {
-        setVoltage(0.0);
+        targetOutputVolts = 0.0;
+        leftIntakeRoller.setControl(neutralRequest);
+        rightIntakeRoller.setControl(neutralRequest);
     }
 
     public void setVoltage(double outputVolts) {

@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -18,7 +19,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -45,6 +45,8 @@ public class ShooterSubsystem extends SubsystemBase {
     private final VelocityVoltage leftFlywheelVelocityRequest = new VelocityVoltage(0).withSlot(0);
     private final VelocityVoltage conveyorVelocityRequest = new VelocityVoltage(0).withSlot(0);
     private final VoltageOut backboardVoltageRequest = new VoltageOut(0);
+    private final NeutralOut flywheelNeutralRequest = new NeutralOut();
+    private final NeutralOut conveyorNeutralRequest = new NeutralOut();
 
     private final Follower flywheelFollower;
     private final Follower conveyorFollower;
@@ -56,7 +58,6 @@ public class ShooterSubsystem extends SubsystemBase {
     private double flywheelOutputVolts = 0.0;
     private double flywheelTargetVelocity = 0.0;
     private double flywheelVelocityTolerance = Constants.Shooter.flywheelReadyVelocityTolerance;
-    private double flywheelVelocityReadyStartTimestamp = 0.0;
     private boolean flywheelVelocityTuningActive = false;
     private double shooterConveyorTargetVelocity = 0.0;
     private boolean shooterConveyorVelocityTuningActive = false;
@@ -79,10 +80,18 @@ public class ShooterSubsystem extends SubsystemBase {
         leftConveyor.getConfigurator().apply(Constants.Shooter.conveyorSlot0Configs);
         rightConveyor.getConfigurator().apply(Constants.Shooter.conveyorSlot0Configs);
 
-        var motorOutputConfigs = new MotorOutputConfigs();
-        motorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
-        leftFlywheel.getConfigurator().apply(motorOutputConfigs);
-        leftConveyor.getConfigurator().apply(motorOutputConfigs);
+        var leftFlywheelMotorOutputConfigs = new MotorOutputConfigs();
+        leftFlywheelMotorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
+        leftFlywheelMotorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
+        leftFlywheel.getConfigurator().apply(leftFlywheelMotorOutputConfigs);
+
+        var rightFlywheelMotorOutputConfigs = new MotorOutputConfigs();
+        rightFlywheelMotorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
+        rightFlywheel.getConfigurator().apply(rightFlywheelMotorOutputConfigs);
+
+        var conveyorMotorOutputConfigs = new MotorOutputConfigs();
+        conveyorMotorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
+        leftConveyor.getConfigurator().apply(conveyorMotorOutputConfigs);
 
         flywheelFollower = new Follower(leftFlywheel.getDeviceID(), MotorAlignmentValue.Opposed).withUpdateFreqHz(50);
         conveyorFollower = new Follower(leftConveyor.getDeviceID(), MotorAlignmentValue.Opposed).withUpdateFreqHz(50);
@@ -136,24 +145,21 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setFlywheelVelocity(double targetVelocityRps) {
-        double clampedTargetVelocity = MathUtil.clamp(
-            targetVelocityRps,
-            -Constants.Shooter.flywheelMaxVelocity,
-            Constants.Shooter.flywheelMaxVelocity
-        );
-        if (Math.abs(clampedTargetVelocity - flywheelTargetVelocity) > 1e-6) {
-            flywheelVelocityReadyStartTimestamp = Timer.getFPGATimestamp();
-        }
-        flywheelTargetVelocity = clampedTargetVelocity;
+        flywheelTargetVelocity = targetVelocityRps;
         leftFlywheel.setControl(leftFlywheelVelocityRequest.withVelocity(flywheelTargetVelocity));
         setRightFlywheelFollowLeft();
     }
 
     public void stopFlywheel() {
-        setFlywheelVelocity(0.0);
+        flywheelTargetVelocity = 0.0;
+        leftFlywheel.setControl(flywheelNeutralRequest);
+        rightFlywheel.setControl(flywheelNeutralRequest);
     }
 
     public boolean atVelocity() {
+        if (flywheelTargetVelocity <= 10.0) {
+            return false;
+        }
         double currentvelocity = getAverageFlywheelVelocity();
         if(currentvelocity>flywheelTargetVelocity*0.95){
             return true;
@@ -197,7 +203,9 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void stopShooterConveyor() {
-        runShooterConveyorVelocity(0.0);
+        shooterConveyorTargetVelocity = 0.0;
+        leftConveyor.setControl(conveyorNeutralRequest);
+        rightConveyor.setControl(conveyorNeutralRequest);
     }
 
     public double getShooterConveyorVelocity() {

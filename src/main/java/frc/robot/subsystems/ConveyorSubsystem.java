@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -15,6 +16,7 @@ import frc.robot.Constants;
 public class ConveyorSubsystem extends SubsystemBase {
     public final TalonFX mainConveyor;
     private final VoltageOut voltageRequest = new VoltageOut(0);
+    private final NeutralOut neutralRequest = new NeutralOut();
     private final NetworkTable table = NetworkTableInstance.getDefault().getTable("Conveyor");
     private double targetOutputVolts = 0.0;
 
@@ -29,7 +31,8 @@ public class ConveyorSubsystem extends SubsystemBase {
         setVoltage(Constants.Conveyor.reverseVoltage);
     }
     public void stop() {
-        setVoltage(0.0);
+        targetOutputVolts = 0.0;
+        mainConveyor.setControl(neutralRequest);
     }
     public void setVoltage(double outputVolts) {
         targetOutputVolts = MathUtil.clamp(outputVolts, -12.0, 12.0);
