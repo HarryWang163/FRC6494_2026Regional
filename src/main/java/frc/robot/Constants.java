@@ -158,7 +158,7 @@ public final class Constants {
 
         public static final double shooterFeedVelocity = Shooter.shooterConveyorFeedVelocity;
         public static final double shooterReverseVelocity = Shooter.shooterConveyorReverseVelocity;
-        public static final double shootTimeoutSeconds = 1.0;
+        public static final double shootTimeoutSeconds = 3.0;
         public static final double aimToleranceDegrees = 1.5;
         public static final double stationarySpeedToleranceMetersPerSecond = 0.5;
         public static final double passBallFlywheelVoltage = Shooter.defaultFlywheelVoltage;

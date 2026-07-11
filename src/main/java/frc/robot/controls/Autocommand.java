@@ -23,29 +23,17 @@ public class Autocommand extends SequentialCommandGroup {
         OperatorControls operatorControls
     ) {
         NamedCommands.registerCommand("start_intake", startIntake(superstructure));
-        NamedCommands.registerCommand("start_intake_and_conveyor", startIntake(superstructure));
-        NamedCommands.registerCommand("stop_intake_and_conveyor", idle(superstructure));
-        NamedCommands.registerCommand("start_intake_timelimit", timedIntake(superstructure));
-        NamedCommands.registerCommand("stop_intake", idle(superstructure));
+        NamedCommands.registerCommand("stop_intake_", idle(superstructure));
         NamedCommands.registerCommand("intaker_down", lowerIntaker(intakeRotater));
-        NamedCommands.registerCommand("intaker_up", raiseIntaker(intakeRotater));
         NamedCommands.registerCommand("shoot_hub", shootHub(superstructure));
-        NamedCommands.registerCommand("Shake", shake(driveControls));
-        NamedCommands.registerCommand("AutoAim", autoAim(driveControls));
         NamedCommands.registerCommand("reset_backboard0", operatorControls.resetBackboard0Command());
+        NamedCommands.registerCommand("AutoAimForShoot", autoAimForShoot(driveControls));
     }
 
     public static Command startIntake(Superstructure superstructure) {
         return superstructure.requestIntakeCommand();
     }
 
-    public static Command timedIntake(Superstructure superstructure) {
-        return Commands.sequence(
-            superstructure.requestIntakeCommand(),
-            Commands.waitSeconds(1.5),
-            superstructure.requestIdleCommand()
-        );
-    }
     public static Command idle(Superstructure superstructure) {
         return superstructure.requestIdleCommand();
     }
@@ -54,11 +42,6 @@ public class Autocommand extends SequentialCommandGroup {
         return intakeRotater.lowerForMatchCommand();
     }
 
-    public static Command raiseIntaker(IntakeRotaterSubsystem intakeRotater) {
-        return intakeRotater.raiseForMatchCommand();
-    }
-
-    // 自动射击和手动射击使用同一套 gated shooting 流程。
     public static Command shootHub(Superstructure superstructure) {
         return Commands.sequence(
             superstructure.requestShootHubCommand(),
@@ -66,12 +49,8 @@ public class Autocommand extends SequentialCommandGroup {
             superstructure.requestIdleCommand()
         );
     }
-
-    public static Command autoAim(DriveControls driveControls) {
-        return driveControls.autoAimCommand();
+    public static Command autoAimForShoot(DriveControls driveControls) {
+        return driveControls.autoAimForShootCommand();
     }
 
-    public static Command shake(DriveControls driveControls) {
-        return driveControls.shakeCommand();
-    }
 }

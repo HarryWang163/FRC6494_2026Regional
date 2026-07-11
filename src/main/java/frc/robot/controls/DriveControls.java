@@ -338,21 +338,37 @@ public class DriveControls {
     public Command getAllianceColorCommand() {
         return Commands.runOnce(this::setTeamColors);
     }
-    public Command autoAimCommand() {
+
+    // DriveControls.java
+    public Command autoAimForShootCommand() {
         return drivetrain.applyRequest(() -> {
-        double[] distanceAndRotation = calculateDistanceAndRotationToHub();
-        double vomega = calculateRotationSpeedFromRotationAngle(distanceAndRotation[1]);
-        return fieldCentric
-            .withVelocityX(0.0)
-            .withVelocityY(0.0)
-            .withRotationalRate(vomega);
+            double[] hubAim = calculateDistanceAndRotationToHub();
+            double distanceToHub = hubAim[0];
+            double angleDifferenceToHub = hubAim[1];
+
+            autoControlNetworkTable.getEntry("distanceToHub").setDouble(distanceToHub);
+            autoControlNetworkTable.getEntry("angleDifferenceToHub").setDouble(angleDifferenceToHub);
+
+            drivetrain.setTargetHeading(
+                drivetrain.getRotation().plus(Rotation2d.fromDegrees(angleDifferenceToHub))
+            );
+
+            double vomega = calculateRotationSpeedFromRotationAngle(angleDifferenceToHub);
+
+            autoControlNetworkTable.getEntry("autoRotationRate").setDouble(vomega);
+            autoControlNetworkTable.getEntry("ActualVX").setDouble(0.0);
+            autoControlNetworkTable.getEntry("ActualVY").setDouble(0.0);
+            autoControlNetworkTable.getEntry("ActualVOmega").setDouble(vomega);
+
+            return fieldCentric
+                .withVelocityX(0.0)
+                .withVelocityY(0.0)
+                .withRotationalRate(vomega);
         }, () -> DriveMode.FIELD_CENTRIC)
-        .until(() -> Math.abs(calculateDistanceAndRotationToHub()[1]) < 1.5)
-        .withTimeout(1.0)
-        .andThen(new InstantCommand(() -> {
-            drivetrain.stop();
-        }, drivetrain));
+        .withTimeout(Constants.Superstructure.shootTimeoutSeconds)
+        .andThen(new InstantCommand(() -> drivetrain.stop(), drivetrain));
     }
+
     public Command shakeCommand(double amplitude, double switchPeriod, double totalTime) {
     Timer timer = new Timer();
 
