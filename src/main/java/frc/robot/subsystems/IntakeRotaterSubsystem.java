@@ -82,7 +82,7 @@ public class IntakeRotaterSubsystem extends SubsystemBase {
 
     public void postShootIdleAssist(double elapsedSeconds) {
         double cycleTime = elapsedSeconds % 0.2;
-        setVoltage(cycleTime < 0.1 ? 0.03 : 0.0);
+        setVoltage(cycleTime < 0.1 ? 0.0 : 0.0);
     }
 
     public void manualRaise() {

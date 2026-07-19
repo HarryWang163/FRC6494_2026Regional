@@ -1,0 +1,81 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intaker_down"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "start_intake_and_conveyor"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "RedGotodepot"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "shoot_hub"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAim"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "redDepotToGoudong"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "start_intake_and_conveyor"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "red4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "red5"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Red",
+  "choreoAuto": false
+}

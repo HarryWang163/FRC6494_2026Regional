@@ -41,6 +41,10 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         setVoltage(Constants.Intaker.intakeRollerIntakeVoltage);
     }
 
+    public void intakeforshoot() {
+        setVoltage(-1.0);
+    }  
+
     public void outtake() {
         setVoltage(Constants.Intaker.intakeRollerOuttakeVoltage);
     }

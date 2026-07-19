@@ -23,11 +23,18 @@ public class Autocommand extends SequentialCommandGroup {
         OperatorControls operatorControls
     ) {
         NamedCommands.registerCommand("start_intake", startIntake(superstructure));
+        NamedCommands.registerCommand("start_intake_and_conveyor", startIntake(superstructure));
+        NamedCommands.registerCommand("stop_intake", idle(superstructure));
         NamedCommands.registerCommand("stop_intake_", idle(superstructure));
-        NamedCommands.registerCommand("intaker_down", lowerIntaker(intakeRotater));
+        NamedCommands.registerCommand("stop_intake_and_conveyor", idle(superstructure));
+        NamedCommands.registerCommand("init", init(superstructure));
+        NamedCommands.registerCommand("intaker_down", init(superstructure));
+        NamedCommands.registerCommand("intaker_up", raiseIntaker(intakeRotater));
         NamedCommands.registerCommand("shoot_hub", shootHub(superstructure));
         NamedCommands.registerCommand("reset_backboard0", operatorControls.resetBackboard0Command());
         NamedCommands.registerCommand("AutoAimForShoot", autoAimForShoot(driveControls));
+        NamedCommands.registerCommand("AutoAim", autoAimForShoot(driveControls));
+        NamedCommands.registerCommand("Shake", driveControls.shakeCommand());
     }
 
     public static Command startIntake(Superstructure superstructure) {
@@ -38,8 +45,12 @@ public class Autocommand extends SequentialCommandGroup {
         return superstructure.requestIdleCommand();
     }
 
-    public static Command lowerIntaker(IntakeRotaterSubsystem intakeRotater) {
-        return intakeRotater.lowerForMatchCommand();
+    public static Command init(Superstructure superstructure) {
+        return superstructure.requestInitCommand();
+    }
+
+    public static Command raiseIntaker(IntakeRotaterSubsystem intakeRotater) {
+        return intakeRotater.raiseForMatchCommand();
     }
 
     public static Command shootHub(Superstructure superstructure) {

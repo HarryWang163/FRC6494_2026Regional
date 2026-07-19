@@ -55,8 +55,8 @@ public final class Constants {
 
         public static final double backboardSpeedMax = 3.0;
         public static final double backboardSpeedMin = 0;
-        public static final double backboardGravityFeedforwardMinVolts = 0.1;
-        public static final double backboardGravityFeedforwardMaxVolts = 0.3;
+        public static final double backboardGravityFeedforwardMinVolts = 0.2;
+        public static final double backboardGravityFeedforwardMaxVolts = 0.5;
         public static final double backboardGravityFeedforwardMinPosition = 0.0;
         public static final double backboardGravityFeedforwardMaxPosition = 2200.0;
         public static final double backboardGravityFeedforwardDirection = 1.0;
@@ -128,7 +128,7 @@ public final class Constants {
         public static final double intakeRollerOuttakeVoltage = 3.0;
 
         public static final double intakeRotaterRaiseVoltage = 0.8;
-        public static final double intakeRotaterLowerVoltage = 0.05;
+        public static final double intakeRotaterLowerVoltage = -0.1;
 
         public static final Slot0Configs intakeRollerSlot0Configs = new Slot0Configs()
             .withKP(0.00).withKI(0.00).withKD(0.00)
@@ -158,7 +158,7 @@ public final class Constants {
 
         public static final double shooterFeedVelocity = Shooter.shooterConveyorFeedVelocity;
         public static final double shooterReverseVelocity = Shooter.shooterConveyorReverseVelocity;
-        public static final double shootTimeoutSeconds = 3.0;
+        public static final double shootTimeoutSeconds = 4.0;
         public static final double aimToleranceDegrees = 1.5;
         public static final double stationarySpeedToleranceMetersPerSecond = 0.5;
         public static final double passBallFlywheelVoltage = Shooter.defaultFlywheelVoltage;

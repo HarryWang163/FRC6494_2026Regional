@@ -1,0 +1,99 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 13.12190361445783,
+        "y": 0.691120481927711
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 12.887133367442596,
+        "y": 0.6051964974041462
+      },
+      "isLocked": false,
+      "linkedName": "3"
+    },
+    {
+      "anchor": {
+        "x": 12.761289156626505,
+        "y": 0.5599879518072293
+      },
+      "prevControl": {
+        "x": 12.99982423988793,
+        "y": 0.634827874665722
+      },
+      "nextControl": {
+        "x": 12.517821150197708,
+        "y": 0.48360033380777306
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 10.204204819277109,
+        "y": 0.691120481927711
+      },
+      "prevControl": {
+        "x": 10.591037770446542,
+        "y": 0.5849162537278597
+      },
+      "nextControl": {
+        "x": 9.955173278524573,
+        "y": 0.7594916031134517
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.774607703281026,
+        "y": 1.2855349500713271
+      },
+      "prevControl": {
+        "x": 9.602079825429026,
+        "y": 0.868013848690337
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "1"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.1,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 2.0,
+      "rotationDegrees": 180.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 180.0,
+    "maxAngularAcceleration": 360.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 1.5,
+    "rotation": -90.0
+  },
+  "reversed": false,
+  "folder": "Red Right from pwz",
+  "idealStartingState": {
+    "velocity": 0.0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": false
+}

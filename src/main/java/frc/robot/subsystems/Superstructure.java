@@ -22,6 +22,7 @@ import frc.robot.Constants;
 public class Superstructure extends SubsystemBase {
     // 操作员或自动程序请求的目标状态。
     public enum WantedState {
+        INIT,
         IDLE,
         INTAKE,
         SHOOT_HUB,
@@ -34,6 +35,7 @@ public class Superstructure extends SubsystemBase {
     // 机器人内部实际执行状态，用于动作排序和仪表盘诊断。
     public enum SystemState {
         DISABLED,
+        INITIALIZING,
         STOWED,
         INTAKING,
         PREP_SHOOT,
@@ -85,6 +87,10 @@ public class Superstructure extends SubsystemBase {
         wantedState = WantedState.IDLE;
     }
 
+    public void requestInit() {
+        wantedState = WantedState.INIT;
+    }
+
     public void requestIntake() {
         wantedState = WantedState.INTAKE;
     }
@@ -121,6 +127,14 @@ public class Superstructure extends SubsystemBase {
 
     public Command requestIdleCommand() {
         return Commands.runOnce(this::requestIdle, this);
+    }
+
+    public Command requestInitCommand() {
+        return Commands.sequence(
+            Commands.runOnce(this::requestInit),
+            intakeRotater.lowerForMatchCommand(),
+            Commands.runOnce(this::requestIntake)
+        );
     }
 
     public Command requestIntakeCommand() {
@@ -225,6 +239,7 @@ public class Superstructure extends SubsystemBase {
         }
 
         switch (wantedState) {
+            case INIT -> handleInit();
             case IDLE -> handleIdle();
             case INTAKE -> handleIntake();
             case SHOOT_HUB -> handleShootHub();
@@ -235,6 +250,18 @@ public class Superstructure extends SubsystemBase {
         }
 
         publishTelemetry();
+    }
+
+    private void handleInit() {
+        if (systemState != SystemState.INITIALIZING) {
+            setSystemState(SystemState.INITIALIZING);
+        }
+
+        conveyor.stop();
+        intakeRoller.stop();
+        stopFlywheelUnlessTuning();
+        stopShooterConveyorUnlessTuning();
+        holdBackboardStowedUnlessTuning();
     }
 
     private void handleIdle() {
@@ -306,7 +333,6 @@ public class Superstructure extends SubsystemBase {
             && systemState != SystemState.SHOOTING) {
             setSystemState(SystemState.PREP_SHOOT);
         }
-        intakeRoller.stop();
         // 距离到射速的映射由 LimelightSubsystem 提供；操作员 offset 用于现场微调，
         // 但不会绕过 Superstructure 状态机。
         shooter.setFlywheelVelocity(targetVelocity);
@@ -316,7 +342,7 @@ public class Superstructure extends SubsystemBase {
             // 只有 canShoot() 通过后才会进入本状态；喂球期间不再复查门控，
             // 避免球接触飞轮导致的掉速中断喂球。
             intakeRotater.shootAssist();
-            
+            intakeRoller.intakeforshoot();
             conveyor.feedToShooter();
             runShooterConveyorVelocityUnlessTuning(Constants.Superstructure.shooterFeedVelocity);
             return;
@@ -325,6 +351,7 @@ public class Superstructure extends SubsystemBase {
         // 未开始喂球前，球路保持静止。
         conveyor.stop();
         stopShooterConveyorUnlessTuning();
+        intakeRoller.stop();
 
         // 门控条件实时刷新：条件回落时状态同步回退，仪表盘能看到卡在哪一关。
         if (canShoot()) {

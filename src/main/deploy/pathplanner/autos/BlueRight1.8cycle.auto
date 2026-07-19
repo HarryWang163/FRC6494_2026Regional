@@ -9,34 +9,21 @@
           "data": {
             "commands": [
               {
+                "type": "named",
+                "data": {
+                  "name": "intaker_down"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "start_intake_and_conveyor"
+                }
+              },
+              {
                 "type": "path",
                 "data": {
-                  "pathName": "Back To Shoot Blue"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "intaker_down"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "shoot_hub"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "intaker_down"
+                  "pathName": "blueRight1"
                 }
               }
             ]
@@ -49,42 +36,21 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Shoot to Depot Blue"
-                }
-              }
-            ]
+            "pathName": "blueRight2"
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Depot Intake Blue"
-                }
-              }
-            ]
+            "pathName": "blueRight3"
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "AutoAim"
-                }
-              }
-            ]
+            "pathName": "blueRightTurnToHub2"
           }
         },
         {
@@ -106,16 +72,34 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Shake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "intaker_up"
+                  "name": "AutoAim"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "start_intake_and_conveyor"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "blueRightTurnToHub1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "blueRight4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "blueRight5"
           }
         },
         {
@@ -131,28 +115,16 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Shake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "intaker_up"
+                  "name": "AutoAim"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "blue depot go 1"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Blue Middle",
+  "folder": "Blue",
   "choreoAuto": false
 }

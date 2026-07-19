@@ -1,0 +1,111 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intaker_down"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "start_intake_and_conveyor"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "red1"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "start_intake_and_conveyor"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "red2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "red3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "turntohub2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stop_intake_and_conveyor"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "shoot_hub"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAim"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "start_intake_and_conveyor"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "turntohub1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "red4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "red5"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Red",
+  "choreoAuto": false
+}
