@@ -182,10 +182,8 @@ public class Superstructure extends SubsystemBase {
     /* ====================== */
 
     public boolean canShoot() {
-        boolean stationaryGate = !Constants.Superstructure.stationaryGateEnabled || isDriveStationary();
         return shooter.atVelocity()
             && drive.isAimed()
-            && stationaryGate
             && isBackboardReady();
     }
 
@@ -257,7 +255,7 @@ public class Superstructure extends SubsystemBase {
             setSystemState(SystemState.INITIALIZING);
         }
 
-        conveyor.stop();
+        stopMainConveyorUnlessTuning();
         intakeRoller.stop();
         stopFlywheelUnlessTuning();
         stopShooterConveyorUnlessTuning();
@@ -266,7 +264,7 @@ public class Superstructure extends SubsystemBase {
 
     private void handleIdle() {
         // 安全默认状态：球路不动，intaker 不主动动作，背板保持受控。
-        conveyor.stop();
+        stopMainConveyorUnlessTuning();
         intakeRoller.stop();
         if (!runPostShootIdleAssist()) {
             intakeRotater.stop();
@@ -298,13 +296,13 @@ public class Superstructure extends SubsystemBase {
         holdBackboardStowedUnlessTuning();
         // Intaker 比赛开始后保持下放，收球何时结束由操作员松开按键决定。
         intakeRoller.intake();
-        conveyor.feedToShooter();
+        intakeFeedMainConveyorUnlessTuning();
         setSystemState(SystemState.INTAKING);
     }
 
     private void handleAimHub() {
         intakeRoller.stop();
-        conveyor.stop();
+        stopMainConveyorUnlessTuning();
         stopFlywheelUnlessTuning();
         stopShooterConveyorUnlessTuning();
         holdBackboardStowedUnlessTuning();
@@ -323,8 +321,8 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void handlePassBall() {
-        double targetVelocity = Constants.Superstructure.passBallFlywheelVelocity + flywheelVelocityOffset;
-        double backboardPosition = Constants.Superstructure.passBallBackboardPosition + backboardPositionOffset;
+        double targetVelocity = 30;
+        double backboardPosition = 2000;
         handlePreparedFeed(targetVelocity, backboardPosition);
     }
 
@@ -343,27 +341,32 @@ public class Superstructure extends SubsystemBase {
             // 避免球接触飞轮导致的掉速中断喂球。
             intakeRotater.shootAssist();
             intakeRoller.intakeforshoot();
-            conveyor.feedToShooter();
+            feedMainConveyorUnlessTuning();
             runShooterConveyorVelocityUnlessTuning(Constants.Superstructure.shooterFeedVelocity);
             return;
         }
 
         // 未开始喂球前，球路保持静止。
-        conveyor.stop();
+        stopMainConveyorUnlessTuning();
         stopShooterConveyorUnlessTuning();
         intakeRoller.stop();
 
-        // 门控条件实时刷新：条件回落时状态同步回退，仪表盘能看到卡在哪一关。
-        if (canShoot()) {
+        // Keep normal gating, but force the shot if prep takes too long.
+        if (canShoot() || prepShootFallbackElapsed()) {
             setSystemState(SystemState.SHOOTING);
         }
+    }
+
+    private boolean prepShootFallbackElapsed() {
+        return systemState == SystemState.PREP_SHOOT
+            && timeInState() >= Constants.Superstructure.prepShootFallbackDelaySeconds;
     }
 
     private void handleEject() {
         // Eject 反转整条球路，飞轮保持停止。
         setSystemState(SystemState.EJECTING);
         intakeRoller.outtake();
-        conveyor.reverse();
+        reverseMainConveyorUnlessTuning();
         runShooterConveyorVelocityUnlessTuning(Constants.Superstructure.shooterReverseVelocity);
         stopFlywheelUnlessTuning();
         holdBackboardStowedUnlessTuning();
@@ -393,13 +396,37 @@ public class Superstructure extends SubsystemBase {
         }
     }
 
+    private void feedMainConveyorUnlessTuning() {
+        if (!conveyor.isMainConveyorTuningControlActive()) {
+            conveyor.feedToShooter();
+        }
+    }
+
+    private void intakeFeedMainConveyorUnlessTuning() {
+        if (!conveyor.isMainConveyorTuningControlActive()) {
+            conveyor.feedForIntake();
+        }
+    }
+
+    private void reverseMainConveyorUnlessTuning() {
+        if (!conveyor.isMainConveyorTuningControlActive()) {
+            conveyor.reverse();
+        }
+    }
+
+    private void stopMainConveyorUnlessTuning() {
+        if (!conveyor.isMainConveyorTuningControlActive()) {
+            conveyor.stop();
+        }
+    }
+
     private void handleManual() {
         // 手动模式：状态机不再驱动机构，交给现场手动/调参工具；
         // 只保持飞轮与喂球停止，避免意外射出。
         setSystemState(SystemState.MANUAL_OVERRIDE);
         stopFlywheelUnlessTuning();
         stopShooterConveyorUnlessTuning();
-        conveyor.stop();
+        stopMainConveyorUnlessTuning();
         intakeRoller.stop();
     }
 
@@ -441,6 +468,8 @@ public class Superstructure extends SubsystemBase {
         table.getEntry("flywheelTuningControlActive").setBoolean(shooter.isFlywheelTuningControlActive());
         table.getEntry("shooterConveyorTuningControlActive")
             .setBoolean(shooter.isShooterConveyorTuningControlActive());
+        table.getEntry("mainConveyorTuningControlActive")
+            .setBoolean(conveyor.isMainConveyorTuningControlActive());
         table.getEntry("flywheelVoltageOffset").setDouble(flywheelVelocityOffset * Constants.Shooter.flywheelNominalKv);
         table.getEntry("backboardPositionOffset").setDouble(backboardPositionOffset);
     }

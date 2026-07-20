@@ -30,6 +30,7 @@ public final class Constants {
 
         public static final double shooterConveyorFeedVelocity = 40;
         public static final double shooterConveyorReverseVelocity = -10;
+        public static final double shooterConveyorMaxVelocity = 120.0;
 
         public static final Slot0Configs flyWheelSlot0Configs = new Slot0Configs()
             .withKP(0.21)
@@ -128,7 +129,7 @@ public final class Constants {
         public static final double intakeRollerOuttakeVoltage = 3.0;
 
         public static final double intakeRotaterRaiseVoltage = 0.8;
-        public static final double intakeRotaterLowerVoltage = -0.1;
+        public static final double intakeRotaterLowerVoltage = -1.5;
 
         public static final Slot0Configs intakeRollerSlot0Configs = new Slot0Configs()
             .withKP(0.00).withKI(0.00).withKD(0.00)
@@ -146,6 +147,7 @@ public final class Constants {
     public static class Conveyor {
         public static final int mainConveyorID = 42;
         public static final double feedVoltage = 2.5;
+        public static final double intakeFeedVoltage = 1.5;
         public static final double reverseVoltage = -2.0;
 
         public static final Slot0Configs mainConveyorSlot0Configs = new Slot0Configs()
@@ -159,6 +161,7 @@ public final class Constants {
         public static final double shooterFeedVelocity = Shooter.shooterConveyorFeedVelocity;
         public static final double shooterReverseVelocity = Shooter.shooterConveyorReverseVelocity;
         public static final double shootTimeoutSeconds = 4.0;
+        public static final double prepShootFallbackDelaySeconds = 0.5;
         public static final double aimToleranceDegrees = 1.5;
         public static final double stationarySpeedToleranceMetersPerSecond = 0.5;
         public static final double passBallFlywheelVoltage = Shooter.defaultFlywheelVoltage;
@@ -168,7 +171,5 @@ public final class Constants {
         // Shoot backboard target position in external encoder counts.
         public static final double backboardShootPosition = 175.0;
         public static final double backboardReadyPositionTolerance = 100.0;
-        // Whether the shooting gate requires the drivetrain to be nearly still.
-        public static final boolean stationaryGateEnabled = true;
     }
 }

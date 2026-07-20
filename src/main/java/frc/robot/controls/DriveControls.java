@@ -37,14 +37,14 @@ public class DriveControls {
     private final double maxAngularRate = RotationsPerSecond.of(0.75).in(edu.wpi.first.units.Units.RadiansPerSecond);
 
     // 默认速度比例，普通驾驶使用。
-    private double normalDriveScale = 1.0;
-    private double normalTurnScale  = 1.0;
+    private double normalDriveScale = 0.6;
+    private double normalTurnScale  = 0.8;
 
     // 加速模式比例，按住 RB 时使用。
     private double boostDriveScale = 1.0;
     private double boostTurnScale  = 1.0;
     // 自动瞄准时降低平移速度。
-    private double slowDriveScale =0.1;
+    private double slowDriveScale = 0.3;
 
     private boolean boostEnabled = false;
 

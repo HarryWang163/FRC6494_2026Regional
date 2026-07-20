@@ -69,9 +69,9 @@ public class IntakeRotaterSubsystem extends SubsystemBase {
     }
 
     public void shootAssist() {
-        double cycleTime = Timer.getFPGATimestamp() % 1.7;
+        double cycleTime = Timer.getFPGATimestamp() % 1.6;
 
-        if (cycleTime < 0.7) {
+        if (cycleTime < 0.6) {
             setVoltage(1);
         } else if (cycleTime < 0.9) {
             setVoltage(0.0);

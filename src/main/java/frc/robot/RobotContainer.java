@@ -138,6 +138,9 @@ public class RobotContainer {
         .onTrue(operatorControls.requestShootHubCommand())
         .onFalse(operatorControls.requestIdleCommand());
     controller.rightBumper().and(teleopOnly)
+        .onTrue(Commands.runOnce(() -> driveControls.setBoostEnabled(true)))
+        .onFalse(Commands.runOnce(() -> driveControls.setBoostEnabled(false)));
+    controller.b().and(teleopOnly)
         .onTrue(operatorControls.requestEjectCommand())
         .onFalse(operatorControls.requestIdleCommand());
     controller.povLeft().onTrue(Commands.runOnce(() -> operatorControls.adjustFlywheelVelocityOffset(-1.0)));
@@ -162,6 +165,8 @@ public class RobotContainer {
     configFlywheelTuner.periodic(() -> shooterSubsystem.applyLeftConfigurationToRight());
     configBackboardTuner.periodic();
     shooterSubsystem.debugFlywheelVelocityPeriodic(allowMotorOutputTuning);
+    shooterSubsystem.debugShooterConveyorVelocityPeriodic(allowMotorOutputTuning);
+    conveyorSubsystem.debugMainConveyorVoltagePeriodic(allowMotorOutputTuning);
     shooterSubsystem.debugBackboardTargetPeriodic(allowMotorOutputTuning);
     shooterSubsystem.setRightFlywheelFollowLeft();
     shooterSubsystem.setRightConveyorFollowLeft();
